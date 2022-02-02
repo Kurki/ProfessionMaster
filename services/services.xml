@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Script file="chat-service.lua" />
+    <Script file="commands-service.lua" />
+    <Script file="locale-service.lua" />
+    <Script file="message-service.lua" />
+    <Script file="own-professions-service.lua" />
+    <Script file="player-service.lua" />
+    <Script file="profession-names-service.lua" />
+    <Script file="professions-service.lua" />
+    <Script file="timer-service.lua" />
+    <Script file="tooltip-service.lua" />
+    <Script file="ui-service.lua" />
+    <Script file="version-service.lua" />
+</Ui>

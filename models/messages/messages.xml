@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+   <Script file="hello-message.lua" />
+   <Script file="my-characters-message.lua" />
+   <Script file="player-professions-message.lua" />
+   <Script file="request-professions-message.lua" />
+   <Script file="version-broadcast-message.lua" />
+</Ui>
