@@ -22,7 +22,28 @@ local addon = _G.professionMaster;
 local function CommandHandler(parameters)
     -- check if help should be shown
     if (string.len(parameters) <= 0) then
-        addon:CreateView("professions"):Show();
+        -- write help
+        local chatService = addon:GetService("chat");
+        chatService:Write("CommandsTitle");
+        chatService:Write("CommandsOverview");
+        if (Settings.hideMinimapButton) then
+            chatService:Write("CommandsMinimap");
+        end
+        chatService:Write("CommandsPurge");
+        return;
+    end
+
+    -- check if overview shoulkd be shown
+    if (string.lower(parameters) == "overview") then
+        addon.professionsView:ToggleVisibility();
+        return;
+    end
+
+    -- check if minimap should be toggeled
+    if (string.lower(parameters) == "minimap" and Settings.hideMinimapButton) then
+        addon.minimapButton:Show();
+        Settings.hideMinimapButton = nil;
+        return;
     end
 
     -- check if data should be purged

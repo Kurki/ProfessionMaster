@@ -18,7 +18,7 @@ limitations under the License.
 --]] 
 
 -- define addon name
-local addonName = "ProfessionMaster";
+local addonName = "Profession Master";
 local addonVersion = "1.0.5";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
@@ -32,6 +32,7 @@ if (not Professions) then Professions = {}; end
 if (not SyncTimes) then SyncTimes = {}; end
 if (not Logs) then Logs = {}; end
 if (not CharacterSets) then CharacterSets = {}; end
+if (not BucketList) then BucketList = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
@@ -212,6 +213,9 @@ function ProfessionMasterAddon:RegisterEvents()
             -- unregister event
             _self:UnregisterEvent("PLAYER_LOGIN")
 
+            -- crete professions view
+            self.professionsView = self:CreateView("professions");
+
             -- migrate data
             self:Migrate();
 
@@ -275,7 +279,7 @@ end
 -- Migrate data.
 function ProfessionMasterAddon:Migrate()
     -- check data version
-    if (Settings.storeVersion and Settings.storeVersion == 1) then
+    if (Settings.storeVersion and Settings.storeVersion >= 2) then
         return;
     end
 
@@ -292,18 +296,23 @@ function ProfessionMasterAddon:Migrate()
         -- check skills professions
         for skillId, skill in pairs(profession) do     
             -- check if profession is enchantment
-            if (professionId == 333 and skill.itemId == 0) then
-                -- get item id
-                skill.itemId = enchantItems[skillId];
-                if (not skill.itemId) then
-                    skill.itemId = 0;
+            if (professionId == 333) then
+                if (not skill.itemColor) then
+                    -- set enchant item color
+                    skill.itemColor = "FF71D5FF";
                 end
 
-                -- set enchant item color
-                skill.itemColor = "FF71D5FF";
+                -- check if has item id
+                if (not skill.itemId or skill.itemId == 0) then
+                    -- get item id
+                    skill.itemId = enchantItems[skillId];
+                    if (not skill.itemId) then
+                        skill.itemId = 0;
+                    end
+                end
 
                 -- check if skill found
-                if (skill.itemId ~= 0) then
+                if (skill.itemId and skill.itemId ~= 0 and not skill.itemLink) then
                     -- get item data
                     local item = Item:CreateFromItemID(skill.itemId);
                     if (not item:IsItemEmpty()) then
@@ -320,7 +329,7 @@ function ProfessionMasterAddon:Migrate()
             end
 
             -- check if has item
-            if (skill.itemId ~= 0) then
+            if (skill.itemId and skill.itemId ~= 0) then
                 -- check if bop
                 skill.bop = false;
                 for _, itemId in ipairs(bopItems) do
@@ -335,7 +344,7 @@ function ProfessionMasterAddon:Migrate()
     end  
 
     -- set store version
-    Settings.storeVersion = 1;
+    Settings.storeVersion = 2;
 end
 
 -- create addon

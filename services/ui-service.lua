@@ -178,7 +178,7 @@ function UiService:CreateScrollFrame(container)
     scrollFrame:SetScrollChild(scrollChild);
     scrollFrame:SetPoint("TOPLEFT", parentFrame, 5, -5);
     scrollFrame:SetPoint("BOTTOMRIGHT", parentFrame, 0, 5);
-    return parentFrame, scrollChild;
+    return parentFrame, scrollChild, scrollFrame;
 end
 
 function UiService:CreateTab(container, caption)
@@ -271,14 +271,23 @@ function UiService:CreateMinimapIcon()
 	minimapButton:RegisterForDrag("LeftButton");
 	minimapButton:SetHighlightTexture(136477); --"Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
     minimapButton:SetMovable(true);
+    addon.minimapButton = minimapButton;
+
+    -- check if should be hidden
+    if (Settings.hideMinimapButton) then
+        minimapButton:Hide();
+    end
+
 	local overlay = minimapButton:CreateTexture(nil, "OVERLAY");
 	overlay:SetSize(53, 53);
 	overlay:SetTexture(136430); --"Interface\\Minimap\\MiniMap-TrackingBorder"
 	overlay:SetPoint("TOPLEFT");
+
 	local background = minimapButton:CreateTexture(nil, "BACKGROUND");
 	background:SetSize(20, 20);
 	background:SetTexture(136467); --"Interface\\Minimap\\UI-Minimap-Background"
 	background:SetPoint("TOPLEFT", 7, -5);
+
 	local icon = minimapButton:CreateTexture(nil, "ARTWORK");
 	icon:SetSize(17, 17);
 	icon:SetTexture(133745);
@@ -317,8 +326,12 @@ function UiService:CreateMinimapIcon()
     -- handle mouse enter
     minimapButton:SetScript("OnEnter", function()
         -- show item tool tip
+        local localeService = addon:GetService("locale");
         GameTooltip:SetOwner(minimapButton, "ANCHOR_LEFT");
-        GameTooltip:SetText(addon.shortcut .. addon.name);
+        GameTooltip:SetText(localeService:Get("MinimapButtonTitle"));
+        GameTooltip:AddLine(" ");
+        GameTooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
+        GameTooltip:AddLine(localeService:Get("MinimapButtonRightClick"));
         GameTooltip:Show();
     end);
 
@@ -329,9 +342,14 @@ function UiService:CreateMinimapIcon()
     end);
 
     -- handle click
-    minimapButton:SetScript("OnClick", function()
-        addon:CreateView("professions"):Show();
-    end)
+    minimapButton:SetScript("OnClick", function(_, button)
+        if (button == "LeftButton") then
+            addon.professionsView:ToggleVisibility();
+        elseif (button == "RightButton") then
+            addon.minimapButton:Hide();
+            Settings.hideMinimapButton = true;
+        end
+    end);
 end
 
 -- register service
