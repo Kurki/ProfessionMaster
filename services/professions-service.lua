@@ -24,6 +24,8 @@ ProfessionsService.__index = ProfessionsService;
 
 --- Initialize service.
 function ProfessionsService:Initialize()
+    -- convert
+    self:Convert();
 end
 
 --- Check message.
@@ -330,6 +332,18 @@ function ProfessionsService:FindSkillByName(skillName)
             return skill, professionId;
         end
     end  
+end
+
+--- Convert data.
+function ProfessionsService:Convert()
+    -- local ConvertDate = {}
+    -- Test = {};
+    -- for skillId, skill in pairs(ConvertDate) do
+    --     Test[skillId] = {}
+    --     for i, reagentId in ipairs(skill[6]) do
+    --         Test[skillId][reagentId] = skill[7][i];
+    --     end
+    -- end
 end
 
 -- register service

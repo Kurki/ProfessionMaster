@@ -28,22 +28,41 @@ function LocalesModel:Create()
         -- define en locale
         ["en"] = {
             -- general
-            ["AddonLoaded"] = "Version " .. addon.version .. " loaded. Use /pm to shouw professions.",
+            ["AddonLoaded"] = "Version " .. addon.version .. " loaded. Use /pm to show professions.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
+            -- commands
+            ["CommandsTitle"] = "Possible commands:",
+            ["CommandsOverview"] = "/pm overview - Show professions overview",
+            ["CommandsMinimap"] = "/pm minimap - Toggle professions minimap icon",
+            ["CommandsPurge"] = "/pm purge - Delete all data",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Left click:|cffffffff Show professions overview|r",
+            ["MinimapButtonRightClick"] = "|cff999999Right click:|cffffffff Hide minimap button|r",
+
             -- provession view
-            ["ProfessionsViewTitle"] = "Professtion Master - Overview",
+            ["ProfessionsViewTitle"] = "Profession Master - Overview",
             ["ProfessionsViewProfession"] = "Profession",
             ["ProfessionsViewAllProfessions"] = "All Professions",
             ["ProfessionsViewSearch"] = "Search",
             ["ProfessionsViewItem"] = "Item",
             ["ProfessionsViewEnchantment"] = "Enchantment",
             ["ProfessionsViewPlayers"] = "Players",
-            ["ProfessionsViewToFavorites"] = "Add to Favorites",
-            ["ProfessionsViewToShoppingList"] = "Add to Shopping List",
-            ["ProfessionsViewCancel"] = "Cancel"
+            ["ProfessionsViewToShoppingList"] = "Shopping List",
+            ["ProfessionsViewCancel"] = "Cancel",
+
+            -- bucket list add view
+            ["BucketListAddViewTitle"] = "Shopping List",
+            ["BucketListAddViewItem"] = "Item",
+            ["BucketListAddViewAmount"] = "Amount",
+            ["BucketListAddViewReagents"] = "Required Materials",
+            ["BucketListAddViewAdd"] = "Add",
+            ["BucketListAddViewChange"] = "Change",
+            ["BucketListAddViewDelete"] = "Delete"
         },
         -- define de locale
         ["de"] = {
@@ -53,17 +72,36 @@ function LocalesModel:Create()
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
             ["You"] = "Du",
 
+            -- commands
+            ["CommandsTitle"] = "Mögliche Befehle:",
+            ["CommandsOverview"] = "/pm overview - Berufsübersicht anzeigen",
+            ["CommandsMinimap"] = "/pm minimap - Minimap icon umschalten",
+            ["CommandsPurge"] = "/pm purge - Lösche alle Daten",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Linksklick:|cffffffff Berufsübersicht anzeigen|r",
+            ["MinimapButtonRightClick"] = "|cff999999Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
+
             -- provession view
-            ["ProfessionsViewTitle"] = "Professtion Master - Übersicht",
+            ["ProfessionsViewTitle"] = "Profession Master - Übersicht",
             ["ProfessionsViewProfession"] = "Beruf",
             ["ProfessionsViewAllProfessions"] = "Alle Berufe",
             ["ProfessionsViewSearch"] = "Suchen",
             ["ProfessionsViewItem"] = "Gegenstand",
             ["ProfessionsViewEnchantment"] = "Verzauberung",
             ["ProfessionsViewPlayers"] = "Spieler",
-            ["ProfessionsViewToFavorites"] = "Zu Favoriten hinzufügen",
-            ["ProfessionsViewToShoppingList"] = "Zu Einkaufsliste hinzufügen",
-            ["ProfessionsViewCancel"] = "Abbrechen"
+            ["ProfessionsViewToShoppingList"] = "Einkaufsliste",
+            ["ProfessionsViewCancel"] = "Abbrechen",
+
+            -- bucket list add view
+            ["BucketListAddViewTitle"] = "Einkaufsliste",
+            ["BucketListAddViewItem"] = "Gegenstand",
+            ["BucketListAddViewAmount"] = "Menge",
+            ["BucketListAddViewReagents"] = "Benötigte Materialien",
+            ["BucketListAddViewAdd"] = "Hinzufügen",
+            ["BucketListAddViewChange"] = "Ändern",
+            ["BucketListAddViewDelete"] = "Löschen"
         }
     };
 end
