@@ -89,6 +89,11 @@ end
 -- @param message Message to send.
 -- @return True, if successfully sent. 
 function MessageService:SendToGuild(message)
+    -- check if player is in guild
+    if (not IsInGuild()) then
+        return;
+    end
+
     -- build message string
     local messageString = message.prefix .. ":" .. message:ToString();
     addon:LogTrace("MessageService", "SendToGuild", "GUILD Message: " .. messageString);

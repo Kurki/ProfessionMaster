@@ -26,6 +26,7 @@ local function CommandHandler(parameters)
         local chatService = addon:GetService("chat");
         chatService:Write("CommandsTitle");
         chatService:Write("CommandsOverview");
+        chatService:Write("CommandsReagents");
         if (Settings.hideMinimapButton) then
             chatService:Write("CommandsMinimap");
         end
@@ -34,10 +35,17 @@ local function CommandHandler(parameters)
     end
 
     -- check if overview shoulkd be shown
-    if (string.lower(parameters) == "overview") then
+    if (string.lower(parameters) == "overview" and not addon.inCombat) then
         addon.professionsView:ToggleVisibility();
         return;
     end
+
+    -- check if overview shoulkd be shown
+    if (string.lower(parameters) == "reagents") then
+        addon:GetService("inventory"):ToggleMissingReagents();
+        return;
+    end
+
 
     -- check if minimap should be toggeled
     if (string.lower(parameters) == "minimap" and Settings.hideMinimapButton) then
@@ -50,8 +58,12 @@ local function CommandHandler(parameters)
     if (string.lower(parameters) == "purge") then
         Professions = {};
         OwnProfessions = {};
-        Settings = {};
         SyncTimes = {};
+        Settings = {};
+        Logs = {};
+        CharacterSets = {};
+        BucketList = {};
+        Frames = {};
         addon:CheckSettings();
     end
 

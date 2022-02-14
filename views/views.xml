@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <Script file="bucket-list-add-view.lua" />
+    <Script file="missing-reagents-view.lua" />
     <Script file="professions-view.lua" />
+    <Script file="skill-view.lua" />
 </Ui>

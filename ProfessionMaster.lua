@@ -200,6 +200,9 @@ function ProfessionMasterAddon:RegisterEvents()
     self.frame:RegisterEvent("TRADE_SKILL_UPDATE");
     self.frame:RegisterEvent("CRAFT_UPDATE");
     self.frame:RegisterEvent("GUILD_ROSTER_UPDATE");
+    self.frame:RegisterEvent("PLAYER_REGEN_DISABLED");
+    self.frame:RegisterEvent("PLAYER_REGEN_ENABLED");
+    self.frame:RegisterEvent("BAG_UPDATE");
 
     -- handle on event
     self.frame:SetScript("OnEvent", function(_self, event, prefix, message, channel, sender)
@@ -235,7 +238,11 @@ function ProfessionMasterAddon:RegisterEvents()
 
             -- startup
             self:GetService("timer"):Wait("PlayerWorldEnter", 10, function()
+                -- say hello to guild
                 self:GetService("professions"):SayHelloToGuild();
+
+                -- check missing reagents
+                self:GetService("inventory"):CheckMissingReagents();
             end);
 
         -- handle trade skill update
@@ -250,6 +257,20 @@ function ProfessionMasterAddon:RegisterEvents()
         elseif (event == "GUILD_ROSTER_UPDATE") then
             self:GetService("player"):RefreshOnlineList();
 
+        -- handle combat enter
+        elseif (event == "PLAYER_REGEN_DISABLED") then
+            self.inCombat = true;
+            if (self.professionsView.visible) then
+                self.professionsView:Hide();
+            end
+
+        -- handle combat leave
+        elseif (event == "PLAYER_REGEN_ENABLED") then
+            self.inCombat = nil;
+
+        -- handle bag update
+        elseif (event == "BAG_UPDATE") then
+            self:GetService("inventory"):CheckMissingReagents();
         end
     end);
 end

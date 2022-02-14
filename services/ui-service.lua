@@ -61,7 +61,7 @@ function UiService:CreateView(name, width, height, title)
     -- add title
     local titleLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
     titleLabel:SetPoint("TOPLEFT", 16, -14);
-    titleLabel:SetText(addon.shortcut .. title);
+    titleLabel:SetText(addon.shortcut .. (title or ""));
     view.titleLabel = titleLabel;
 
     -- set moveable
@@ -332,6 +332,7 @@ function UiService:CreateMinimapIcon()
         GameTooltip:AddLine(" ");
         GameTooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
         GameTooltip:AddLine(localeService:Get("MinimapButtonRightClick"));
+        GameTooltip:AddLine(localeService:Get("MinimapButtonShiftRightClick"));
         GameTooltip:Show();
     end);
 
@@ -343,11 +344,15 @@ function UiService:CreateMinimapIcon()
 
     -- handle click
     minimapButton:SetScript("OnClick", function(_, button)
-        if (button == "LeftButton") then
+        if (button == "LeftButton" and not addon.inCombat) then
             addon.professionsView:ToggleVisibility();
         elseif (button == "RightButton") then
-            addon.minimapButton:Hide();
-            Settings.hideMinimapButton = true;
+            if (IsShiftKeyDown()) then
+                addon.minimapButton:Hide();
+                Settings.hideMinimapButton = true;
+            else
+                addon:GetService("inventory"):ToggleMissingReagents();
+            end
         end
     end);
 end
