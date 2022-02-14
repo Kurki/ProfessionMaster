@@ -90,7 +90,7 @@ function PlayerService:IsCurrentPlayer(name)
 end
 
 --- Format palyer names.
-function PlayerService:CombinePlayerNames(playerNames, separator, maxAmount)
+function PlayerService:CombinePlayerNames(playerNames, maxAmount)
     -- prepare values
     local localeService = addon:GetService("locale");
     local containsCurrentPlayer = false;
@@ -227,8 +227,8 @@ function PlayerService:CombinePlayerNames(playerNames, separator, maxAmount)
         end
     end
 
-    -- concat result
-    return table.concat(result, ", ");
+    -- players combined
+    return result;
 end
 
 --- Find character set by character name.

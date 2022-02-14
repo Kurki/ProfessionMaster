@@ -102,11 +102,11 @@ function TooltipService:CheckTooltip(tooltip)
     end
 
     -- get player names
-    local playerNames = addon:GetService("player"):CombinePlayerNames(skill.players, ", ", 5);
+    local playerNames = addon:GetService("player"):CombinePlayerNames(skill.players, 5);
 
     -- get icon and name of profession
     local professionNamesService = addon:GetService("profession-names");
-    tooltip:AddLine("|n|T" .. professionNamesService:GetProfessionIcon(professionId) .. ":12|t  |cffDA8CFF[PM] " .. playerNames);
+    tooltip:AddLine("|n|T" .. professionNamesService:GetProfessionIcon(professionId) .. ":12|t  |cffDA8CFF[PM] " .. table.concat(playerNames, ", "));
 end
 
 -- register service

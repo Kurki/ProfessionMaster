@@ -37,12 +37,14 @@ function LocalesModel:Create()
             ["CommandsTitle"] = "Possible commands:",
             ["CommandsOverview"] = "/pm overview - Show professions overview",
             ["CommandsMinimap"] = "/pm minimap - Toggle professions minimap icon",
+            ["CommandsReagents"] = "/pm reagents - Show/Hide missing Reagents",
             ["CommandsPurge"] = "/pm purge - Delete all data",
 
             -- minimap button
             ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
-            ["MinimapButtonLeftClick"] = "|cff999999Left click:|cffffffff Show professions overview|r",
-            ["MinimapButtonRightClick"] = "|cff999999Right click:|cffffffff Hide minimap button|r",
+            ["MinimapButtonLeftClick"] = "|cff999999Left Click:|cffffffff Show overview|r",
+            ["MinimapButtonRightClick"] = "|cff999999Right Click:|cffffffff Show/Hide missing Reagents|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Right Click:|cffffffff Hide minimap button|r",
 
             -- provession view
             ["ProfessionsViewTitle"] = "Profession Master - Overview",
@@ -52,17 +54,17 @@ function LocalesModel:Create()
             ["ProfessionsViewItem"] = "Item",
             ["ProfessionsViewEnchantment"] = "Enchantment",
             ["ProfessionsViewPlayers"] = "Players",
-            ["ProfessionsViewToShoppingList"] = "Shopping List",
-            ["ProfessionsViewCancel"] = "Cancel",
+            ["ProfessionsViewBucketList"] = "Shopping List",
+            ["ProfessionsViewReagentsForBucketList"] = "Reagents for Shopping List",
+            ["ProfessionsViewNotOnBucketList"] = "Other",
 
-            -- bucket list add view
-            ["BucketListAddViewTitle"] = "Shopping List",
-            ["BucketListAddViewItem"] = "Item",
-            ["BucketListAddViewAmount"] = "Amount",
-            ["BucketListAddViewReagents"] = "Required Materials",
-            ["BucketListAddViewAdd"] = "Add",
-            ["BucketListAddViewChange"] = "Change",
-            ["BucketListAddViewDelete"] = "Delete"
+            -- skill view
+            ["SkillViewPlayers"] = "Players",
+            ["SkillViewOnBucketList"] = "On Shopping List",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Missing Reagents"
         },
         -- define de locale
         ["de"] = {
@@ -76,12 +78,14 @@ function LocalesModel:Create()
             ["CommandsTitle"] = "Mögliche Befehle:",
             ["CommandsOverview"] = "/pm overview - Berufsübersicht anzeigen",
             ["CommandsMinimap"] = "/pm minimap - Minimap icon umschalten",
+            ["CommandsReagents"] = "/pm reagents - Fehlende Materialien ein-/ausblenden",
             ["CommandsPurge"] = "/pm purge - Lösche alle Daten",
 
             -- minimap button
             ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
-            ["MinimapButtonLeftClick"] = "|cff999999Linksklick:|cffffffff Berufsübersicht anzeigen|r",
-            ["MinimapButtonRightClick"] = "|cff999999Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
+            ["MinimapButtonLeftClick"] = "|cff999999Linksklick:|cffffffff Übersicht anzeigen|r",
+            ["MinimapButtonRightClick"] = "|cff999999Rechtsklick:|cffffffff Fehlende Materialien ein-/ausblenden|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
 
             -- provession view
             ["ProfessionsViewTitle"] = "Profession Master - Übersicht",
@@ -91,17 +95,17 @@ function LocalesModel:Create()
             ["ProfessionsViewItem"] = "Gegenstand",
             ["ProfessionsViewEnchantment"] = "Verzauberung",
             ["ProfessionsViewPlayers"] = "Spieler",
-            ["ProfessionsViewToShoppingList"] = "Einkaufsliste",
-            ["ProfessionsViewCancel"] = "Abbrechen",
+            ["ProfessionsViewBucketList"] = "Einkaufliste",
+            ["ProfessionsViewReagentsForBucketList"] = "Materialien für Einkaufliste",
+            ["ProfessionsViewNotOnBucketList"] = "Weitere",
 
-            -- bucket list add view
-            ["BucketListAddViewTitle"] = "Einkaufsliste",
-            ["BucketListAddViewItem"] = "Gegenstand",
-            ["BucketListAddViewAmount"] = "Menge",
-            ["BucketListAddViewReagents"] = "Benötigte Materialien",
-            ["BucketListAddViewAdd"] = "Hinzufügen",
-            ["BucketListAddViewChange"] = "Ändern",
-            ["BucketListAddViewDelete"] = "Löschen"
+            -- skill view
+            ["SkillViewPlayers"] = "Spieler",
+            ["SkillViewOnBucketList"] = "Auf Einkaufliste",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Fehlende Materialien"
         }
     };
 end

@@ -5,7 +5,7 @@
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
 ## Version: 1.0.5
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, Settings, Logs, CharacterSets, BucketList
-## SavedVariablesPerCharacter: 
+## SavedVariablesPerCharacter: Frames
 
 ProfessionMaster.lua
 models\models.xml
