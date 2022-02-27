@@ -64,6 +64,7 @@ local function CommandHandler(parameters)
         CharacterSets = {};
         BucketList = {};
         Frames = {};
+        CharacterSettings = {}; 
         addon:CheckSettings();
     end
 

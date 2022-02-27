@@ -29,21 +29,23 @@ local realmName = string.gsub(GetRealmName(), "%s+", "");
 function PlayerService:Initialize()
     -- get player name
     self.current = self:GetLongName(GetUnitName("player"));
-    self.onlineList = {};
+    self.guildPlayers = {};
 end
 
 -- Refresh online list.
-function PlayerService:RefreshOnlineList()
+function PlayerService:RefreshGuildPlayers()
     -- iterate all members
-    local onlineList = {};
+    local guildPlayers = {};
     for guildIndex = 1, GetNumGuildMembers() do
         -- get player info
         local playerName, _, _, _, _, _, _, _, online = GetGuildRosterInfo(guildIndex);
-        if (online) then
-            onlineList[playerName] = true;
+        if (playerName) then
+            guildPlayers[playerName] = {
+                online = online
+            }
         end
     end
-    self.onlineList = onlineList;
+    self.guildPlayers = guildPlayers;
 end
 
 --- Get player short name.
@@ -120,7 +122,8 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                 end
             else
                 -- check if is online
-                if (self.onlineList[playerName]) then
+                local guildPlayer = self.guildPlayers[playerName];
+                if (guildPlayer and guildPlayer.online) then
                     -- set online player
                     onlinePlayers[shortPlayerName] = {};
                 else
@@ -131,7 +134,8 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                         -- check if twink online
                         local twinkNamesOnline = {};
                         for _, twinkName in ipairs(characterSet) do
-                            if (self.onlineList[twinkName]) then
+                            local twinkGuildPlayer = self.guildPlayers[twinkName];
+                            if (twinkGuildPlayer and twinkGuildPlayer.online) then
                                 table.insert(twinkNamesOnline, twinkName);
                             end
                         end
@@ -164,8 +168,12 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                                         onlinePlayers[shortTwinkNameOnline] = {};
                                     end
 
-                                    -- add twink
-                                    table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
+                                    -- check if is in guild
+                                    if (self.guildPlayers[playerName]) then
+                                        table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
+                                    else
+                                        table.insert(onlinePlayers[shortTwinkNameOnline], "Twink");
+                                    end
                                 end
                             end
                         end
@@ -173,8 +181,30 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
 
                     -- check if is offline
                     if (addToOffline) then
-                        -- add to offline players
-                        table.insert(offlinePlayers, shortPlayerName);
+                        if (self.guildPlayers[playerName]) then
+                            -- add to offline players
+                            table.insert(offlinePlayers, shortPlayerName);
+                        elseif (characterSet) then
+                            local guildTwinkName = nil;
+                            local characterSetExists = false;
+                            for _, twinkName in ipairs(characterSet) do
+                                local shortTwinkName = self:GetShortName(twinkName);
+                                if (self:ListContains(offlinePlayers, shortTwinkName)) then
+                                    characterSetExists = true;
+                                    break;
+                                end
+                                
+                                -- get guild twink name
+                                if (self.guildPlayers[twinkName] and not guildTwinkName) then  
+                                    guildTwinkName = shortTwinkName;
+                                end
+                            end
+
+                            -- check if guild twink name found and not added already
+                            if (not characterSetExists and guildTwinkName) then
+                                table.insert(offlinePlayers, guildTwinkName);
+                            end
+                        end
                     end
                 end
             end
@@ -206,7 +236,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
         if (#onlinePlayerTwinks == 1) then
             table.insert(result, "|cffffffff" .. onlinePlayerName .. " (" .. onlinePlayerTwinks[1] .. ")");
         elseif (#onlinePlayerTwinks > 1) then
-            table.insert(result, "|cffffffff" .. onlinePlayerName .. " (" .. #onlinePlayerTwinks .. ")");
+            table.insert(result, "|cffffffff" .. onlinePlayerName .. " (Twink)");
         else
             table.insert(result, "|cffffffff" .. onlinePlayerName);
         end
@@ -229,6 +259,16 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
 
     -- players combined
     return result;
+end
+
+--- Cehck if list contains the given value
+function PlayerService:ListContains(list, value)
+    for _, entryValue in ipairs(list) do
+        if (entryValue == value) then
+            return true;
+        end
+    end
+    return false;
 end
 
 --- Find character set by character name.

@@ -154,7 +154,7 @@ function SkillView:Show(skillRow, professionsView)
         local clearButton = CreateFrame("Button", nil, bucketListFrame);
         clearButton:SetHeight(32);
         clearButton:SetWidth(32);
-        clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", -5, -2);
+        clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", -5, -1.5);
         clearButton:SetPushedTexture("Interface\\Buttons\\CancelButton-Down");
         clearButton:SetHighlightTexture("Interface\\Buttons\\CancelButton-Highlight");
         clearButton:SetNormalTexture("Interface\\Buttons\\CancelButton-Up");
