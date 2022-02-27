@@ -28,7 +28,7 @@ function LocalesModel:Create()
         -- define en locale
         ["en"] = {
             -- general
-            ["AddonLoaded"] = "Version " .. addon.version .. " loaded. Use /pm to show professions.",
+            ["AddonLoaded"] = "Version " .. addon.version .. " loaded. Use /pm for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
@@ -39,6 +39,12 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Toggle professions minimap icon",
             ["CommandsReagents"] = "/pm reagents - Show/Hide missing Reagents",
             ["CommandsPurge"] = "/pm purge - Delete all data",
+
+            -- welcome
+            ["WelcomeTitle"] = addon.name .. " - Welcome",
+            ["WelcomeDescription"] = addon.name .. " shows you your profession and the professions of all your guild members who also use " .. addon.name .. " in a single overview.\n\n" .. 
+                "Use the button on your minimap or the chat command /pm to show or hide the corresponding windows.\n\n" ..
+                "|cffd4af37Open your now your profession windows to share your professions.",
 
             -- minimap button
             ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
@@ -69,10 +75,16 @@ function LocalesModel:Create()
         -- define de locale
         ["de"] = {
             -- general
-            ["AddonLoaded"] = "Version " .. addon.version .. " geladen. Benutze /pm um Berufe anzuzeigen.",
+            ["AddonLoaded"] = "Version " .. addon.version .. " geladen. Benutze /pm für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
             ["You"] = "Du",
+
+            -- welcome
+            ["WelcomeTitle"] = addon.name .. " - Willkommen",
+            ["WelcomeDescription"] = addon.name .. " zeigt dir deine und die Berufe all deiner Gildenmitglieder, die auch " .. addon.name .. " nutzen, in einer einzigen Übersicht an.\n\n" ..
+                "Benutze die Schaltfläche an deiner Minimap oder den Chat-Befehl /pm um die entsprechenden Fenster ein- oder auszublenden.\n\n" .. 
+                "|cffd4af37Öffne deine jetzt deine Berufsfenster, um deine Berufe zu teilen.",
 
             -- commands
             ["CommandsTitle"] = "Mögliche Befehle:",

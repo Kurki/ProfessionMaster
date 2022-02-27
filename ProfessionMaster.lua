@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.0.5";
+local addonVersion = "1.1.2";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -33,6 +33,7 @@ if (not SyncTimes) then SyncTimes = {}; end
 if (not Logs) then Logs = {}; end
 if (not CharacterSets) then CharacterSets = {}; end
 if (not BucketList) then BucketList = {}; end
+if (not CharacterSettings) then CharacterSettings = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
@@ -196,7 +197,6 @@ function ProfessionMasterAddon:RegisterEvents()
     -- register events
     self.frame:RegisterEvent("CHAT_MSG_ADDON");
     self.frame:RegisterEvent("PLAYER_LOGIN");
-    self.frame:RegisterEvent("PLAYER_ENTERING_WORLD");
     self.frame:RegisterEvent("TRADE_SKILL_UPDATE");
     self.frame:RegisterEvent("CRAFT_UPDATE");
     self.frame:RegisterEvent("GUILD_ROSTER_UPDATE");
@@ -225,19 +225,20 @@ function ProfessionMasterAddon:RegisterEvents()
             -- create minimap icon
             self:GetService("ui"):CreateMinimapIcon();
 
-            -- show loaded message
-            self:GetService("chat"):Write("AddonLoaded");
-
-            -- broadcast version
-            self:GetService("message"):SendToGuild(self:GetModel("version-broadcast-message"):Create());
-
-        -- handle enter world
-        elseif (event == "PLAYER_ENTERING_WORLD") then
             -- watch tooltip
             self:GetService("tooltip"):WatchTooltip();
 
             -- startup
-            self:GetService("timer"):Wait("PlayerWorldEnter", 10, function()
+            self:GetService("timer"):Wait("PlayerLogin", 10, function()
+                -- show loaded message
+                self:GetService("chat"):Write("AddonLoaded");
+
+                -- broadcast version
+                self:GetService("message"):SendToGuild(self:GetModel("version-broadcast-message"):Create());
+
+                -- check welcome
+                self:GetService("own-professions"):CheckWelcome();
+
                 -- say hello to guild
                 self:GetService("professions"):SayHelloToGuild();
 
@@ -255,7 +256,7 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- handle craft update
         elseif (event == "GUILD_ROSTER_UPDATE") then
-            self:GetService("player"):RefreshOnlineList();
+            self:GetService("player"):RefreshGuildPlayers();
 
         -- handle combat enter
         elseif (event == "PLAYER_REGEN_DISABLED") then

@@ -97,13 +97,28 @@ function ProfessionsView:Show()
         local bucketListTitleText = bucketListFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         bucketListTitleText:SetPoint("TOPLEFT", 13, -15);
         bucketListTitleText:SetText(localeService:Get("ProfessionsViewReagentsForBucketList"));
+
+        -- add bucket list clear button
+        local bucketListClearButton = CreateFrame("Button", nil, bucketListFrame);
+        bucketListClearButton:SetHeight(32);
+        bucketListClearButton:SetWidth(32);
+        bucketListClearButton:SetPoint("TOPRIGHT", -4, -7);
+        bucketListClearButton:SetPushedTexture("Interface\\Buttons\\CancelButton-Down");
+        bucketListClearButton:SetHighlightTexture("Interface\\Buttons\\CancelButton-Highlight");
+        bucketListClearButton:SetNormalTexture("Interface\\Buttons\\CancelButton-Up");
+        bucketListClearButton:SetScript("OnClick", function()
+            -- clear and refresh bucket list
+            BucketList = {};
+            self:CheckBucketList();
+            addon:GetService("inventory"):CheckMissingReagents();
+        end);
         
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         professionLabel:SetPoint("TOPLEFT", 18, -15);
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        professionSelection:SetPoint("TOPLEFT", -2, -31);
+        professionSelection:SetPoint("TOPLEFT", 6, -24);
         UIDropDownMenu_SetWidth(professionSelection, 140);
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()
@@ -153,7 +168,6 @@ function ProfessionsView:Show()
         end)
         itemSearch:SetScript("OnTextChanged", function()
             -- add skills and hide bucket list
-            self:HideSkillView();
             self:AddSkills();
         end);
 
@@ -227,6 +241,11 @@ end
 
 --- Check bucket list.
 function ProfessionsView:CheckBucketList()
+    -- check view
+    if (not self.view) then
+        return;
+    end
+    
     -- check bucket list has values
     local hasBucketList = false;
     for _ in pairs(BucketList) do

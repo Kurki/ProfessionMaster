@@ -22,7 +22,7 @@ local addon = _G.professionMaster;
 MissingReagentsView = {};
 MissingReagentsView.__index = MissingReagentsView;
 
---- Show professions view.
+--- Show missing view.
 function MissingReagentsView:Show(missingReagents)
     -- get services
     local uiService = addon:GetService("ui");
@@ -35,19 +35,37 @@ function MissingReagentsView:Show(missingReagents)
         self.reagentRows = {};
 
         -- create view
-        local view = uiService:CreateView("PmMissingReagents", 200, 200, localeService:Get("MissingReagentsViewTitle"));
+        local view = uiService:CreateView("PmMissingReagents", 210, 200, localeService:Get("MissingReagentsViewTitle"));
         view:EnableKeyboard();
         view:SetBackdropColor(0, 0, 0, 0);
         view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0);
-        view:SetScript("OnEnter", function()
+        self.view = view;
+
+        -- add close button
+        local closeButton = CreateFrame("Button", nil, view, "UIPanelCloseButton");
+        closeButton:SetHeight(24);
+        closeButton:SetWidth(24);
+        closeButton:SetPoint("TOPRIGHT", -7, -8);
+        closeButton:SetScript("OnClick", function()
+            addon:GetService("inventory"):ToggleMissingReagents();
+        end);
+
+        -- bind events
+        local onEnter = function()
             view:SetBackdropColor(0, 0, 0, 0.2);
             view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.1);
-        end);
-        view:SetScript("OnLeave", function()
+            closeButton:Show();
+        end;
+        local onLeave = function()
             view:SetBackdropColor(0, 0, 0, 0);
             view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0);
-        end);
-        self.view = view;
+            closeButton:Hide();
+        end;
+
+        view:SetScript("OnEnter", onEnter);
+        view:SetScript("OnLeave", onLeave);
+        closeButton:SetScript("OnEnter", onEnter);
+        closeButton:SetScript("OnLeave", onLeave);
     end
 
     -- hide rows

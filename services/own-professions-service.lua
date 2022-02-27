@@ -28,6 +28,11 @@ end
 
 --- Get own trade skill professions. Enchanting is not part of trade professions.
 function OwnProfessionsService:GetTradeSkillProfessionData()
+    -- check if is in combat
+    if (addon.inCombat) then
+        return;
+    end
+
     -- get an check profession id
     local professionNamesService = addon:GetService("profession-names");
     local professionId = professionNamesService:GetProfessionId(GetTradeSkillLine());
@@ -71,6 +76,11 @@ end
 
 --- Get own enchanting skills.
 function OwnProfessionsService:GetEnchantingProfessionData()
+    -- check if is in combat
+    if (addon.inCombat) then
+        return;
+    end
+
     -- get and check profession id
     local professionId = addon:GetService("profession-names"):GetProfessionId(GetCraftSkillLine(1));
     if (not professionId or professionId ~= 333) then
@@ -177,7 +187,7 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
     -- iterate all players
     local playerService = addon:GetService("player");
     for characterName, professions in pairs(OwnProfessions) do
-        -- check if is same realm
+        -- check if is same realm and same guild
         if (playerService:IsSameRealm(characterName)) then
              -- iterate all professions
             for professionId, skills in pairs(professions) do
@@ -261,6 +271,23 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
         -- send message
         messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, Settings.storageId, ownPlayerName, messageSkills)); 
     end
+end
+
+--- Check welcome.
+function OwnProfessionsService:CheckWelcome()
+    -- check if welcome read
+    if (CharacterSettings.welcomeRead) then
+        return;
+    end
+
+    -- check if player professions read
+    local playerName = addon:GetService("player").current;
+    if (OwnProfessions[playerName]) then
+        return;
+    end
+
+    -- show welcome view
+    addon:CreateView("welcome"):Show();
 end
 
 -- register service
