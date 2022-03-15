@@ -118,7 +118,7 @@ function ProfessionsView:Show()
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        professionSelection:SetPoint("TOPLEFT", 6, -24);
+        professionSelection:SetPoint("TOPLEFT", -2, -31);
         UIDropDownMenu_SetWidth(professionSelection, 140);
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()

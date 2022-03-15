@@ -28,14 +28,14 @@ function LocalesModel:Create()
         -- define en locale
         ["en"] = {
             -- general
-            ["AddonLoaded"] = "Version " .. addon.version .. " loaded. Use /pm for more informations.",
+            ["AddonLoaded"] = "v" .. addon.version .. " by Esperanza@Everlook. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
             -- commands
             ["CommandsTitle"] = "Possible commands:",
-            ["CommandsOverview"] = "/pm overview - Show professions overview",
+            ["CommandsOverview"] = "/pm - Show/Hide professions overview",
             ["CommandsMinimap"] = "/pm minimap - Toggle professions minimap icon",
             ["CommandsReagents"] = "/pm reagents - Show/Hide missing Reagents",
             ["CommandsPurge"] = "/pm purge - Delete all data",
@@ -75,7 +75,7 @@ function LocalesModel:Create()
         -- define de locale
         ["de"] = {
             -- general
-            ["AddonLoaded"] = "Version " .. addon.version .. " geladen. Benutze /pm für weitere Informationen.",
+            ["AddonLoaded"] = "v" .. addon.version .. " von Esperanza@Everlook. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
             ["You"] = "Du",
@@ -88,7 +88,7 @@ function LocalesModel:Create()
 
             -- commands
             ["CommandsTitle"] = "Mögliche Befehle:",
-            ["CommandsOverview"] = "/pm overview - Berufsübersicht anzeigen",
+            ["CommandsOverview"] = "/pm - Berufsübersicht ein-/ausblenden",
             ["CommandsMinimap"] = "/pm minimap - Minimap icon umschalten",
             ["CommandsReagents"] = "/pm reagents - Fehlende Materialien ein-/ausblenden",
             ["CommandsPurge"] = "/pm purge - Lösche alle Daten",
