@@ -425,6 +425,7 @@ function ProfessionsView:AddFilteredSkills(professionId, searchParts)
                 if (#searchParts == 0) then
                     -- add to skills
                     table.insert(self.skills, {
+                        professionId = professionId,
                         skillId = skillId,
                         skill = skill,
                         bucketListAmount = bucketListAmount
@@ -448,6 +449,7 @@ function ProfessionsView:AddFilteredSkills(professionId, searchParts)
                     if (skillValid) then
                         -- add to skills
                         table.insert(self.skills, {
+                            professionId = professionId,
                             skillId = skillId,
                             skill = skill,
                             bucketListAmount = bucketListAmount
@@ -478,6 +480,7 @@ function ProfessionsView:RefreshRows()
     for rowIndex = startIndex, endIndex do
         -- getr row and skill
         local row = self.rows[rowIndex];
+        local professionId = self.skills[rowIndex].professionId;
         local skillId = self.skills[rowIndex].skillId;
         local skill = self.skills[rowIndex].skill;
         local bucketListAmount = self.skills[rowIndex].bucketListAmount;
@@ -537,15 +540,26 @@ function ProfessionsView:RefreshRows()
 
                 -- show item tool tip
                 GameTooltip:SetOwner(row, "ANCHOR_LEFT");
-                GameTooltip:SetHyperlink(row.skill.skillLink);
-                GameTooltip:Show();
+                addon:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
             end);
 
             -- handle row mouse click
             row:SetScript("OnMouseDown", function(_, button)
                 -- check if link should be added to chat window
                 if (button == "LeftButton") and IsShiftKeyDown() and ChatEdit_GetActiveWindow() then
-                    ChatEdit_InsertLink(row.skill.skillLink);
+                    -- check if era
+                    if (addon.isEra) then
+                        if (row.skill.skillLink) then
+                            local editbox = GetCurrentKeyBoardFocus();
+                            if (editbox) then
+                                editbox:Insert("[PM: " .. row.skill.name .. " : " .. row.skillId .. "]");
+                            end
+                        else
+                            ChatEdit_InsertLink(row.skill.itemLink);
+                        end
+                    else
+                        ChatEdit_InsertLink(row.skill.skillLink);
+                    end
                     return;
                 elseif (button == "LeftButton") then
                     self:ShowSkillView(row);
@@ -577,6 +591,7 @@ function ProfessionsView:RefreshRows()
 
             -- show and set valid
             row:Show();
+            row.professionId = professionId;
             row.skill = skill;
             row.skillId = skillId;
             row.invalid = nil;

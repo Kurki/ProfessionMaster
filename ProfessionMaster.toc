@@ -4,7 +4,7 @@
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
 ## Version: 1.1.4
-## SavedVariables: Professions, OwnProfessions, SyncTimes, Settings, Logs, CharacterSets, BucketList, Guildmates
+## SavedVariables: Professions, OwnProfessions, SyncTimes, Settings, Logs, CharacterSets, BucketList, Guildmates,
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 
 ProfessionMaster.lua

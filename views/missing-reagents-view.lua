@@ -49,6 +49,7 @@ function MissingReagentsView:Show(missingReagents)
         closeButton:SetScript("OnClick", function()
             addon:GetService("inventory"):ToggleMissingReagents();
         end);
+        closeButton:Hide();
 
         -- bind events
         local onEnter = function()
