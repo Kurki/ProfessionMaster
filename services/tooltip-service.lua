@@ -134,7 +134,6 @@ function TooltipService:CheckTooltip(tooltip)
         end
     else
         -- get icon and name of profession
-        local professionNamesService = addon:GetService("profession-names");
         tooltip:AddLine("|n|T" .. professionIcon .. ":12|t  |cffDA8CFF[PM] " .. table.concat(playerNames, ", "));
     end
 end
