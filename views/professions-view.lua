@@ -77,7 +77,7 @@ function ProfessionsView:Show()
         skillsFrame:SetBackdropColor(0, 0, 0, 0.5);
         skillsFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
         skillsFrame:SetPoint("TOPLEFT", 12, -36);
-        skillsFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+        skillsFrame:SetPoint("BOTTOMRIGHT", -12, 30);
         self.skillsFrame = skillsFrame;
 
         -- add bucket list frame
@@ -90,8 +90,13 @@ function ProfessionsView:Show()
         bucketListFrame:SetBackdropColor(0, 0, 0, 0.5);
         bucketListFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
         bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
-        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 30);
         self.bucketListFrame = bucketListFrame;
+
+        -- add footer
+        local footerLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
+        footerLabel:SetPoint("BOTTOMLEFT", 16, 10);
+        footerLabel:SetText(localeService:Get("ProfessionsViewFooter"));
 
         -- add bucket list group text
         local bucketListTitleText = bucketListFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -255,10 +260,10 @@ function ProfessionsView:CheckBucketList()
 
     -- Check bucket list
     if (hasBucketList) then
-        self.skillsFrame:SetPoint("BOTTOMRIGHT", -260, 12);
+        self.skillsFrame:SetPoint("BOTTOMRIGHT", -260, 30);
         self.bucketListFrame:Show();
     else
-        self.skillsFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+        self.skillsFrame:SetPoint("BOTTOMRIGHT", -12, 30);
         self.bucketListFrame:Hide();
     end
     self.scrollChild:SetWidth(self.scrollFrame:GetWidth());

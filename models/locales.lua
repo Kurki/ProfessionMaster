@@ -63,6 +63,7 @@ function LocalesModel:Create()
             ["ProfessionsViewBucketList"] = "Shopping List",
             ["ProfessionsViewReagentsForBucketList"] = "Reagents for Shopping List",
             ["ProfessionsViewNotOnBucketList"] = "Other",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffCopy link into Text-Chat.",
 
             -- skill view
             ["SkillViewPlayers"] = "Players",
@@ -110,6 +111,7 @@ function LocalesModel:Create()
             ["ProfessionsViewBucketList"] = "Einkaufliste",
             ["ProfessionsViewReagentsForBucketList"] = "Materialien für Einkaufliste",
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufslsite setzen.   |cffDA8CFFShift + Linksklick: |cffffffffLink in Text-Chat kopieren.",
 
             -- skill view
             ["SkillViewPlayers"] = "Spieler",
