@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.1.2";
+local addonVersion = "1.1.4";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -34,6 +34,7 @@ if (not Logs) then Logs = {}; end
 if (not CharacterSets) then CharacterSets = {}; end
 if (not BucketList) then BucketList = {}; end
 if (not CharacterSettings) then CharacterSettings = {}; end
+if (not Guildmates) then Guildmates = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
@@ -256,7 +257,7 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- handle craft update
         elseif (event == "GUILD_ROSTER_UPDATE") then
-            self:GetService("player"):RefreshGuildPlayers();
+            self:GetService("player"):RefreshGuildmates();
 
         -- handle combat enter
         elseif (event == "PLAYER_REGEN_DISABLED") then

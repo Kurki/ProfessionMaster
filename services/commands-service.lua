@@ -20,8 +20,22 @@ local addon = _G.professionMaster;
 
 -- handle command line 
 local function CommandHandler(parameters)
+    -- check if no parameters entered
+    if (string.len(parameters) <= 0 and not addon.inCombat) then
+        -- show / hide overview
+        addon.professionsView:ToggleVisibility();
+        return;
+    end
+
+    -- check if overview should be shown
+    if (string.lower(parameters) == "overview" and not addon.inCombat) then
+        -- show / hide overview
+        addon.professionsView:ToggleVisibility();
+        return;
+    end
+
     -- check if help should be shown
-    if (string.len(parameters) <= 0) then
+    if (string.lower(parameters) == "help") then
         -- write help
         local chatService = addon:GetService("chat");
         chatService:Write("CommandsTitle");
@@ -31,12 +45,6 @@ local function CommandHandler(parameters)
             chatService:Write("CommandsMinimap");
         end
         chatService:Write("CommandsPurge");
-        return;
-    end
-
-    -- check if overview shoulkd be shown
-    if (string.lower(parameters) == "overview" and not addon.inCombat) then
-        addon.professionsView:ToggleVisibility();
         return;
     end
 
@@ -65,6 +73,7 @@ local function CommandHandler(parameters)
         BucketList = {};
         Frames = {};
         CharacterSettings = {}; 
+        Guildmates = {}; 
         addon:CheckSettings();
     end
 
