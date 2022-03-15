@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.1.4";
+local addonVersion = "1.2.0";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
