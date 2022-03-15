@@ -173,10 +173,18 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                 -- get spell
                 local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
 
+                -- get skill link
+                local skillLink;
+                if (addon.isEra) then
+                    skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
+                else
+                    skillLink = GetSpellLink(skill.skillId);
+                end
+
                 -- add item
                 skillEntry = {
                     name = spellName,
-                    skillLink = GetSpellLink(skill.skillId),
+                    skillLink = skillLink,
                     itemId = skill.itemId,
                     itemLink = nil,
                     itemColor = "FF71D5FF",
@@ -233,7 +241,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                         if (not skillEntry.name) then
                             skillEntry.name = itemName;
                         end
-                        if (not skillEntry.skillLink) then
+                        if (not skillEntry.skillLink and not addon.isEra) then
                             skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
                         end
                     end);
@@ -287,7 +295,7 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
         for skillId, skill in pairs(profession) do     
             -- check item id
             if (skill.itemId and skill.itemId == itemId) then
-                return skill, professionId;
+                return skillId, skill, professionId;
             end
         end  
     end  
@@ -329,19 +337,27 @@ function ProfessionsService:FindSkillByName(skillName)
     for skillId, skill in pairs(Professions[professionId]) do     
         -- check item id
         if (skill.name and skill.name == skillName) then
-            return skill, professionId;
+            return skillId, skill, professionId;
         end
     end  
 end
 
 --- Convert data.
 function ProfessionsService:Convert()
-    -- local ConvertDate = {}
-    -- Test = {};
-    -- for skillId, skill in pairs(ConvertDate) do
-    --     Test[skillId] = {}
+    -- local ConvertData = {}
+    -- Convert = {};
+    -- for skillId, skill in pairs(ConvertData) do
+    --     if (skill[1]) then
+    --         Convert[skill[1]] = skillId;
+    --     end
+    -- end
+
+    -- local ConvertData = {}
+    -- Convert = {};
+    -- for skillId, skill in pairs(ConvertData) do
+    --     Convert[skillId] = {}
     --     for i, reagentId in ipairs(skill[6]) do
-    --         Test[skillId][reagentId] = skill[7][i];
+    --         Convert[skillId][reagentId] = skill[7][i];
     --     end
     -- end
 end

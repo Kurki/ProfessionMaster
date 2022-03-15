@@ -46,6 +46,9 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
     -- prepare item ids
     local skills = {};
 
+    -- get item skills
+    local itemSkills = addon:GetModel("item-skills");
+
     -- iterate trade skills
     for tradeSkillIndex = 1, tradeSkillAmount do
         -- ger trade skill name and type
@@ -53,19 +56,30 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
         -- check name and type
         if (tradeSkillName and (tradeSkillType == "optimal" or tradeSkillType == "medium" or tradeSkillType == "easy" or tradeSkillType == "trivial")) then
-            -- get trade skill item link and id
+            -- get trade skill item link and link
             local tradeSkillItemLink = GetTradeSkillItemLink(tradeSkillIndex);
             local tradeSkillItemId = GetItemInfoInstant(tradeSkillItemLink);
-            local tradeSkillId = professionNamesService:GetSkillId(GetTradeSkillRecipeLink(tradeSkillIndex));
 
-            -- check skill id
-            if (tradeSkillId) then
-                -- add skill
-                table.insert(skills, {
-                    skillId = tradeSkillId,
-                    itemId = tradeSkillItemId,
-                    added = time()
-                });
+            -- get trade skill id
+            if (tradeSkillItemId) then
+                -- get trande skill id
+                local tradeSkillId = itemSkills[tradeSkillItemId];
+                if (not tradeSkillId) then
+                    local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+                    if (tradeSkillLink) then
+                        tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+                    end
+                end 
+
+                -- check skill id
+                if (tradeSkillId) then
+                    -- add skill
+                    table.insert(skills, {
+                        skillId = tradeSkillId,
+                        itemId = tradeSkillItemId,
+                        added = time()
+                    });
+                end
             end
         end
     end

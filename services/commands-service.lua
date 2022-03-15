@@ -73,7 +73,6 @@ local function CommandHandler(parameters)
         BucketList = {};
         Frames = {};
         CharacterSettings = {}; 
-        Guildmates = {}; 
         addon:CheckSettings();
     end
 
