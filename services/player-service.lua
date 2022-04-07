@@ -34,6 +34,7 @@ end
 --- Refresh guildmates.
 function PlayerService:RefreshGuildmates()
     -- set all guildmates offline
+    if (not Guildmates) then Guildmates = {}; end
     for _, guildmate in pairs(Guildmates) do
         guildmate.online = false;
     end
@@ -43,13 +44,16 @@ function PlayerService:RefreshGuildmates()
         -- get player info
         local playerName, _, _, _, _, _, _, _, online = GetGuildRosterInfo(guildIndex);
 
-        -- check if not in guild mates
-        if (not Guildmates[playerName]) then
-            Guildmates[playerName] = {};
-        end
+        -- check player name
+        if (playerName) then
+            -- check if not in guild mates
+            if (not Guildmates[playerName]) then
+                Guildmates[playerName] = {};
+            end
 
-        -- set online/offline
-        Guildmates[playerName].online = online;
+            -- set online/offline
+            Guildmates[playerName].online = online;
+        end
     end
 end
 

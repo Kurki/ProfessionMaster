@@ -589,7 +589,7 @@ function ProfessionsView:RefreshRows()
             row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
 
             -- set player text
-            row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players), ", "));
+            row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
 
             -- set bucket list text
             row.bucketListText:SetText(bucketListAmount);

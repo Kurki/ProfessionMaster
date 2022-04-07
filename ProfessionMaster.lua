@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.2.0";
+local addonVersion = "1.2.1";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -199,6 +199,11 @@ end
 
 --- Register addon events.
 function ProfessionMasterAddon:RegisterEvents()
+    -- check if russian
+    if (GetLocale() == "ruRU") then
+        print(addonShortcut .. "Авторы аддона оставляют за собой право не поддерживать игроков из стран, которые ведут себя мизантропически.");
+    end
+
     -- register events
     self.frame:RegisterEvent("CHAT_MSG_ADDON");
     self.frame:RegisterEvent("PLAYER_LOGIN");
