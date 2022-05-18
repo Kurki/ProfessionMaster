@@ -3,7 +3,9 @@
 # Profession Master
 
 [![Profession Master on Discord](https://img.shields.io/discord/831203449675841567?color=7289da&label=DISCORD&style=for-the-badge)](https://discord.gg/YddUBQ6R55)
-
+  
+![Logo](https://user-images.githubusercontent.com/2084071/169080261-9fadfbd2-8be6-4f4a-a163-bb2929bf0d71.png)
+  
 </div>
 
 Profession Master should help you and your guild to know faster which player has which profession and who can craft which item or who has learned which enchantment. To make this work Profession Master builds in the following components of WoW:
@@ -20,19 +22,19 @@ Regularly when logging in or learning new profession skills, the learned profess
 
 The tooltips show you - if known - the players who can craft the item. The same applies to tooltips of professional skills. The tooltips also take into account whether you yourself have learned this skill or which of the known players is currently online.
 
-![Tooltip Extension](https://media.forgecdn.net/attachments/430/87/a654a85f-2114-44e2-860f-52d9dd2df117.jpeg "")
+![Tooltip Extension](https://user-images.githubusercontent.com/2084071/169080265-e670ea29-440d-49f8-bdeb-86ca89e2da70.jpeg "")
 
 ## Profession overview
 
 Profession Master also offers you the possibility to display and search all known professions and their players in a single overview. Players who are online will be highlighted there as well.
 
-![Profession Overview](https://media.forgecdn.net/attachments/430/86/fd0a48da-ead7-45ab-a224-1ff2ecd47570.jpeg "")
+![Profession Overview](https://user-images.githubusercontent.com/2084071/169080267-21d01a3d-6805-4f84-96da-b58342ecfe53.jpeg "")
 
 ## Shopping List
 
 You can put Enchants or Items to the Shopping List to remember what you need. You will also be informed which reagents are missing in your bags.
 
-![Add to Shopping List](https://media.forgecdn.net/attachments/440/999/add.png "")
+![Add to Shopping List](https://user-images.githubusercontent.com/2084071/169080254-6119111e-381d-4e04-8fb5-6be3d02a73ba.png "")
 
 ## So what comes next? 
 
