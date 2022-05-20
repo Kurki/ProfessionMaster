@@ -45,7 +45,7 @@ Besides small corrections and improvements, as well as work on the speed, if pos
 Visit the Discord Server to give feedback.  
 [![Discord Server](https://img.shields.io/discord/831203449675841567?color=7289da&label=DISCORD&style=for-the-badge "")](https://discord.gg/YddUBQ6R55 "Join the Discord Server")
 
-###Support
+## Support
 
 To keep this addon alive it would be very helpful to make a small donation. Thank you very much!
 
