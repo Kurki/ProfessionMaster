@@ -47,6 +47,7 @@ function ProfessionNamesService:GetProfessionIdsToShow()
         165,
         164,
         202,
+        773,
         185
     };
 end

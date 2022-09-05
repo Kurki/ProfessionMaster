@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.3.0";
+local addonVersion = "1.4.0";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -259,10 +259,6 @@ function ProfessionMasterAddon:RegisterEvents()
         -- handle trade skill update
         elseif (event == "TRADE_SKILL_UPDATE") then
             self:GetService("own-professions"):GetTradeSkillProfessionData();
-
-        -- handle craft update
-        elseif (event == "CRAFT_UPDATE") then
-            self:GetService("own-professions"):GetEnchantingProfessionData();
 
         -- handle craft update
         elseif (event == "GUILD_ROSTER_UPDATE") then

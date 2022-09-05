@@ -26,6 +26,22 @@ OwnProfessionsService.__index = OwnProfessionsService;
 function OwnProfessionsService:Initialize()
 end
 
+-- --- Trasde skill was updates.
+-- function OwnProfessionsService:TradeSkillUpdate()
+    
+
+--     -- GetCraftSkillLine(1)
+
+--     -- check if is enchanting
+--     if (professionId == 333) then
+--         self:GetEnchantingProfessionData();
+--         return;
+--     end
+
+--     -- get trade skill data
+--     self:GetTradeSkillProfessionData(professionId);
+-- end
+
 --- Get own trade skill professions. Enchanting is not part of trade professions.
 function OwnProfessionsService:GetTradeSkillProfessionData()
     -- check if is in combat
@@ -33,11 +49,24 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
         return;
     end
 
-    -- get an check profession id
+    -- get and check profession id
     local professionNamesService = addon:GetService("profession-names");
     local professionId = professionNamesService:GetProfessionId(GetTradeSkillLine());
     if (not professionId) then
         return;
+    end
+
+    -- check if is link
+    local tradeSkillIsLink, tradeSkillPlayerName = IsTradeSkillLinked();
+    local longTradeSkillPlayerName = nil;
+    if (tradeSkillIsLink) then
+        -- get long name
+        longTradeSkillPlayerName = addon:GetService("player"):GetLongName(tradeSkillPlayerName);
+
+        -- check if is guild mate
+        if (not Guildmates or not Guildmates[longTradeSkillPlayerName]) then
+            return;
+        end
     end
 
     -- get amount of trade skills
@@ -56,79 +85,99 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
         -- check name and type
         if (tradeSkillName and (tradeSkillType == "optimal" or tradeSkillType == "medium" or tradeSkillType == "easy" or tradeSkillType == "trivial")) then
-            -- get trade skill item link and link
-            local tradeSkillItemLink = GetTradeSkillItemLink(tradeSkillIndex);
-            local tradeSkillItemId = GetItemInfoInstant(tradeSkillItemLink);
-
-            -- get trade skill id
-            if (tradeSkillItemId) then
-                -- get trande skill id
-                local tradeSkillId = itemSkills[tradeSkillItemId];
-                if (not tradeSkillId) then
-                    local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
-                    if (tradeSkillLink) then
-                        tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
-                    end
-                end 
-
-                -- check skill id
-                if (tradeSkillId) then
+            -- check if enchanting
+            if (professionId == 333) then
+                -- get trade skill lid
+                local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+                if (tradeSkillLink) then
+                    local tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+                    
                     -- add skill
                     table.insert(skills, {
                         skillId = tradeSkillId,
-                        itemId = tradeSkillItemId,
+                        itemId = 0,
                         added = time()
                     });
+                end
+            else 
+                 -- get trade skill item link and link
+                local tradeSkillItemLink = GetTradeSkillItemLink(tradeSkillIndex);
+                local tradeSkillItemId = GetItemInfoInstant(tradeSkillItemLink);
+
+                -- get trade skill id
+                if (tradeSkillItemId) then
+                    -- get trande skill id
+                    local tradeSkillId = itemSkills[tradeSkillItemId];
+                    if (not tradeSkillId) then
+                        local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+                        if (tradeSkillLink) then
+                            tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+                        end
+                    end 
+
+                    -- check skill id
+                    if (tradeSkillId) then
+                        -- add skill
+                        table.insert(skills, {
+                            skillId = tradeSkillId,
+                            itemId = tradeSkillItemId,
+                            added = time()
+                        });
+                    end
                 end
             end
         end
     end
 
-    -- store own profession
-    self:StoreAndSendOwnProfession(professionId, skills);
+    -- chck if is link
+    if (tradeSkillIsLink) then
+        -- add to player professions
+        addon:GetService("professions"):StorePlayerSkills(longTradeSkillPlayerName, professionId, skills);
+    else
+        -- store own profession
+        self:StoreAndSendOwnProfession(professionId, skills);
+    end
 end
 
---- Get own enchanting skills.
-function OwnProfessionsService:GetEnchantingProfessionData()
-    -- check if is in combat
-    if (addon.inCombat) then
-        return;
-    end
+-- --- Get own enchanting skills.
+-- function OwnProfessionsService:GetEnchantingProfessionData()
+--     -- get amount of skills
+--     local recipeAmount = GetNumCrafts();
 
-    -- get and check profession id
-    local professionId = addon:GetService("profession-names"):GetProfessionId(GetCraftSkillLine(1));
-    if (not professionId or professionId ~= 333) then
-        return;
-    end
+--     -- prepare skills
+--     local skills = {};
 
-    -- get amount of skills
-    local recipeAmount = GetNumCrafts();
+--     -- iterate skills
+--     for recipeIndex = 1, recipeAmount do
+--         -- ger recipe name and type
+--         local recipeName, _, recipeType = GetCraftInfo(recipeIndex);
 
-    -- prepare skills
-    local skills = {};
+--         -- check name and type
+--         if (recipeName and (recipeType == "optimal" or recipeType == "medium" or recipeType == "easy" or recipeType == "trivial")) then
+--             -- get item id of recipe
+--             local _, _, _, _, _, _, recipeId = GetSpellInfo(recipeName);
 
-    -- iterate skills
-    for recipeIndex = 1, recipeAmount do
-        -- ger recipe name and type
-        local recipeName, _, recipeType = GetCraftInfo(recipeIndex);
+--             -- add item id
+--             table.insert(skills, {
+--                 skillId = recipeId,
+--                 itemId = 0,
+--                 added = time()
+--             });
+--         end
+--     end
 
-        -- check name and type
-        if (recipeName and (recipeType == "optimal" or recipeType == "medium" or recipeType == "easy" or recipeType == "trivial")) then
-            -- get item id of recipe
-            local _, _, _, _, _, _, recipeId = GetSpellInfo(recipeName);
-
-            -- add item id
-            table.insert(skills, {
-                skillId = recipeId,
-                itemId = 0,
-                added = time()
-            });
-        end
-    end
-
-    -- store own profession
-    self:StoreAndSendOwnProfession(professionId, skills);
-end
+--     -- check if is  ink and get player name
+--     local tradeSkillIsLink, tradeSkillPlayerName = IsTradeSkillLinked()
+--     if (tradeSkillIsLink) then
+--         -- add to player professions
+--         local professionsService = addon:GetService("professions");
+--         local playerService = addon:GetService("player");
+--         professionsService:StorePlayerSkills(playerService:GetLongName(tradeSkillPlayerName), 333, skills);
+--     else
+--         -- store own profession
+--         self:StoreAndSendOwnProfession(333, skills);
+--     end
+-- end
 
 --- Store profession.
 -- @param professionId Id of profession to store.
