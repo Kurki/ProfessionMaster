@@ -32,7 +32,7 @@ local ProfessionIcons = {
     [356] = 136245,
     [393] = 134366,
     [755] = 134071,
-    [773] = nil,
+    [773] = 237171
 };
 
 -- register model
