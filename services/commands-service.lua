@@ -62,23 +62,25 @@ local function CommandHandler(parameters)
         return;
     end
 
-    -- check if data should be purged
+    -- check if purge information must be shown
     if (string.lower(parameters) == "purge") then
-        Professions = {};
-        OwnProfessions = {};
-        SyncTimes = {};
-        Settings = {};
-        Logs = {};
-        CharacterSets = {};
-        BucketList = {};
-        Frames = {};
-        CharacterSettings = {}; 
-        addon:CheckSettings();
+        local chatService = addon:GetService("chat");
+        chatService:Write("CommandsPurgeRow1");
+        chatService:Write("CommandsPurgeRow2");
+        chatService:Write("CommandsPurgeRow3");
+        chatService:Write("CommandsPurgeRow4");
+        return;
+    end
+
+    --check if data msut be purged
+    if (string.find(parameters, "purge") == 1 and string.len(parameters) > 6) then
+        addon:GetService("purge"):Purge(string.sub(parameters, 7));
     end
 
     -- check if history should be shown
     if (string.lower(parameters) == "debug") then
         addon:ToggleDebug();
+        return;
     end
 
     -- check if history should be shown

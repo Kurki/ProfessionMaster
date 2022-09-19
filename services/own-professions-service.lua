@@ -26,22 +26,6 @@ OwnProfessionsService.__index = OwnProfessionsService;
 function OwnProfessionsService:Initialize()
 end
 
--- --- Trasde skill was updates.
--- function OwnProfessionsService:TradeSkillUpdate()
-    
-
---     -- GetCraftSkillLine(1)
-
---     -- check if is enchanting
---     if (professionId == 333) then
---         self:GetEnchantingProfessionData();
---         return;
---     end
-
---     -- get trade skill data
---     self:GetTradeSkillProfessionData(professionId);
--- end
-
 --- Get own trade skill professions. Enchanting is not part of trade professions.
 function OwnProfessionsService:GetTradeSkillProfessionData()
     -- check if is in combat
@@ -138,46 +122,6 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
         self:StoreAndSendOwnProfession(professionId, skills);
     end
 end
-
--- --- Get own enchanting skills.
--- function OwnProfessionsService:GetEnchantingProfessionData()
---     -- get amount of skills
---     local recipeAmount = GetNumCrafts();
-
---     -- prepare skills
---     local skills = {};
-
---     -- iterate skills
---     for recipeIndex = 1, recipeAmount do
---         -- ger recipe name and type
---         local recipeName, _, recipeType = GetCraftInfo(recipeIndex);
-
---         -- check name and type
---         if (recipeName and (recipeType == "optimal" or recipeType == "medium" or recipeType == "easy" or recipeType == "trivial")) then
---             -- get item id of recipe
---             local _, _, _, _, _, _, recipeId = GetSpellInfo(recipeName);
-
---             -- add item id
---             table.insert(skills, {
---                 skillId = recipeId,
---                 itemId = 0,
---                 added = time()
---             });
---         end
---     end
-
---     -- check if is  ink and get player name
---     local tradeSkillIsLink, tradeSkillPlayerName = IsTradeSkillLinked()
---     if (tradeSkillIsLink) then
---         -- add to player professions
---         local professionsService = addon:GetService("professions");
---         local playerService = addon:GetService("player");
---         professionsService:StorePlayerSkills(playerService:GetLongName(tradeSkillPlayerName), 333, skills);
---     else
---         -- store own profession
---         self:StoreAndSendOwnProfession(333, skills);
---     end
--- end
 
 --- Store profession.
 -- @param professionId Id of profession to store.
