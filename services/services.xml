@@ -8,6 +8,7 @@
     <Script file="player-service.lua" />
     <Script file="profession-names-service.lua" />
     <Script file="professions-service.lua" />
+    <Script file="purge-service.lua" />
     <Script file="timer-service.lua" />
     <Script file="tooltip-service.lua" />
     <Script file="ui-service.lua" />

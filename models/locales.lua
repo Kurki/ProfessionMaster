@@ -38,13 +38,17 @@ function LocalesModel:Create()
             ["CommandsOverview"] = "/pm - Show/Hide professions overview",
             ["CommandsMinimap"] = "/pm minimap - Toggle professions minimap icon",
             ["CommandsReagents"] = "/pm reagents - Show/Hide missing Reagents",
-            ["CommandsPurge"] = "/pm purge - Delete all data",
+            ["CommandsPurge"] = "/pm purge [all | own | <player name>] - Delete all data, the data of yourself or of a specific player",
+            ["CommandsPurgeRow1"] = "Possible purge commands:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Delete all data",
+            ["CommandsPurgeRow3"] = "/pm purge own - Delete data of yourself",
+            ["CommandsPurgeRow4"] = "/pm purge <player name> - Delete data of a specific player",
 
             -- welcome
             ["WelcomeTitle"] = addon.name .. " - Welcome",
             ["WelcomeDescription"] = addon.name .. " shows you your profession and the professions of all your guild members who also use " .. addon.name .. " in a single overview.\n\n" .. 
                 "Use the button on your minimap or the chat command /pm to show or hide the corresponding windows.\n\n" ..
-                "|cffd4af37Open your now your profession windows to share your professions.",
+                "|cffd4af37Open your profession windows now to share your professions.",
 
             -- minimap button
             ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
@@ -71,7 +75,11 @@ function LocalesModel:Create()
             ["SkillViewOk"] = "OK",
 
             -- missing reagents view
-            ["MissingReagentsViewTitle"] = "Missing Reagents"
+            ["MissingReagentsViewTitle"] = "Missing Reagents",
+
+            -- purge
+            ["AllDataPurged"] = "All data was deleted",
+            ["CharacterPurged"] = "Data of %s was deleted"
         },
         -- define de locale
         ["de"] = {
@@ -85,14 +93,18 @@ function LocalesModel:Create()
             ["WelcomeTitle"] = addon.name .. " - Willkommen",
             ["WelcomeDescription"] = addon.name .. " zeigt dir deine und die Berufe all deiner Gildenmitglieder, die auch " .. addon.name .. " nutzen, in einer einzigen Übersicht an.\n\n" ..
                 "Benutze die Schaltfläche an deiner Minimap oder den Chat-Befehl /pm um die entsprechenden Fenster ein- oder auszublenden.\n\n" .. 
-                "|cffd4af37Öffne deine jetzt deine Berufsfenster, um deine Berufe zu teilen.",
+                "|cffd4af37Öffne jetzt deine Berufsfenster, um deine Berufe zu teilen.",
 
             -- commands
             ["CommandsTitle"] = "Mögliche Befehle:",
             ["CommandsOverview"] = "/pm - Berufsübersicht ein-/ausblenden",
             ["CommandsMinimap"] = "/pm minimap - Minimap icon umschalten",
             ["CommandsReagents"] = "/pm reagents - Fehlende Materialien ein-/ausblenden",
-            ["CommandsPurge"] = "/pm purge - Lösche alle Daten",
+            ["CommandsPurge"] = "/pm purge [all | own | <Spielername>] - Lösche alle Daten, Daten von dir oder von einem spezifischen Spieler",
+            ["CommandsPurgeRow1"] = "Mögliche Lösch-Befehle:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Lösche alle Daten",
+            ["CommandsPurgeRow3"] = "/pm purge own - Lösche Daten von dir",
+            ["CommandsPurgeRow4"] = "/pm purge <Spielername> - Lösche Daten von einem spezifischen Spieler",
 
             -- minimap button
             ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
@@ -119,7 +131,11 @@ function LocalesModel:Create()
             ["SkillViewOk"] = "OK",
 
             -- missing reagents view
-            ["MissingReagentsViewTitle"] = "Fehlende Materialien"
+            ["MissingReagentsViewTitle"] = "Fehlende Materialien",
+
+            -- purge
+            ["AllDataPurged"] = "Alle Daten wurden gelöscht",
+            ["CharacterPurged"] = "Daten von %s wurden gelöscht"
         }
     };
 end
