@@ -181,7 +181,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                                     if (Guildmates[playerName]) then
                                         table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
                                     else
-                                        table.insert(onlinePlayers[shortTwinkNameOnline], "Twink");
+                                        table.insert(onlinePlayers[shortTwinkNameOnline], "alt");
                                     end
                                 end
                             end

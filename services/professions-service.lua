@@ -346,13 +346,13 @@ end
 function ProfessionsService:Convert()
     -- local ConvertData = {}
     -- Convert = {};
+    -- print("123")
     -- for skillId, skill in pairs(ConvertData) do
     --     if (skill[1]) then
     --         Convert[skill[1]] = skillId;
     --     end
     -- end
 
-    -- local ConvertData = {}
     -- Convert = {};
     -- for skillId, skill in pairs(ConvertData) do
     --     Convert[skillId] = {}
