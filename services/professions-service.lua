@@ -158,62 +158,43 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     local professionNamesService = addon:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
-    local enchantItems = addon:GetModel("enchant-items");
+    local skillItems = addon:GetModel("skill-items");
     local bopItems = addon:GetModel("bop-items");
 
     -- check skills
     for i, skill in ipairs(skills) do
         -- check item
         if (not profession[skill.skillId]) then
-            -- prepare skill entry
-            local skillEntry = nil;
+            -- get spell
+            local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
 
-            -- check if profession is enchantment
+            -- get skill link
+            local skillLink = GetSpellLink(skill.skillId);
+
+            -- add item
+            local skillEntry = {
+                name = spellName,
+                skillLink = skillLink,
+                itemId = skill.itemId,
+                itemLink = nil,
+                itemColor = nil,
+                icon = spellIcon,
+                bop = false,
+                players = {}
+            };
+            profession[skill.skillId] = skillEntry;
+
+            -- use default enchaning color
             if (professionId == 333) then
-                -- get spell
-                local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
+                skillEntry.itemColor = "FF71D5FF";
+            end
 
-                -- get skill link
-                local skillLink;
-                if (addon.isEra) then
-                    skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
-                else
-                    skillLink = GetSpellLink(skill.skillId);
+            -- check if item can be found by skill id
+            if (skillEntry.itemId == 0) then
+                skillEntry.itemId = skillItems[skill.skillId];
+                if (not skillEntry.itemId) then
+                    skillEntry.itemId = 0;
                 end
-
-                -- add item
-                skillEntry = {
-                    name = spellName,
-                    skillLink = skillLink,
-                    itemId = skill.itemId,
-                    itemLink = nil,
-                    itemColor = "FF71D5FF",
-                    icon = spellIcon,
-                    bop = false,
-                    players = {}
-                };
-                profession[skill.skillId] = skillEntry;
-
-                -- check if item can be found by skill id
-                if (skillEntry.itemId == 0) then
-                    skillEntry.itemId = enchantItems[skill.skillId];
-                    if (not skillEntry.itemId) then
-                        skillEntry.itemId = 0;
-                    end
-                end
-            else
-                -- add item
-                skillEntry = {
-                    name = nil,
-                    skillLink = nil,
-                    itemId = skill.itemId,
-                    itemLink = nil,
-                    itemColor = nil,
-                    icon = nil,
-                    bop = false,
-                    players = {}
-                };
-                profession[skill.skillId] = skillEntry;
             end
 
             -- check if skill has item
@@ -247,8 +228,6 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                     end);
                 end
             end
-        else
-
         end
 
         -- get player names
@@ -344,12 +323,13 @@ end
 
 --- Convert data.
 function ProfessionsService:Convert()
-    -- local ConvertData = {}
+    -- local ConvertData = {
+    -- }
     -- Convert = {};
-    -- print("123")
+    -- -- print("123")
     -- for skillId, skill in pairs(ConvertData) do
     --     if (skill[1]) then
-    --         Convert[skill[1]] = skillId;
+    --         Convert[skillId] = skill[1];
     --     end
     -- end
 
