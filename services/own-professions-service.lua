@@ -59,9 +59,6 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
     -- prepare item ids
     local skills = {};
 
-    -- get item skills
-    local itemSkills = addon:GetModel("item-skills");
-
     -- iterate trade skills
     for tradeSkillIndex = 1, tradeSkillAmount do
         -- ger trade skill name and type
@@ -69,46 +66,24 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
         -- check name and type
         if (tradeSkillName and (tradeSkillType == "optimal" or tradeSkillType == "medium" or tradeSkillType == "easy" or tradeSkillType == "trivial")) then
-            -- check if enchanting
-            if (professionId == 333) then
-                -- get trade skill lid
-                local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
-                if (tradeSkillLink) then
-                    local tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
-                    
-                    -- add skill
-                    table.insert(skills, {
-                        skillId = tradeSkillId,
-                        itemId = 0,
-                        added = time()
-                    });
-                end
-            else 
-                 -- get trade skill item link and link
+            -- get trade skill lid
+            local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+            if (tradeSkillLink) then
+                -- build skill
+                local skill = {
+                    skillId = professionNamesService:GetSkillId(tradeSkillLink),
+                    itemId = 0,
+                    added = time()
+                };
+
+                -- get trade skil, item link
                 local tradeSkillItemLink = GetTradeSkillItemLink(tradeSkillIndex);
-                local tradeSkillItemId = GetItemInfoInstant(tradeSkillItemLink);
-
-                -- get trade skill id
-                if (tradeSkillItemId) then
-                    -- get trande skill id
-                    local tradeSkillId = itemSkills[tradeSkillItemId];
-                    if (not tradeSkillId) then
-                        local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
-                        if (tradeSkillLink) then
-                            tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
-                        end
-                    end 
-
-                    -- check skill id
-                    if (tradeSkillId) then
-                        -- add skill
-                        table.insert(skills, {
-                            skillId = tradeSkillId,
-                            itemId = tradeSkillItemId,
-                            added = time()
-                        });
-                    end
+                if (tradeSkillItemLink) then
+                    skill.itemId = GetItemInfoInstant(tradeSkillItemLink);
                 end
+
+                -- add skill
+                table.insert(skills, skill);
             end
         end
     end
