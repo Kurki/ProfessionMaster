@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.5.1";
+local addonVersion = "1.5.2";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -307,7 +307,7 @@ end
 -- Migrate data.
 function ProfessionMasterAddon:Migrate()
     -- check data version
-    if (self.isEra and Settings.storeVersion and Settings.storeVersion < 3) then
+    if (Settings.storeVersion and Settings.storeVersion < 3) then
         -- clear data
         Professions = {};
         OwnProfessions = {};
@@ -315,72 +315,24 @@ function ProfessionMasterAddon:Migrate()
         CharacterSettings = {}; 
         Settings = {};
         self:CheckSettings();
+    end
 
     -- check data version
-    elseif (Settings.storeVersion and Settings.storeVersion < 2) then
-        -- clear logs
-        Logs = {};
-
-        -- get items
-        local enchantItems = self:GetModel("enchant-items");
-        local bopItems = self:GetModel("bop-items");
-        local professionNamesService = self:GetService("profession-names");
-
+    if (Settings.storeVersion and Settings.storeVersion < 4) then
         -- check all professions
-        for professionId, profession in pairs(Professions) do     
-            -- check skills professions
+        for _, profession in pairs(Professions) do  
+            -- iterate skills
             for skillId, skill in pairs(profession) do     
-                -- check if profession is enchantment
-                if (professionId == 333) then
-                    if (not skill.itemColor) then
-                        -- set enchant item color
-                        skill.itemColor = "FF71D5FF";
-                    end
-
-                    -- check if has item id
-                    if (not skill.itemId or skill.itemId == 0) then
-                        -- get item id
-                        skill.itemId = enchantItems[skillId];
-                        if (not skill.itemId) then
-                            skill.itemId = 0;
-                        end
-                    end
-
-                    -- check if skill found
-                    if (skill.itemId and skill.itemId ~= 0 and not skill.itemLink) then
-                        -- get item data
-                        local item = Item:CreateFromItemID(skill.itemId);
-                        if (not item:IsItemEmpty()) then
-                            -- wait until loaded
-                            item:ContinueOnItemLoad(function()
-                                -- set values
-                                local itemLink = item:GetItemLink();
-                                skill.itemLink = itemLink;
-                                skill.itemColor = professionNamesService:GetItemColor(itemLink);
-                                skill.icon = item:GetItemIcon();
-                            end);
-                        end
-                    end
+                if (not skill.name) then
+                    profession[skillId] = nil;
+                    break;
                 end
-
-                -- check if has item
-                if (skill.itemId and skill.itemId ~= 0) then
-                    -- check if bop
-                    skill.bop = false;
-                    for _, itemId in ipairs(bopItems) do
-                        -- check if is bop
-                        if (skill.itemId == itemId) then
-                            skill.bop = true;
-                            break;
-                        end
-                    end
-                end
-            end  
-        end  
+            end
+        end
     end
 
     -- set store version
-    Settings.storeVersion = 3;
+    Settings.storeVersion = 4;
 end
 
 -- create addon
