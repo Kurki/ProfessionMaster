@@ -421,8 +421,8 @@ function ProfessionsView:AddFilteredSkills(professionId, searchParts)
     -- filter skills
     if (profession) then
         for skillId, skill in pairs(profession) do
-            -- check if bop
-            if (not skill.bop) then
+            -- check if bop and skill ok
+            if (skill.name ~= nil and skill.itemId ~= nil) then
                 -- get bucket list amount
                 local bucketListAmount = BucketList[skillId];
 
