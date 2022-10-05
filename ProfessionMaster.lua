@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.5.2";
+local addonVersion = "1.5.3";
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -318,21 +318,50 @@ function ProfessionMasterAddon:Migrate()
     end
 
     -- check data version
-    if (Settings.storeVersion and Settings.storeVersion < 4) then
+    if (Settings.storeVersion and Settings.storeVersion < 5) then
         -- check all professions
-        for _, profession in pairs(Professions) do  
+        for professionId, profession in pairs(Professions) do  
+            -- prepare valid skills
+            local validSkills = {};
+
             -- iterate skills
             for skillId, skill in pairs(profession) do     
-                if (not skill.name) then
-                    profession[skillId] = nil;
-                    break;
+                -- check skill
+                if (skill.name ~= nil and skill.itemId ~= nil) then
+                    validSkills[skillId] = skill;
                 end
+            end
+
+            -- store valid skills
+            Professions[professionId] = validSkills;
+        end
+
+        -- check own professions
+        for characterName, professions in pairs(OwnProfessions) do
+            -- iterate all professions
+            for professionId, skills in pairs(professions) do
+                -- prepare valid skills
+                local validSkills = {};
+
+                -- iterate all skills
+                for skillIndex = 1, #skills do
+                    -- get skill
+                    local skill = skills[skillIndex];
+
+                    -- check skill
+                    if (skill.skillId ~= nil and skill.itemId ~= nil) then
+                        table.insert(validSkills, skill);
+                    end
+                end
+
+                -- store valid skills
+                professions[professionId] = validSkills;
             end
         end
     end
 
     -- set store version
-    Settings.storeVersion = 4;
+    Settings.storeVersion = 5;
 end
 
 -- create addon
