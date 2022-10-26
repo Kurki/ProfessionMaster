@@ -41,7 +41,7 @@ local function CommandHandler(parameters)
         chatService:Write("CommandsTitle");
         chatService:Write("CommandsOverview");
         chatService:Write("CommandsReagents");
-        if (Settings.hideMinimapButton) then
+        if (Settings.minimapButton.hide) then
             chatService:Write("CommandsMinimap");
         end
         chatService:Write("CommandsPurge");
@@ -54,11 +54,10 @@ local function CommandHandler(parameters)
         return;
     end
 
-
     -- check if minimap should be toggeled
-    if (string.lower(parameters) == "minimap" and Settings.hideMinimapButton) then
-        addon.minimapButton:Show();
-        Settings.hideMinimapButton = nil;
+    if (string.lower(parameters) == "minimap") then
+        LibStub("LibDBIcon-1.0"):Show("ProfessionMaster");
+        Settings.minimapButton.hide = false;
         return;
     end
 

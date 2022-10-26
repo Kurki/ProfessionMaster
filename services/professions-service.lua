@@ -158,7 +158,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     local professionNamesService = addon:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
-    local skillItems = addon:GetModel("skill-items");
+    local allSkills = addon:GetModel("all-skills");
     local bopItems = addon:GetModel("bop-items");
 
     -- check skills
@@ -191,10 +191,13 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
             -- check if item can be found by skill id
             if (skillEntry.itemId == 0) then
-                skillEntry.itemId = skillItems[skill.skillId];
-                if (not skillEntry.itemId) then
-                    skillEntry.itemId = 0;
-                end
+				local skillInfo = allSkills[skill.skillId];
+				if (skillInfo) then
+					skillEntry.itemId = skillInfo.itemId;
+					if (not skillEntry.itemId) then
+						skillEntry.itemId = 0;
+					end
+				end
             end
 
             -- check if skill has item
@@ -323,21 +326,27 @@ end
 
 --- Convert data.
 function ProfessionsService:Convert()
-    -- local ConvertData = {
-    -- }
+    -- local ConvertData = {};
     -- Convert = {};
-    -- -- print("123")
     -- for skillId, skill in pairs(ConvertData) do
-    --     if (skill[1]) then
-    --         Convert[skillId] = skill[1];
-    --     end
-    -- end
+    --     -- Convert[skillId] = {};
+    --     -- local reagents = {};
+    --     -- for i, reagentId in ipairs(skill[6]) do
+    --     --     table.insert(reagents, reagentId);
+    --     --     table.insert(reagents, skill[7][i]);
+    --     -- end
 
-    -- Convert = {};
-    -- for skillId, skill in pairs(ConvertData) do
-    --     Convert[skillId] = {}
+    --     -- table.insert(Convert[skillId], 0);
+    --     -- table.insert(Convert[skillId], skill[1]);
+    --     -- table.insert(Convert[skillId], reagents);
+    --     Convert[skillId] = {
+    --         addon = 2,
+    --         itemId = skill[1],
+    --         reagents = {}
+    --     }
+
     --     for i, reagentId in ipairs(skill[6]) do
-    --         Convert[skillId][reagentId] = skill[7][i];
+    --         Convert[skillId].reagents[reagentId] = skill[7][i];
     --     end
     -- end
 end

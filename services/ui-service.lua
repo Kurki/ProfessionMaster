@@ -263,98 +263,38 @@ end
 
 -- Create minimap icon.
 function UiService:CreateMinimapIcon()
-    local minimapButton = CreateFrame("Button", "PMMinimap", Minimap)
-	minimapButton:SetFrameStrata("MEDIUM");
-	minimapButton:SetSize(31, 31);
-	minimapButton:SetFrameLevel(8);
-	minimapButton:RegisterForClicks("anyUp");
-	minimapButton:RegisterForDrag("LeftButton");
-	minimapButton:SetHighlightTexture(136477); --"Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
-    minimapButton:SetMovable(true);
-    addon.minimapButton = minimapButton;
+    -- get lib
+    local libDbIcon = LibStub("LibDBIcon-1.0");
 
-    -- check if should be hidden
-    if (Settings.hideMinimapButton) then
-        minimapButton:Hide();
-    end
-
-	local overlay = minimapButton:CreateTexture(nil, "OVERLAY");
-	overlay:SetSize(53, 53);
-	overlay:SetTexture(136430); --"Interface\\Minimap\\MiniMap-TrackingBorder"
-	overlay:SetPoint("TOPLEFT");
-
-	local background = minimapButton:CreateTexture(nil, "BACKGROUND");
-	background:SetSize(20, 20);
-	background:SetTexture(136467); --"Interface\\Minimap\\UI-Minimap-Background"
-	background:SetPoint("TOPLEFT", 7, -5);
-
-	local icon = minimapButton:CreateTexture(nil, "ARTWORK");
-	icon:SetSize(17, 17);
-	icon:SetTexture(133745);
-	icon:SetPoint("TOPLEFT", 7, -6);
-    
-    local myIconPos = Settings.minimapPos or 0;
-    
-    -- Control movement
-    local function UpdateMapBtn()
-        local Xpoa, Ypoa = GetCursorPosition()
-        local Xmin, Ymin = Minimap:GetLeft(), Minimap:GetBottom()
-        Xpoa = Xmin - Xpoa / Minimap:GetEffectiveScale() + 70
-        Ypoa = Ypoa / Minimap:GetEffectiveScale() - Ymin - 70
-        myIconPos = math.deg(math.atan2(Ypoa, Xpoa))
-        Settings.minimapPos = myIconPos;
-        minimapButton:ClearAllPoints()
-        minimapButton:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(myIconPos)), (80 * sin(myIconPos)) - 52)
-    end
-    
-    minimapButton:RegisterForDrag("LeftButton")
-    minimapButton:SetScript("OnDragStart", function()
-        minimapButton:StartMoving()
-        minimapButton:SetScript("OnUpdate", UpdateMapBtn)
-    end)
-    
-    minimapButton:SetScript("OnDragStop", function()
-        minimapButton:StopMovingOrSizing();
-        minimapButton:SetScript("OnUpdate", nil)
-        UpdateMapBtn();
-    end)
-    
-    -- set position
-    minimapButton:ClearAllPoints();
-    minimapButton:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 52 - (80 * cos(myIconPos)),(80 * sin(myIconPos)) - 52)
-    
-    -- handle mouse enter
-    minimapButton:SetScript("OnEnter", function()
-        -- show item tool tip
-        local localeService = addon:GetService("locale");
-        GameTooltip:SetOwner(minimapButton, "ANCHOR_LEFT");
-        GameTooltip:SetText(localeService:Get("MinimapButtonTitle"));
-        GameTooltip:AddLine(" ");
-        GameTooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
-        GameTooltip:AddLine(localeService:Get("MinimapButtonRightClick"));
-        GameTooltip:AddLine(localeService:Get("MinimapButtonShiftRightClick"));
-        GameTooltip:Show();
-    end);
-
-    -- handle mouse leave
-    minimapButton:SetScript("OnLeave", function()
-        -- hite item tool tip
-        GameTooltip:Hide();
-    end);
-
-    -- handle click
-    minimapButton:SetScript("OnClick", function(_, button)
-        if (button == "LeftButton" and not addon.inCombat) then
-            addon.professionsView:ToggleVisibility();
-        elseif (button == "RightButton") then
-            if (IsShiftKeyDown()) then
-                addon.minimapButton:Hide();
-                Settings.hideMinimapButton = true;
-            else
-                addon:GetService("inventory"):ToggleMissingReagents();
+    -- create / register data broker
+	local dataObj = LibStub("LibDataBroker-1.1"):NewDataObject("ProfessionMaster", {
+		type = "launcher",
+        label = "Profession Master",
+		icon = "Interface\\Icons\\Inv_misc_book_05",
+		OnClick = function(_, button)
+            if (button == "LeftButton" and not addon.inCombat) then
+                addon.professionsView:ToggleVisibility();
+            elseif (button == "RightButton") then
+                if (IsShiftKeyDown()) then
+                    libDbIcon:Hide("ProfessionMaster");
+                    Settings.minimapButton.hide = true;
+                else
+                    addon:GetService("inventory"):ToggleMissingReagents();
+                end
             end
-        end
-    end);
+		end,
+		OnTooltipShow = function(tooltip)
+            local localeService = addon:GetService("locale");
+            tooltip:SetText(localeService:Get("MinimapButtonTitle"));
+            tooltip:AddLine(" ");
+            tooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
+            tooltip:AddLine(localeService:Get("MinimapButtonRightClick"));
+            tooltip:AddLine(localeService:Get("MinimapButtonShiftRightClick"));
+		end,
+	})
+
+    -- show minimap button
+	libDbIcon:Register("ProfessionMaster", dataObj, Settings.minimapButton);
 end
 
 -- register service
