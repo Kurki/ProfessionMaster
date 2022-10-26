@@ -24,8 +24,6 @@ ProfessionsService.__index = ProfessionsService;
 
 --- Initialize service.
 function ProfessionsService:Initialize()
-    -- convert
-    self:Convert();
 end
 
 --- Check message.
@@ -322,33 +320,6 @@ function ProfessionsService:FindSkillByName(skillName)
             return skillId, skill, professionId;
         end
     end  
-end
-
---- Convert data.
-function ProfessionsService:Convert()
-    -- local ConvertData = {};
-    -- Convert = {};
-    -- for skillId, skill in pairs(ConvertData) do
-    --     -- Convert[skillId] = {};
-    --     -- local reagents = {};
-    --     -- for i, reagentId in ipairs(skill[6]) do
-    --     --     table.insert(reagents, reagentId);
-    --     --     table.insert(reagents, skill[7][i]);
-    --     -- end
-
-    --     -- table.insert(Convert[skillId], 0);
-    --     -- table.insert(Convert[skillId], skill[1]);
-    --     -- table.insert(Convert[skillId], reagents);
-    --     Convert[skillId] = {
-    --         addon = 2,
-    --         itemId = skill[1],
-    --         reagents = {}
-    --     }
-
-    --     for i, reagentId in ipairs(skill[6]) do
-    --         Convert[skillId].reagents[reagentId] = skill[7][i];
-    --     end
-    -- end
 end
 
 -- register service

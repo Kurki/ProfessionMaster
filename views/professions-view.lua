@@ -146,7 +146,7 @@ function ProfessionsView:Show()
         
         -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        professionLabel:SetPoint("TOPRIGHT", -293, -15);
+        professionLabel:SetPoint("TOPLEFT", 404, -15);
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
