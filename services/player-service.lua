@@ -245,7 +245,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
         if (#onlinePlayerTwinks == 1) then
             table.insert(result, "|cffffffff" .. onlinePlayerName .. " (" .. onlinePlayerTwinks[1] .. ")");
         elseif (#onlinePlayerTwinks > 1) then
-            table.insert(result, "|cffffffff" .. onlinePlayerName .. " (Twink)");
+            table.insert(result, "|cffffffff" .. onlinePlayerName .. " (alt)");
         else
             table.insert(result, "|cffffffff" .. onlinePlayerName);
         end

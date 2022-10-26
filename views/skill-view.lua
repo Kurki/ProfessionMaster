@@ -32,6 +32,7 @@ function SkillView:Show(skillRow, professionsView)
     -- get skilla nd skill id
     local skill = skillRow.skill;
     local skillId = skillRow.skillId;
+    print(skillId);
 
     -- check if view created
     if (self.view == nil) then

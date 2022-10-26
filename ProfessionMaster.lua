@@ -220,7 +220,7 @@ function ProfessionMasterAddon:RegisterEvents()
     -- handle on event
     self.frame:SetScript("OnEvent", function(_self, event, prefix, message, channel, sender)
         -- handle chat messaage
-        if (event == "ADDON_LOADED") then
+        if (event == "ADDON_LOADED" and prefix == "ProfessionMaster") then
             -- startup
             self:CheckSettings();
 
