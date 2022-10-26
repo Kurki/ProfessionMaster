@@ -287,9 +287,9 @@ function SkillView:RefreshBucketListAmount()
         row:Hide();
     end
 
-    -- get reagents
-    local reagents = addon:GetModel("profession-reagents")[self.skillId];
-    if (not reagents) then
+    -- get all skills
+    local skillInfo = addon:GetModel("all-skills")[self.skillId];
+    if (not skillInfo) then
         return;
     end
 
@@ -302,7 +302,7 @@ function SkillView:RefreshBucketListAmount()
 
     -- show reagents
     local rowAmount = 0;
-    for reagentItemId, reagentAmount in pairs(reagents) do
+    for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
         rowAmount = rowAmount + 1;
         if (#self.reagentRows < rowAmount) then
             -- create row frame

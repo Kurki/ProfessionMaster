@@ -117,13 +117,40 @@ function ProfessionsView:Show()
             self:CheckBucketList();
             addon:GetService("inventory"):CheckMissingReagents();
         end);
+
+        -- add item search box
+        local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        itemSearchLabel:SetPoint("TOPLEFT", 18, -15);
+        itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
+        local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
+        itemSearch:SetPoint("TOPLEFT", 22, -33);
+        itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
+        itemSearch:SetAutoFocus(false);
+        self.itemSearch = itemSearch;
+        itemSearch:SetScript("OnKeyDown", function(_, key)
+            -- check escape
+            if (key == "ESCAPE") then
+                if (self.skillViewVisible) then
+                    self:HideSkillView();
+                else
+                    self:Hide();
+                end
+            elseif (key == "ENTER") then
+                ChatFrame_OpenChat("", nil, nil);
+            end
+        end)
+        itemSearch:SetScript("OnTextChanged", function()
+            -- add skills and hide bucket list
+            self:AddSkills();
+        end);
         
+        -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        professionLabel:SetPoint("TOPLEFT", 18, -15);
+        professionLabel:SetPoint("TOPRIGHT", -293, -15);
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        professionSelection:SetPoint("TOPLEFT", -2, -31);
+        professionSelection:SetPoint("TOPRIGHT", -153, -31);
         UIDropDownMenu_SetWidth(professionSelection, 140);
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()
@@ -150,30 +177,37 @@ function ProfessionsView:Show()
             end
         end);
 
-        -- add item search box
-        local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        itemSearchLabel:SetPoint("TOPLEFT", 196, -15);
-        itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
-        local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
-        itemSearch:SetPoint("TOPLEFT", 200, -35);
-        itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -20, -54);
-        itemSearch:SetAutoFocus(false);
-        self.itemSearch = itemSearch;
-        itemSearch:SetScript("OnKeyDown", function(_, key)
-            -- check escape
-            if (key == "ESCAPE") then
-                if (self.skillViewVisible) then
-                    self:HideSkillView();
-                else
-                    self:Hide();
-                end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+        -- add addon selection
+        local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        addonLabel:SetPoint("TOPRIGHT", -120, -15);
+        addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
+        local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
+        addonSelection:ClearAllPoints();
+        addonSelection:SetPoint("TOPRIGHT", -20, -31);
+        UIDropDownMenu_SetWidth(addonSelection, 110);
+        self.addonSelection = addonSelection;
+        UIDropDownMenu_Initialize(addonSelection, function()
+            -- create item
+            local item = UIDropDownMenu_CreateInfo();
+            item.notCheckable = true;
+            item.func = function(_self, addonId, arg2)
+                -- select addon
+                self:SelectAddon(addonId);
+                self.itemSearch:SetFocus();
+
+                -- add skills
+                self:AddSkills();
+            end;
+
+            -- add all date
+            item.text, item.arg1 = self:GetAddonText(nil), nil;
+            UIDropDownMenu_AddButton(item);
+
+            -- add dates
+            for addonId = 0, 2, 1 do
+                item.text, item.arg1 = self:GetAddonText(addonId), addonId;
+                UIDropDownMenu_AddButton(item);
             end
-        end)
-        itemSearch:SetScript("OnTextChanged", function()
-            -- add skills and hide bucket list
-            self:AddSkills();
         end);
 
         -- add bucket list icon
@@ -230,6 +264,7 @@ function ProfessionsView:Show()
 
         -- select first profession
         self:SelectProfession(Settings.lastProfession or 0);
+        self:SelectAddon(Settings.lastAddon);
     end
 
     -- hide skill view
@@ -319,7 +354,7 @@ end
 function ProfessionsView:GetProfessionText(professionId)
     -- check if all selected
     if (professionId == 0) then
-        return "|T133745:16|t  " .. addon:GetService("locale"):Get("ProfessionsViewAllProfessions");
+        return "|T133745:16|t " .. addon:GetService("locale"):Get("ProfessionsViewAllProfessions");
     end
 
     -- get icon and name of profession
@@ -335,6 +370,37 @@ function ProfessionsView:SelectProfession(professionId)
 
     -- select dropdown
     UIDropDownMenu_SetText(self.professionSelection, self:GetProfessionText(professionId));
+end
+
+--- Get Text of addon.
+function ProfessionsView:GetAddonText(addonId)
+    -- check classic
+    if (addonId == 0) then
+        return "|T135954:16|t Classic";
+    end
+    
+    -- check classic
+    if (addonId == 1) then
+        return "|T135804:16|t TBC";
+    end
+    
+    -- check wotlk
+    if (addonId == 2) then
+        return "|T135773:16|t WOTLK";
+    end
+
+    -- use all addons
+    return "|T135749:16|t " .. addon:GetService("locale"):Get("ProfessionsViewAllAddons");
+end
+
+--- Select addon.
+function ProfessionsView:SelectAddon(addonId)
+    -- set addon id
+    self.addonId = addonId;
+    Settings.lastAddon = addonId;
+
+    -- select dropdown
+    UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
 end
 
 --- Add skills.
@@ -366,10 +432,10 @@ function ProfessionsView:AddSkills()
         -- get profession ids
         local professionIds = addon:GetService("profession-names"):GetProfessionIdsToShow();
         for i, professionId in ipairs(professionIds) do
-            self:AddFilteredSkills(professionId, searchParts);    
+            self:AddFilteredSkills(professionId, self.addonId, searchParts);    
         end
     else
-        self:AddFilteredSkills(self.professionId, searchParts);
+        self:AddFilteredSkills(self.professionId, self.addonId, searchParts);
     end
 
     -- sort skills
@@ -414,44 +480,24 @@ function ProfessionsView:AddSkills()
 end
 
 --- Add filtered skills.
-function ProfessionsView:AddFilteredSkills(professionId, searchParts)
-    -- get profession
+function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
+    -- get profession and all skills
     local profession = Professions[professionId];
+    local allSkills = addon:GetModel("all-skills");
 
     -- filter skills
     if (profession) then
         for skillId, skill in pairs(profession) do
-            -- check if bop and skill ok
+            -- check if skill ok
             if (skill.name ~= nil and skill.itemId ~= nil) then
-                -- get bucket list amount
-                local bucketListAmount = BucketList[skillId];
+                -- get skill info
+                local skillInfo = allSkills[skillId];
+                if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
+                    -- get bucket list amount
+                    local bucketListAmount = BucketList[skillId];
 
-                -- check if has search parts
-                if (#searchParts == 0) then
-                    -- add to skills
-                    table.insert(self.skills, {
-                        professionId = professionId,
-                        skillId = skillId,
-                        skill = skill,
-                        bucketListAmount = bucketListAmount
-                    });
-
-                    -- increase bucket list skill amount
-                    if (bucketListAmount) then
-                        self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
-                    end
-                else
-                    -- check if skill valid
-                    local skillValid = true;
-                    for i, part in ipairs(searchParts) do
-                        if (string.len(part) > 0 and string.find(string.lower(skill.name), part) == nil) then
-                            skillValid = false;
-                            break;
-                        end
-                    end
-
-                    -- check if recip valid
-                    if (skillValid) then
+                    -- check if has search parts
+                    if (#searchParts == 0) then
                         -- add to skills
                         table.insert(self.skills, {
                             professionId = professionId,
@@ -463,6 +509,31 @@ function ProfessionsView:AddFilteredSkills(professionId, searchParts)
                         -- increase bucket list skill amount
                         if (bucketListAmount) then
                             self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
+                        end
+                    else
+                        -- check if skill valid
+                        local skillValid = true;
+                        for i, part in ipairs(searchParts) do
+                            if (string.len(part) > 0 and string.find(string.lower(skill.name), part) == nil) then
+                                skillValid = false;
+                                break;
+                            end
+                        end
+
+                        -- check if recip valid
+                        if (skillValid) then
+                            -- add to skills
+                            table.insert(self.skills, {
+                                professionId = professionId,
+                                skillId = skillId,
+                                skill = skill,
+                                bucketListAmount = bucketListAmount
+                            });
+
+                            -- increase bucket list skill amount
+                            if (bucketListAmount) then
+                                self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
+                            end
                         end
                     end
                 end

@@ -65,8 +65,16 @@ end
 
 --- Purge character.
 function PurgeService:PurgeCharacter(characterName) 
+    -- get lower charatcer name
+    local lowerCharacterName = string.lower(characterName);
+
     -- remove from own professions
-    OwnProfessions[characterName] = nil;
+    for ownProfessionCharacter, _ in pairs(OwnProfessions) do   
+        if (string.lower(ownProfessionCharacter) == lowerCharacterName) then
+            OwnProfessions[ownProfessionCharacter] = nil;
+            break;
+        end
+    end
 
     -- check all professions
     for _, profession in pairs(Professions) do     
@@ -74,7 +82,7 @@ function PurgeService:PurgeCharacter(characterName)
         for _, skill in pairs(profession) do     
             -- check all players
             for playerIndex, playerName in ipairs(skill.players) do
-                if (playerName == characterName) then
+                if (string.lower(playerName) == lowerCharacterName) then
                     table.remove(skill.players, playerIndex);
                     break;
                 end

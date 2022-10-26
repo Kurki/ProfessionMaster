@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = "1.5.3";
+local addonVersion = GetAddOnMetadata("ProfessionMaster", "version");
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -61,9 +61,6 @@ function ProfessionMasterAddon:Create()
     addon.viewTypes = {};
     addon.modelTypes = {};
 
-    -- check settings
-    addon:CheckSettings();
-
     -- register events
     addon:RegisterEvents();
     return addon;
@@ -85,6 +82,11 @@ function ProfessionMasterAddon:CheckSettings()
     end
     if (not Settings.storageId) then
         Settings.storageId = self:GenerateString(12);
+    end
+    if (not Settings.minimapButton) then
+        Settings.minimapButton = {
+            hide = false
+        };
     end
 end
 
@@ -205,6 +207,7 @@ function ProfessionMasterAddon:RegisterEvents()
     end
 
     -- register events
+    self.frame:RegisterEvent("ADDON_LOADED");
     self.frame:RegisterEvent("CHAT_MSG_ADDON");
     self.frame:RegisterEvent("PLAYER_LOGIN");
     self.frame:RegisterEvent("TRADE_SKILL_UPDATE");
@@ -217,7 +220,12 @@ function ProfessionMasterAddon:RegisterEvents()
     -- handle on event
     self.frame:SetScript("OnEvent", function(_self, event, prefix, message, channel, sender)
         -- handle chat messaage
-        if (event == "CHAT_MSG_ADDON") then
+        if (event == "ADDON_LOADED") then
+            -- startup
+            self:CheckSettings();
+
+        -- handle chat messaage
+        elseif (event == "CHAT_MSG_ADDON") then
             -- startup
             self:GetService("message"):HandleMessage(prefix, message, sender);
 

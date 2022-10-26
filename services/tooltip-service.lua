@@ -109,33 +109,8 @@ function TooltipService:CheckTooltip(tooltip)
     local professionNamesService = addon:GetService("profession-names");
     local professionIcon = professionNamesService:GetProfessionIcon(professionId);
 
-    -- add reagents if era 
-    if (addon.isEra) then
-        if (not skill.skillLink) then
-            -- get reagents
-            self:GetTooltipReagents(skillId, function(reagents)
-                -- add header
-                tooltip:AddLine("|n|T" .. professionIcon .. ":12|t  |cffDA8CFFProfession Master");
-    
-                -- check if reagents must be added
-                if (reagents) then
-                    tooltip:AddLine("|cffffffff" .. SPELL_REAGENTS .. reagents);
-                end
-    
-                -- add players
-                tooltip:AddLine("|cffffffff" .. addon:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
-            end);
-        else
-            -- add header
-            tooltip:AddLine("|n|T" .. professionIcon .. ":12|t  |cffDA8CFFProfession Master");
-
-            -- add players
-            tooltip:AddLine("|cffffffff" .. addon:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
-        end
-    else
-        -- get icon and name of profession
-        tooltip:AddLine("|n|T" .. professionIcon .. ":12|t  |cffDA8CFF[PM] " .. table.concat(playerNames, ", "));
-    end
+    -- get icon and name of profession
+    tooltip:AddLine("|n|T" .. professionIcon .. ":12|t  |cffDA8CFF[PM] " .. table.concat(playerNames, ", "));
 end
 
 --- Fill tooltip.
@@ -173,8 +148,8 @@ end
 -- Get tooltip reagents.
 function TooltipService:GetTooltipReagents(skillId, callback)
     -- get skill reagents
-    local skillReagents = addon:GetModel("profession-reagents")[skillId];
-    if (not skillReagents) then
+    local skillInfo = addon:GetModel("all-skills")[skillId];
+    if (not skillInfo) then
         callback(nil);
         return;
     end
@@ -185,13 +160,13 @@ function TooltipService:GetTooltipReagents(skillId, callback)
 
     -- count reaegnts
     local reagentCount = 0;
-    for _ in pairs(skillReagents) do
+    for _ in pairs(skillInfo.reaegnts) do
         reagentCount = reagentCount + 1;
     end
 
     -- iterate skill reagents
     local result = {};
-    for reagentItemId, reagentAmount in pairs(skillReagents) do
+    for reagentItemId, reagentAmount in pairs(skillInfo.reaegnts) do
         -- get item data
         local reagentItem = Item:CreateFromItemID(reagentItemId);
         if (not reagentItem:IsItemEmpty()) then

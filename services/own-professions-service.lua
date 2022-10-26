@@ -58,7 +58,7 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
     -- prepare item ids
     local skills = {};
-    local skillItems = addon:GetModel("skill-items");
+    local allSkills = addon:GetModel("all-skills");
 
     -- iterate trade skills
     for tradeSkillIndex = 1, tradeSkillAmount do
@@ -88,9 +88,12 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
                 -- check if item can be found by skill id
                 if (skill.itemId == 0) then
-                    skill.itemId = skillItems[skill.skillId];
-                    if (not skill.itemId) then
-                        skill.itemId = 0;
+                    local skillInfo = allSkills[skill.skillId];
+                    if (skillInfo) then
+                        skill.itemId = skillInfo.itemId;
+                        if (not skill.itemId) then
+                            skill.itemId = 0;
+                        end
                     end
                 end
 
