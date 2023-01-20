@@ -35,10 +35,10 @@ function InventoryService:ScanInventory()
     -- iterate all bags
     for bag = 0, NUM_BAG_SLOTS do
         -- iterate all slots in bag
-        for slot = 1, GetContainerNumSlots(bag) do
+        for slot = 1, C_Container.GetContainerNumSlots(bag) do
             -- get item id and amount
-            local itemId = GetContainerItemID(bag, slot);
-            local _, amount = GetContainerItemInfo(bag, slot);
+            local itemId = C_Container.GetContainerItemID(bag, slot);
+            local _, amount = C_Container.GetContainerItemInfo(bag, slot);
 
             -- check if id and amount loaded
             if (itemId and amount) then
