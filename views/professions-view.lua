@@ -41,16 +41,19 @@ function ProfessionsView:Show()
         -- create view
         local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"));
         view:EnableKeyboard();
-        view:SetScript("OnKeyDown", function(_, key)
+        view:SetPropagateKeyboardInput(true)
+        view:SetScript("OnKeyDown", function(frame, key)
             -- check escape
             if (key == "ESCAPE") then
-                if (self.skillViewVisible) then
-                    self:HideSkillView();
+                if  (self.skillViewVisible) then
+                    self:HideSkillView()
+                    frame:SetPropagateKeyboardInput(false)
                 else
-                    self:Hide();
+                    self:Hide()
+                    frame:SetPropagateKeyboardInput(false)
                 end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+            else
+                frame:SetPropagateKeyboardInput(true)
             end
         end)
         self.view = view;
@@ -127,16 +130,10 @@ function ProfessionsView:Show()
         itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
         itemSearch:SetAutoFocus(false);
         self.itemSearch = itemSearch;
-        itemSearch:SetScript("OnKeyDown", function(_, key)
+        itemSearch:SetScript("OnKeyDown", function(frame, key)
             -- check escape
             if (key == "ESCAPE") then
-                if (self.skillViewVisible) then
-                    self:HideSkillView();
-                else
-                    self:Hide();
-                end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+                frame:ClearFocus()
             end
         end)
         itemSearch:SetScript("OnTextChanged", function()
