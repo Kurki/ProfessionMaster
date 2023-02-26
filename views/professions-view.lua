@@ -132,7 +132,7 @@ function ProfessionsView:Show()
         self.itemSearch = itemSearch;
         itemSearch:SetScript("OnKeyDown", function(frame, key)
             -- check escape
-            if (key == "ESCAPE") then
+            if (key == "ESCAPE") or (key == "ENTER") then
                 frame:ClearFocus()
             end
         end)
