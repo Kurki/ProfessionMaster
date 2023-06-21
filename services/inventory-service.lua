@@ -99,7 +99,7 @@ end
 -- Check for missing reagents.
 function InventoryService:CheckMissingReagents()
     -- check if missing reagents should be hidden
-    if (Settings.hideMissingReagents) then
+    if (PMSettings.hideMissingReagents) then
         return;
     end
 
@@ -132,13 +132,13 @@ function InventoryService:ToggleMissingReagents()
     -- check if visible
     if (self.missingReagentsView.visible) then
         --hide missing reagents
-        Settings.hideMissingReagents = true;
+        PMSettings.hideMissingReagents = true;
         self.missingReagentsView:Hide();
         return;
     end
 
     -- do not hide missing ragents
-    Settings.hideMissingReagents = nil;
+    PMSettings.hideMissingReagents = nil;
     self:CheckMissingReagents();
 end
 

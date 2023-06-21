@@ -263,8 +263,8 @@ function ProfessionsView:Show()
         self.skillViewBackground = skillViewBackground;
 
         -- select first profession
-        self:SelectProfession(Settings.lastProfession or 0);
-        self:SelectAddon(Settings.lastAddon);
+        self:SelectProfession(PMSettings.lastProfession or 0);
+        self:SelectAddon(PMSettings.lastAddon);
     end
 
     -- hide skill view
@@ -366,7 +366,7 @@ end
 function ProfessionsView:SelectProfession(professionId)
     -- set profession id
     self.professionId = professionId;
-    Settings.lastProfession = professionId;
+    PMSettings.lastProfession = professionId;
 
     -- select dropdown
     UIDropDownMenu_SetText(self.professionSelection, self:GetProfessionText(professionId));
@@ -397,7 +397,7 @@ end
 function ProfessionsView:SelectAddon(addonId)
     -- set addon id
     self.addonId = addonId;
-    Settings.lastAddon = addonId;
+    PMSettings.lastAddon = addonId;
 
     -- select dropdown
     UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
