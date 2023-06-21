@@ -37,7 +37,7 @@ function PurgeService:Purge(context)
         Professions = {};
         OwnProfessions = {};
         SyncTimes = {};
-        Settings = {};
+        PMSettings = {};
         Logs = {};
         CharacterSets = {};
         BucketList = {};
@@ -94,7 +94,7 @@ function PurgeService:PurgeCharacter(characterName)
     SyncTimes = {};
 
     -- reset storage id to recieve data again
-    Settings.storageId = nil;
+    PMSettings.storageId = nil;
 
     -- check settings
     addon:CheckSettings();
