@@ -41,7 +41,7 @@ local function CommandHandler(parameters)
         chatService:Write("CommandsTitle");
         chatService:Write("CommandsOverview");
         chatService:Write("CommandsReagents");
-        if (Settings.minimapButton.hide) then
+        if (PMSettings.minimapButton.hide) then
             chatService:Write("CommandsMinimap");
         end
         chatService:Write("CommandsPurge");
@@ -57,7 +57,7 @@ local function CommandHandler(parameters)
     -- check if minimap should be toggeled
     if (string.lower(parameters) == "minimap") then
         LibStub("LibDBIcon-1.0"):Show("ProfessionMaster");
-        Settings.minimapButton.hide = false;
+        PMSettings.minimapButton.hide = false;
         return;
     end
 
