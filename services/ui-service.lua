@@ -43,7 +43,7 @@ function UiService:CreateView(name, width, height, title)
     view.positionName = name;
     view:SetFrameLevel(currentZIndex);
     view:SetBackdrop({
-        bgFile = [[Interface/AddOns/nAuras/Media/BackgroundFlat]],
+        bgFile = [[Interface/Buttons/WHITE8X8]],
         edgeFile = [[Interface/Buttons/WHITE8X8]],
         edgeSize = 1
     });
