@@ -277,7 +277,7 @@ function UiService:CreateMinimapIcon()
             elseif (button == "RightButton") then
                 if (IsShiftKeyDown()) then
                     libDbIcon:Hide("ProfessionMaster");
-                    Settings.minimapButton.hide = true;
+                    PMSettings.minimapButton.hide = true;
                 else
                     addon:GetService("inventory"):ToggleMissingReagents();
                 end
@@ -294,7 +294,7 @@ function UiService:CreateMinimapIcon()
 	})
 
     -- show minimap button
-	libDbIcon:Register("ProfessionMaster", dataObj, Settings.minimapButton);
+	libDbIcon:Register("ProfessionMaster", dataObj, PMSettings.minimapButton);
 end
 
 -- register service
