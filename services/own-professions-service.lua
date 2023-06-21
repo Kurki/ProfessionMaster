@@ -257,7 +257,7 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
             -- check if 8 skills added
             if (#messageSkills == 8) then
                 -- send message
-                messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, Settings.storageId, ownPlayerName, messageSkills));
+                messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PMSettings.storageId, ownPlayerName, messageSkills));
                 messageSkills = {};
             end
         end
@@ -266,7 +266,7 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
     -- check if skills to send
     if (#messageSkills > 0) then
         -- send message
-        messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, Settings.storageId, ownPlayerName, messageSkills)); 
+        messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PMSettings.storageId, ownPlayerName, messageSkills)); 
     end
 end
 

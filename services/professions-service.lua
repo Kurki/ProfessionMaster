@@ -73,7 +73,7 @@ end
 --- Say hello to guild.
 function ProfessionsService:SayHelloToGuild()
     -- send hello message to guild
-    addon:GetService("message"):SendToGuild(addon:GetModel("hello-message"):Create(Settings.storageId));
+    addon:GetService("message"):SendToGuild(addon:GetModel("hello-message"):Create(PMSettings.storageId));
 end
 
 --- Request profession from other player.
@@ -82,7 +82,7 @@ function ProfessionsService:RequestProfessionsFromPlayer(playerName, playerStora
     local lastSyncDate = self:GetLastSyncDate(playerStorageId);
 
     -- send request professions message to player
-    addon:GetService("message"):SendToPlayer(playerName, addon:GetModel("request-professions-message"):Create(Settings.storageId, lastSyncDate, sendBack));
+    addon:GetService("message"):SendToPlayer(playerName, addon:GetModel("request-professions-message"):Create(PMSettings.storageId, lastSyncDate, sendBack));
 end
 
 --- Get last sync date of storage.

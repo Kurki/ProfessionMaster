@@ -77,14 +77,14 @@ end
 --- Check settings.
 function ProfessionMasterAddon:CheckSettings()
     -- check settings
-    if (not Settings) then 
-        Settings = {}; 
+    if (not PMSettings) then 
+        PMSettings = {}; 
     end
-    if (not Settings.storageId) then
-        Settings.storageId = self:GenerateString(12);
+    if (not PMSettings.storageId) then
+        PMSettings.storageId = self:GenerateString(12);
     end
-    if (not Settings.minimapButton) then
-        Settings.minimapButton = {
+    if (not PMSettings.minimapButton) then
+        PMSettings.minimapButton = {
             hide = false
         };
     end
@@ -315,18 +315,18 @@ end
 -- Migrate data.
 function ProfessionMasterAddon:Migrate()
     -- check data version
-    if (Settings.storeVersion and Settings.storeVersion < 3) then
+    if (PMSettings.storeVersion and PMSettings.storeVersion < 3) then
         -- clear data
         Professions = {};
         OwnProfessions = {};
         SyncTimes = {};
         CharacterSettings = {}; 
-        Settings = {};
+        PMSettings = {};
         self:CheckSettings();
     end
 
     -- check data version
-    if (Settings.storeVersion and Settings.storeVersion < 5) then
+    if (PMSettings.storeVersion and PMSettings.storeVersion < 5) then
         -- check all professions
         for professionId, profession in pairs(Professions) do  
             -- prepare valid skills
@@ -369,7 +369,7 @@ function ProfessionMasterAddon:Migrate()
     end
 
     -- set store version
-    Settings.storeVersion = 5;
+    PMSettings.storeVersion = 5;
 end
 
 -- create addon
