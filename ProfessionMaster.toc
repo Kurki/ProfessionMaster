@@ -1,6 +1,10 @@
-## Author: Esperanza - Everlook/EU-Alliance
-## Interface: 30402
-## Title: Profession Master |cffDA8CFF[PM]
+## original Author: Esperanza - Everlook/EU-Alliance
+## Interface: 11507
+## Title: Profession Master – Guild Trade Skills – SoD
+## Notes: ProfessionMaster für die Erweiterung Season of Discovery
+## Author: Flax78
+## Version: 1.0.0
+## X-Old-Interface: 30402
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
 ## Version: 1.6.5

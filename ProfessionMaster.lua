@@ -15,7 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
---]] 
+--]]
+
+-- BuildInfo-Check für Season of Discovery
+local _, _, _, interface = GetBuildInfo()
+local isSoD = (interface == 11507)
+if isSoD then
+    print(addonShortcut.."Season of Discovery Mode aktiviert!")
+end
 
 -- define addon name
 local addonName = "Profession Master";
@@ -370,6 +377,15 @@ function ProfessionMasterAddon:Migrate()
 
     -- set store version
     PMSettings.storeVersion = 5;
+end
+
+-- Modul-Lader
+if isSoD then
+    local sod = require("modules.sod")
+    -- init sod module …
+else
+    local cata = require("modules.cata")
+    -- init cata module …
 end
 
 -- create addon
