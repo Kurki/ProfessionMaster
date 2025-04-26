@@ -88,9 +88,9 @@ function TooltipService:CheckTooltip(tooltip)
     -- check if skill not found yet
     if (not skill) then
         -- check if small text is reagents
-        local text1 = GameTooltipTextLeft1:GetText();
-        local text2 = GameTooltipTextLeft2:GetText();
-        local text3 = GameTooltipTextLeft3:GetText();
+        local text1 = _G[ tooltip:GetName().."TextLeft1" ]:GetName();
+        local text2 = _G[ tooltip:GetName().."TextLeft2" ]:GetName();
+        local text3 = _G[ tooltip:GetName().."TextLeft3" ]:GetName();
         if (text1 and (text2 and string.find(text2, SPELL_REAGENTS) == 1 or text3 and string.find(text3, SPELL_REAGENTS) == 1)) then
             -- find skill by name
             skillId, skill, professionId = addon:GetService("professions"):FindSkillByName(text1);
