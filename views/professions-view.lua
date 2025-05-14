@@ -41,16 +41,19 @@ function ProfessionsView:Show()
         -- create view
         local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"));
         view:EnableKeyboard();
-        view:SetScript("OnKeyDown", function(_, key)
+        view:SetPropagateKeyboardInput(true)
+        view:SetScript("OnKeyDown", function(frame, key)
             -- check escape
             if (key == "ESCAPE") then
-                if (self.skillViewVisible) then
-                    self:HideSkillView();
+                if  (self.skillViewVisible) then
+                    self:HideSkillView()
+                    frame:SetPropagateKeyboardInput(false)
                 else
-                    self:Hide();
+                    self:Hide()
+                    frame:SetPropagateKeyboardInput(false)
                 end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+            else
+                frame:SetPropagateKeyboardInput(true)
             end
         end)
         self.view = view;
@@ -127,16 +130,10 @@ function ProfessionsView:Show()
         itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
         itemSearch:SetAutoFocus(false);
         self.itemSearch = itemSearch;
-        itemSearch:SetScript("OnKeyDown", function(_, key)
+        itemSearch:SetScript("OnKeyDown", function(frame, key)
             -- check escape
-            if (key == "ESCAPE") then
-                if (self.skillViewVisible) then
-                    self:HideSkillView();
-                else
-                    self:Hide();
-                end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+            if (key == "ESCAPE") or (key == "ENTER") then
+                frame:ClearFocus()
             end
         end)
         itemSearch:SetScript("OnTextChanged", function()
@@ -204,7 +201,7 @@ function ProfessionsView:Show()
             UIDropDownMenu_AddButton(item);
 
             -- add dates
-            for addonId = 0, 2, 1 do
+            for addonId = 0, 0, 1 do
                 item.text, item.arg1 = self:GetAddonText(addonId), addonId;
                 UIDropDownMenu_AddButton(item);
             end
@@ -376,7 +373,7 @@ end
 function ProfessionsView:GetAddonText(addonId)
     -- check classic
     if (addonId == 0) then
-        return "|T135954:16|t Classic";
+        return "|T135954:16|t Classic Era";
     end
     
     -- check classic

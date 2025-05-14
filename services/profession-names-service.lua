@@ -41,13 +41,13 @@ end
 function ProfessionNamesService:GetProfessionIdsToShow()
     return {
         333,
-        755,
+        -- 755,
         171,
         197,
         165,
         164,
         202,
-        773,
+        -- 773,
         185
     };
 end
@@ -97,7 +97,7 @@ end
 function ProfessionNamesService:GetSkillId(skillLink)
     -- find enchant prefix
     local _, enchantPrefixEnd = string.find(skillLink, "|Henchant:");
-    if (enchantPrefixEnd == 0) then
+    if (enchantPrefixEnd == 0 or enchantPrefixEnd == nil) then
         return nil;
     end
 
