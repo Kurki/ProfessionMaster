@@ -337,7 +337,7 @@ function SkillView:RefreshBucketListAmount()
 
                 -- show item tool tip
                 GameTooltip:SetOwner(row, "ANCHOR_LEFT");
-                GameTooltip:SetHyperlink(row.itemLink);
+                if row.itemLink then GameTooltip:SetHyperlink(row.itemLink); end
                 GameTooltip:Show();
             end);
 

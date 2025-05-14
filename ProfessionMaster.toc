@@ -1,9 +1,9 @@
-## Author: Esperanza - Everlook/EU-Alliance
-## Interface: 30402
+## Author: Esperanza - Everlook/EU-Alliance, GrumpyPlayers 
+## Interface: 11506
 ## Title: Profession Master |cffDA8CFF[PM]
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 1.6.4
+## Version: 2.1.0
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 

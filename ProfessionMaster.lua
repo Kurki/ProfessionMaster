@@ -46,8 +46,8 @@ function ProfessionMasterAddon:Create()
         name = addonName,
         version = addonVersion,
         shortcut = addonShortcut,
-        debug = false,
-        trace = false,
+        debug = true,
+        trace = true,
         frame = CreateFrame("Frame"),
         logLevel = 0,
         loaded = false,
@@ -265,7 +265,7 @@ function ProfessionMasterAddon:RegisterEvents()
             end);
 
         -- handle trade skill update
-        elseif (event == "TRADE_SKILL_UPDATE") then
+        elseif (event == "TRADE_SKILL_UPDATE") or (event == "CRAFT_UPDATE") then
             self:GetService("own-professions"):GetTradeSkillProfessionData();
 
         -- handle craft update

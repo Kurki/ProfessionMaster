@@ -160,47 +160,49 @@ function TooltipService:GetTooltipReagents(skillId, callback)
 
     -- count reaegnts
     local reagentCount = 0;
-    for _ in pairs(skillInfo.reaegnts) do
+    if skillInfo.reaegnts then 
+      for _ in pairs(skillInfo.reaegnts) do
         reagentCount = reagentCount + 1;
-    end
+      end
 
-    -- iterate skill reagents
-    local result = {};
-    for reagentItemId, reagentAmount in pairs(skillInfo.reaegnts) do
-        -- get item data
-        local reagentItem = Item:CreateFromItemID(reagentItemId);
-        if (not reagentItem:IsItemEmpty()) then
-            -- wait until loaded
-            reagentItem:ContinueOnItemLoad(function()
-                -- prepare reagent text
-                local reagentText = "";
+      -- iterate skill reagents
+      local result = {};
+      for reagentItemId, reagentAmount in pairs(skillInfo.reaegnts) do
+          -- get item data
+          local reagentItem = Item:CreateFromItemID(reagentItemId);
+          if (not reagentItem:IsItemEmpty()) then
+              -- wait until loaded
+              reagentItem:ContinueOnItemLoad(function()
+                  -- prepare reagent text
+                  local reagentText = "";
 
-                -- check if inventory amount is not high enough
-                local lowStocks = (inventoryService.inventory[reagentItemId] or 0) < reagentAmount;
-                if (lowStocks) then
-                    reagentText = "|cFFFF0000";
-                end
+                  -- check if inventory amount is not high enough
+                  local lowStocks = (inventoryService.inventory[reagentItemId] or 0) < reagentAmount;
+                  if (lowStocks) then
+                      reagentText = "|cFFFF0000";
+                  end
 
-                -- add reagent name
-                reagentText = reagentText .. reagentItem:GetItemName();
+                  -- add reagent name
+                  reagentText = reagentText .. reagentItem:GetItemName();
 
-                -- add reagent amount
-                if (reagentAmount > 1) then
-                    reagentText = reagentText .. " (" .. reagentAmount .. ")";
-                end
+                  -- add reagent amount
+                  if (reagentAmount > 1) then
+                      reagentText = reagentText .. " (" .. reagentAmount .. ")";
+                  end
 
-                -- reset color
-                if (lowStocks) then
-                    reagentText = reagentText .. "|r";
-                end
+                  -- reset color
+                  if (lowStocks) then
+                      reagentText = reagentText .. "|r";
+                  end
 
-                -- add regent text
-                table.insert(result, reagentText);
-                if (#result >= reagentCount) then
-                    callback(table.concat(result, ", "));
-                end
-            end);
-        end
+                  -- add regent text
+                  table.insert(result, reagentText);
+                  if (#result >= reagentCount) then
+                      callback(table.concat(result, ", "));
+                  end
+              end);
+          end
+      end
     end
 end
 
