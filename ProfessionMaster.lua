@@ -38,6 +38,9 @@ if (not Guildmates) then Guildmates = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
+    -- get wow build
+    local wowBuild = GetBuildInfo();
+
     -- create addon and add empty holders
     local addon = {
         name = addonName,
@@ -48,7 +51,7 @@ function ProfessionMasterAddon:Create()
         frame = CreateFrame("Frame"),
         logLevel = 0,
         loaded = false,
-        isEra = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+        isEra = string.find(wowBuild, "1.") == 1
     };
     setmetatable(addon, ProfessionMasterAddon);
     
