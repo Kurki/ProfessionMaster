@@ -30708,19 +30708,14 @@ local allSkills = {
 	},
 };
 
-local function BuildItemIdToSkillIdTable(skillsTable)
-  local itemIdToSkillId = {} -- Create an empty table for the inverted index
-  for skillId, skillData in pairs(skillsTable) do
-    local itemId = skillData["itemId"]
-    if itemId then -- Make sure itemId exists (good practice for data validation)
-      itemIdToSkillId[itemId] = skillId -- Invert: itemId becomes key, skillId becomes value
-    end
-  end
-  return itemIdToSkillId
+-- index skill by item id
+local allItems = {}; 
+for skillId, skillData in pairs(allSkills) do
+	local itemId = skillData["itemId"];
+	if itemId then 
+		allItems[itemId] = skillId;
+	end
 end
-
--- 2. Build the inverted table ONCE (when your addon initializes or when allSkills is loaded)
-local allItems = BuildItemIdToSkillIdTable(allSkills)
 
 -- register model
 addon:RegisterModel(allSkills, "all-skills");
