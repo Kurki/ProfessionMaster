@@ -85,7 +85,7 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
             -- get trade skill lid
             local tradeSkillLink = nil;
             local tradeSkillId = nil;
-            local tradeSkillItemId = nil;
+            local tradeSkillItemId = 0;
 
             -- check if is enchanting
             if (craftProfessionId) then
@@ -99,7 +99,7 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
                     -- enchant items ids not all supported in ara
                     if (addon.isEra and tradeSkillItemId > 30000) then
                         -- this enchant item id is not supported in era
-                        tradeSkillItemId = nil;
+                        tradeSkillItemId = 0;
                     end
                 end
             else

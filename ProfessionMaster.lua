@@ -179,7 +179,7 @@ function ProfessionMasterAddon:LogDebug(class, method, message, ...)
     table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Debug] " .. string.format(message, ...));
 
     -- print out trace
-    --print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
+    print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
 --- Log trace message.
@@ -196,7 +196,7 @@ function ProfessionMasterAddon:LogTrace(class, method, message, ...)
     table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Trace] " .. string.format(message, ...));
 
     -- print out trace
-    -- print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
+    print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
 --- Register addon events.

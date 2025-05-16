@@ -211,9 +211,12 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 				local skillInfo = allSkills[skill.skillId];
 				if (skillInfo) then
 					skillEntry.itemId = skillInfo.itemId;
-					if (not skillEntry.itemId) then
-						skillEntry.itemId = 0;
-					end
+
+                    -- enchant items ids not all supported in ara
+                    if ((not skillEntry.itemId) or (addon.isEra and skillEntry.itemId > 30000)) then
+                        -- this enchant item id is not supported in era
+                        skillEntry.itemId = 0;
+                    end
 				end
             end
 

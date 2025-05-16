@@ -32,21 +32,24 @@ function InventoryService:ScanInventory()
     -- clear inventory
     self.inventory = {};
 
+    -- log trace
+    addon:LogTrace("InventoryService", "ScanInventory", "Scanning inventory...");
+
     -- iterate all bags
     for bag = 0, NUM_BAG_SLOTS do
         -- iterate all slots in bag
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
             -- get item id and amount
             local itemId = C_Container.GetContainerItemID(bag, slot);
-            local _, amount = C_Container.GetContainerItemInfo(bag, slot);
-
+            local slotInfo = C_Container.GetContainerItemInfo(bag, slot);
+ 
             -- check if id and amount loaded
-            if (itemId and amount) then
+            if (itemId and slotInfo.stackCount) then
                 -- check if contais item id
                 if (self.inventory[itemId]) then
-                    self.inventory[itemId] = self.inventory[itemId] + amount;
+                    self.inventory[itemId] = self.inventory[itemId] + slotInfo.stackCount;
                 else
-                    self.inventory[itemId] = amount;
+                    self.inventory[itemId] = slotInfo.stackCount;
                 end
             end
         end
