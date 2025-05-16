@@ -154,10 +154,10 @@ function ProfessionsView:Show()
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
         if (addon.isEra) then
-            professionLabel:SetPoint("TOPLEFT", 785, -15);
+            professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -190, -15);
             professionSelection:SetPoint("TOPRIGHT", -20, -31);
         else
-            professionLabel:SetPoint("TOPLEFT", 652, -15);
+            professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -323, -15);
             professionSelection:SetPoint("TOPRIGHT", -153, -31);
         end
         UIDropDownMenu_SetWidth(professionSelection, 140);
