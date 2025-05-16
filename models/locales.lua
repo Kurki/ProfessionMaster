@@ -30,6 +30,7 @@ function LocalesModel:Create()
             -- general
             ["AddonLoaded"] = "v" .. addon.version .. " by Esperanza@Everlook. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Try out the “Profession Master - Guild Trade Skills” add-on, which allows everyone to see the professions of the other guild members.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
@@ -70,6 +71,7 @@ function LocalesModel:Create()
             ["ProfessionsViewReagentsForBucketList"] = "Reagents for Shopping List",
             ["ProfessionsViewNotOnBucketList"] = "Other",
             ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffCopy link into Text-Chat.",
+            ["ProfessionsViewAnnounce"] = "Promote in Guild Chat",
 
             -- skill view
             ["SkillViewPlayers"] = "Players",
@@ -89,6 +91,7 @@ function LocalesModel:Create()
             ["AddonLoaded"] = "v" .. addon.version .. " von Esperanza@Everlook. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
+            ["GuildAnnouncement"] = "Probiert mal das Addon “Profession Master - Guild Trade Skills” aus, damit kann jeder die Berufe der anderen Gildenmitglieder sehen.",
             ["You"] = "Du",
 
             -- welcome
@@ -128,6 +131,7 @@ function LocalesModel:Create()
             ["ProfessionsViewReagentsForBucketList"] = "Materialien für Einkaufliste",
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
             ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufslsite setzen.   |cffDA8CFFShift + Linksklick: |cffffffffLink in Text-Chat kopieren.",
+            ["ProfessionsViewAnnounce"] = "Im Gildenchat ankündigen",
 
             -- skill view
             ["SkillViewPlayers"] = "Spieler",

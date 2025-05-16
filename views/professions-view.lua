@@ -124,7 +124,11 @@ function ProfessionsView:Show()
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
-        itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
+        if (addon.isEra) then
+            itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -199, -56);
+        else
+            itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
+        end
         itemSearch:SetAutoFocus(false);
         self.itemSearch = itemSearch;
         itemSearch:SetScript("OnKeyDown", function(_, key)
@@ -146,11 +150,16 @@ function ProfessionsView:Show()
         
         -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        professionLabel:SetPoint("TOPLEFT", 404, -15);
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        professionSelection:SetPoint("TOPRIGHT", -153, -31);
+        if (addon.isEra) then
+            professionLabel:SetPoint("TOPLEFT", 785, -15);
+            professionSelection:SetPoint("TOPRIGHT", -20, -31);
+        else
+            professionLabel:SetPoint("TOPLEFT", 652, -15);
+            professionSelection:SetPoint("TOPRIGHT", -153, -31);
+        end
         UIDropDownMenu_SetWidth(professionSelection, 140);
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()
@@ -177,38 +186,41 @@ function ProfessionsView:Show()
             end
         end);
 
-        -- add addon selection
-        local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        addonLabel:SetPoint("TOPRIGHT", -120, -15);
-        addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
-        local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
-        addonSelection:ClearAllPoints();
-        addonSelection:SetPoint("TOPRIGHT", -20, -31);
-        UIDropDownMenu_SetWidth(addonSelection, 110);
-        self.addonSelection = addonSelection;
-        UIDropDownMenu_Initialize(addonSelection, function()
-            -- create item
-            local item = UIDropDownMenu_CreateInfo();
-            item.notCheckable = true;
-            item.func = function(_self, addonId, arg2)
-                -- select addon
-                self:SelectAddon(addonId);
-                self.itemSearch:SetFocus();
+        -- check if is not era
+        if (not addon.isEra) then
+            -- add addon selection
+            local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            addonLabel:SetPoint("TOPRIGHT", -120, -15);
+            addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
+            local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
+            addonSelection:ClearAllPoints();
+            addonSelection:SetPoint("TOPRIGHT", -20, -31);
+            UIDropDownMenu_SetWidth(addonSelection, 110);
+            self.addonSelection = addonSelection;
+            UIDropDownMenu_Initialize(addonSelection, function()
+                -- create item
+                local item = UIDropDownMenu_CreateInfo();
+                item.notCheckable = true;
+                item.func = function(_self, addonId, arg2)
+                    -- select addon
+                    self:SelectAddon(addonId);
+                    self.itemSearch:SetFocus();
 
-                -- add skills
-                self:AddSkills();
-            end;
+                    -- add skills
+                    self:AddSkills();
+                end;
 
-            -- add all date
-            item.text, item.arg1 = self:GetAddonText(nil), nil;
-            UIDropDownMenu_AddButton(item);
-
-            -- add dates
-            for addonId = 0, 0, 1 do
-                item.text, item.arg1 = self:GetAddonText(addonId), addonId;
+                -- add all date
+                item.text, item.arg1 = self:GetAddonText(nil), nil;
                 UIDropDownMenu_AddButton(item);
-            end
-        end);
+
+                -- add dates
+                for addonId = 0, 4, 1 do
+                    item.text, item.arg1 = self:GetAddonText(addonId), addonId;
+                    UIDropDownMenu_AddButton(item);
+                end
+            end);
+        end
 
         -- add bucket list icon
         local bucketListIcon = skillsFrame:CreateTexture(nil, "OVERLAY");
@@ -265,6 +277,14 @@ function ProfessionsView:Show()
         -- select first profession
         self:SelectProfession(PMSettings.lastProfession or 0);
         self:SelectAddon(PMSettings.lastAddon);
+
+        -- create ok button
+        local okButton = uiService:CreateButton(view, localeService:Get("ProfessionsViewAnnounce"), function()
+            SendChatMessage(localeService:Get("GuildAnnouncement"), "GUILD");
+        end);
+        okButton:SetWidth(200);
+        okButton:SetHeight(20);
+        okButton:SetPoint("BOTTOMRIGHT", -10, 6);
     end
 
     -- hide skill view
@@ -389,18 +409,36 @@ function ProfessionsView:GetAddonText(addonId)
         return "|T135773:16|t WOTLK";
     end
 
+    -- check cata
+    if (addonId == 3) then
+        return "|T134158:16|t Cata";
+    end
+
+    -- check mop
+    if (addonId == 4) then
+        return "|T132183:16|t MoP";
+    end
+
     -- use all addons
     return "|T135749:16|t " .. addon:GetService("locale"):Get("ProfessionsViewAllAddons");
 end
 
 --- Select addon.
 function ProfessionsView:SelectAddon(addonId)
+    -- check if is era
+    if (addon.isEra) then
+        -- select alla ddons in era
+        addonId = 0;
+    end
+
     -- set addon id
     self.addonId = addonId;
     PMSettings.lastAddon = addonId;
 
     -- select dropdown
-    UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
+    if (self.addonSelection) then
+        UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
+    end
 end
 
 --- Add skills.

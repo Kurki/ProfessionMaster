@@ -39,17 +39,23 @@ end
 --- Get profession ids to show.
 -- @return List of ids.
 function ProfessionNamesService:GetProfessionIdsToShow()
-    return {
+    -- get classic profession ids
+    local professionIds = {
         333,
-        -- 755,
         171,
         197,
         165,
         164,
         202,
-        -- 773,
         185
     };
+
+    -- add non era ids
+    if (not addon.isEra) then
+        table.insert(professionIds, 2, 755);
+        table.insert(professionIds, 773);
+    end
+    return professionIds;
 end
 
 --- Get profession name by profession id.

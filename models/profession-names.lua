@@ -32,8 +32,8 @@ local ProfessionNames = {
         [333] = "Enchanting",
         [356] = "Fishing",
         [393] = "Skinning",
-        -- [755] = "Jewelcrafting",
-        -- [773] = "Inscription"
+        [755] = "Jewelcrafting",
+        [773] = "Inscription"
     },
     ["deDE"] = {
         [164] = "Schmiedekunst",
@@ -47,8 +47,8 @@ local ProfessionNames = {
         [333] = "Verzauberkunst",
         [356] = "Angeln",
         [393] = "Kürschnerei",
-        -- [755] = "Juwelenschleifen",
-        -- [773] = "Inschriftenkunde",
+        [755] = "Juwelenschleifen",
+        [773] = "Inschriftenkunde",
     },
     ["frFR"] = {
         [164] = "Forge",
@@ -62,8 +62,8 @@ local ProfessionNames = {
         [333] = "Enchantement",
         [356] = "Pêche",
         [393] = "Dépeçage",
-        -- [755] = "Joaillerie",
-        -- [773] = "Calligraphie",
+        [755] = "Joaillerie",
+        [773] = "Calligraphie",
     },
     ["esMX"] = {
         [164] = "Herrería",
@@ -77,8 +77,8 @@ local ProfessionNames = {
         [333] = "Encantamiento",
         [356] = "Pesca",
         [393] = "Desuello",
-        -- [755] = "Joyería",
-        -- [773] = "Inscripción",
+        [755] = "Joyería",
+        [773] = "Inscripción",
     },
     ["esES"] = {
         [164] = "Herrería",
@@ -92,8 +92,8 @@ local ProfessionNames = {
         [333] = "Encantamiento",
         [356] = "Pesca",
         [393] = "Desuello",
-        -- [755] = "Joyería",
-        -- [773] = "Inscripción",
+        [755] = "Joyería",
+        [773] = "Inscripción",
     },
     ["ptBR"] = {
         [164] = "Ferraria",
@@ -107,8 +107,8 @@ local ProfessionNames = {
         [333] = "Encantamento",
         [356] = "Pesca",
         [393] = "Esfolamento",
-        -- [755] = "Joalheria",
-        -- [773] = "Escrivania",
+        [755] = "Joalheria",
+        [773] = "Escrivania",
     },
     -- ["ruRU"] = {
     --     [164] = "Кузнечное дело",
@@ -137,8 +137,8 @@ local ProfessionNames = {
         [333] = "附魔",
         [356] = "钓鱼",
         [393] = "剥皮",
-        -- [755] = "珠宝加工",
-        -- [773] = "铭文",
+        [755] = "珠宝加工",
+        [773] = "铭文",
     },
     ["zhTW"] = {
         [164] = "鍛造",
@@ -152,8 +152,8 @@ local ProfessionNames = {
         [333] = "附魔",
         [356] = "釣魚",
         [393] = "剝皮",
-        -- [755] = "珠寶設計",
-        -- [773] = "銘文學",
+        [755] = "珠寶設計",
+        [773] = "銘文學",
     },
     ["koKR"] = {
         [164] = "대장기술",
@@ -167,8 +167,8 @@ local ProfessionNames = {
         [333] = "마법부여",
         [356] = "낚시",
         [393] = "무두질",
-        -- [755] = "보석세공",
-        -- [773] = "주문각인",
+        [755] = "보석세공",
+        [773] = "주문각인",
     }
 };
 
