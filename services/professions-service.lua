@@ -231,24 +231,29 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                     end
                 end
 
-                -- get item data
-                local item = Item:CreateFromItemID(skillEntry.itemId);
-                if (not item:IsItemEmpty()) then
-                    -- wait until loaded
-                    item:ContinueOnItemLoad(function()
-                        -- set values
-                        local itemName = item:GetItemName();
-                        local itemLink = item:GetItemLink();
-                        skillEntry.itemLink = itemLink;
-                        skillEntry.itemColor = professionNamesService:GetItemColor(itemLink);
-                        skillEntry.icon = item:GetItemIcon();
-                        if (not skillEntry.name) then
-                            skillEntry.name = itemName;
-                        end
-                        if (not skillEntry.skillLink and not addon.isEra) then
-                            skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
-                        end
-                    end);
+                -- check if item id known
+                if (C_Item.DoesItemExistByID(skillEntry.itemId)) then
+                    -- get item data
+                    local item = Item:CreateFromItemID(skillEntry.itemId);
+                    if (not item:IsItemEmpty()) then
+                        pcall(function()
+                            -- wait until loaded
+                            item:ContinueOnItemLoad(function()
+                                -- set values
+                                local itemName = item:GetItemName();
+                                local itemLink = item:GetItemLink();
+                                skillEntry.itemLink = itemLink;
+                                skillEntry.itemColor = professionNamesService:GetItemColor(itemLink);
+                                skillEntry.icon = item:GetItemIcon();
+                                if (not skillEntry.name) then
+                                    skillEntry.name = itemName;
+                                end
+                                if (not skillEntry.skillLink and not addon.isEra) then
+                                    skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
+                                end
+                            end);
+                        end);
+                    end
                 end
             end
         end
@@ -342,6 +347,27 @@ function ProfessionsService:FindSkillByName(skillName)
             return skillId, skill, professionId;
         end
     end  
+end
+
+--- Convert data.
+function ProfessionsService:Convert()
+    local convertData = addon:GetModel('convert-data');
+    Convert = {};
+    self:ConvertAddon(0, convertData.CLASSIC);
+    table.sort(Convert);
+end
+function ProfessionsService:ConvertAddon(addonNumber, convertData)
+    for skillId, skill in pairs(convertData) do
+        local convertedSkill = {
+            addon = addonNumber,
+            reagents = {},
+            itemId = skill[1]
+        }
+        for i, reagentId in ipairs(skill[6]) do
+            convertedSkill.reagents[reagentId] = skill[7][i];
+        end
+        Convert[skillId] = convertedSkill;
+    end
 end
 
 -- register service

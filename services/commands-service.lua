@@ -49,6 +49,12 @@ local function CommandHandler(parameters)
     end
 
     -- check if overview shoulkd be shown
+    if (string.lower(parameters) == "convert") then
+        addon:GetService("professions"):Convert();
+        return;
+    end
+
+    -- check if overview shoulkd be shown
     if (string.lower(parameters) == "reagents") then
         addon:GetService("inventory"):ToggleMissingReagents();
         return;

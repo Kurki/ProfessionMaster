@@ -112,14 +112,19 @@ function MissingReagentsView:Show(missingReagents)
         -- update amount
         row.amountText:SetText(missingAmount);
 
-        -- get item
-        local item = Item:CreateFromItemID(itemId);
-        if (not item:IsItemEmpty()) then
-            -- wait until loaded
-            item:ContinueOnItemLoad(function()
-                row.itemLink = item:GetItemLink();
-                row.itemText:SetText("|c" .. professionNamesService:GetItemColor(row.itemLink) .. item:GetItemName());
-            end);
+        -- check if item id known
+        if (C_Item.DoesItemExistByID(itemId)) then
+            -- get item
+            local item = Item:CreateFromItemID(itemId);
+            if (not item:IsItemEmpty()) then
+                pcall(function()
+                    -- wait until loaded
+                    item:ContinueOnItemLoad(function()
+                        row.itemLink = item:GetItemLink();
+                        row.itemText:SetText("|c" .. professionNamesService:GetItemColor(row.itemLink) .. item:GetItemName());
+                    end);
+                end);
+            end
         end
     end
 

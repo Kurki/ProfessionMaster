@@ -26,41 +26,43 @@ OwnProfessionsService.__index = OwnProfessionsService;
 function OwnProfessionsService:Initialize()
 end
 
---- Get own trade skill professions. Enchanting is not part of trade professions.
-function OwnProfessionsService:GetTradeSkillProfessionData()
+--- Get own profession data.
+function OwnProfessionsService:GetProfessionData()
     -- check if is in combat
     if (addon.inCombat) then
         return;
     end
 
+    -- check if is link
+    local professionIsLink, professionPlayerName = IsTradeSkillLinked();
+    if (professionIsLink) then
+        -- get long name
+        professionPlayerName = addon:GetService("player"):GetLongName(professionPlayerName);
+
+        -- check if is guild mate
+        if (not Guildmates or not Guildmates[professionPlayerName]) then
+            return;
+        end
+    end
+
+    -- get trade skill profession data
+    self:GetTradeSkillProfessionData(professionIsLink, professionPlayerName);
+
+    -- get craft skill profession data
+    self:GetCraftSkillProfessionData(professionIsLink, professionPlayerName);
+end
+
+--- Get own trade skill profession data. 
+function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, professionPlayerName)
     -- get and check profession id
     local professionNamesService = addon:GetService("profession-names");
     local professionId = professionNamesService:GetProfessionId(GetTradeSkillLine());
-    local craftProfessionId = professionNamesService:GetProfessionId(GetCraftDisplaySkillLine());
-    if (not professionId and not craftProfessionId) then
+    if (not professionId) then
         return;
     end
 
-    -- check if is link
-    -- local tradeSkillIsLink, tradeSkillPlayerName = IsTradeSkillLinked();
-    local longTradeSkillPlayerName = nil;
-    -- if (tradeSkillIsLink) then
-    --     -- get long name
-    --     longTradeSkillPlayerName = addon:GetService("player"):GetLongName(tradeSkillPlayerName);
-
-    --     -- check if is guild mate
-    --     if (not Guildmates or not Guildmates[longTradeSkillPlayerName]) then
-    --         return;
-    --     end
-    -- end
-
     -- get amount of trade skills
-    local tradeSkillAmount = 0;
-    if (craftProfessionId) then
-        tradeSkillAmount = GetNumCrafts();
-    else
-        tradeSkillAmount = GetNumTradeSkills();
-    end
+    local tradeSkillAmount = GetNumTradeSkills();
 
     -- prepare item ids
     local skills = {};
@@ -69,60 +71,33 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
 
     -- iterate trade skills
     for tradeSkillIndex = 1, tradeSkillAmount do
-        -- prepare trade skill name and type
-        local tradeSkillName = nil;
-        local tradeSkillType = nil;
-
         -- get trade skill name and type
-        if (craftProfessionId) then
-            tradeSkillName, _, tradeSkillType = GetCraftInfo(tradeSkillIndex);
-        else
-            tradeSkillName, tradeSkillType = GetTradeSkillInfo(tradeSkillIndex);
-        end
+        local tradeSkillName, tradeSkillType = GetTradeSkillInfo(tradeSkillIndex);
 
         -- check name and type
         if (tradeSkillName and (tradeSkillType == "optimal" or tradeSkillType == "medium" or tradeSkillType == "easy" or tradeSkillType == "trivial")) then
-            -- get trade skill lid
-            local tradeSkillLink = nil;
-            local tradeSkillId = nil;
-            local tradeSkillItemId = 0;
-
-            -- check if is enchanting
-            if (craftProfessionId) then
-                -- get link, id and item id from enchant
-                tradeSkillLink = GetCraftItemLink(tradeSkillIndex);
-                tradeSkillId = tonumber(tradeSkillLink:match("enchant:(%d+)"));
-                local tradeSkill = allSkills[tradeSkillId];
-                if (tradeSkill) then
-                    tradeSkillItemId = tradeSkill["itemId"];
-
-                    -- enchant items ids not all supported in ara
-                    if (addon.isEra and tradeSkillItemId > 30000) then
-                        -- this enchant item id is not supported in era
-                        tradeSkillItemId = 0;
-                    end
-                end
-            else
-                -- get link and item id
-                tradeSkillLink = GetTradeSkillItemLink(tradeSkillIndex);
-                tradeSkillItemId = tonumber(tradeSkillLink:match("item:(%d+)"));
-
-                -- get trande skill id
+            -- get link and item id
+            local tradeSkillLink = GetTradeSkillItemLink(tradeSkillIndex);
+            local tradeSkillId = tonumber(tradeSkillLink:match("enchant:(%d+)"));
+            local tradeSkillItemId = tonumber(tradeSkillLink:match("item:(%d+)"));
+            if (tradeSkillItemId and (not tradeSkillId)) then
                 tradeSkillId = allItems[tradeSkillItemId];
-                if (not tradeSkillId) then
-                    local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
-                    if (tradeSkillLink) then
-                        tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
-                    end
-                end 
             end
+
+            -- get trande skill id
+            if (not tradeSkillId) then
+                local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+                if (tradeSkillLink) then
+                    tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+                end
+            end 
 
             -- check trade skill id
             if (tradeSkillId) then
                 -- add skill
                 table.insert(skills, {
                     skillId = tradeSkillId,
-                    itemId = tradeSkillItemId,
+                    itemId = tradeSkillItemId or 0,
                     added = time()
                 });
             end
@@ -130,12 +105,67 @@ function OwnProfessionsService:GetTradeSkillProfessionData()
     end
 
     -- chck if is link
-    if (tradeSkillIsLink) then
+    if (professionIsLink) then
         -- add to player professions
-        addon:GetService("professions"):StorePlayerSkills(longTradeSkillPlayerName, professionId or craftProfessionId, skills);
+        addon:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
     else
         -- store own profession
-        self:StoreAndSendOwnProfession(professionId or craftProfessionId, skills);
+        self:StoreAndSendOwnProfession(professionId, skills);
+    end
+end
+
+--- Get own craft skill profession data. 
+function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, professionPlayerName)
+    -- get and check profession id
+    local professionNamesService = addon:GetService("profession-names");
+    local professionId = professionNamesService:GetProfessionId(GetCraftDisplaySkillLine());
+    if (not professionId) then
+        return;
+    end
+
+    -- get amount of craft skills
+    local craftSkillAmount = GetNumCrafts();
+
+    -- prepare item ids
+    local skills = {};
+    local allSkills = addon:GetModel("all-skills");
+    local allItems = addon:GetModel("all-items");
+
+    -- iterate craft skills
+    for craftSkillIndex = 1, craftSkillAmount do
+        -- get craft skill name and type
+        local craftSkillName, _, craftSkillType = GetCraftInfo(craftSkillIndex);
+
+        -- check name and type
+        if (craftSkillName and (craftSkillType == "optimal" or craftSkillType == "medium" or craftSkillType == "easy" or craftSkillType == "trivial")) then
+            -- get link, id and item id from enchant
+            local craftSkillLink = GetCraftItemLink(craftSkillIndex);
+            local craftSkillId = tonumber(craftSkillLink:match("enchant:(%d+)"));
+            local craftSkillItemId = tonumber(craftSkillLink:match("item:(%d+)"));
+            local craftSkill = allSkills[craftSkillId];
+            if (craftSkill and (not craftSkillItemId)) then
+                craftSkillItemId = craftSkill["itemId"];
+            end
+
+            -- check trade skill id
+            if (craftSkillId) then
+                -- add skill
+                table.insert(skills, {
+                    skillId = craftSkillId,
+                    itemId = craftSkillItemId or 0,
+                    added = time()
+                });
+            end
+        end
+    end
+
+    -- chck if is link
+    if (professionIsLink) then
+        -- add to player professions
+        addon:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
+    else
+        -- store own profession
+        self:StoreAndSendOwnProfession(professionId, skills);
     end
 end
 

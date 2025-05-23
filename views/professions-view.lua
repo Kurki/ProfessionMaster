@@ -808,16 +808,21 @@ function ProfessionsView:RefreshBucketListRows()
             reagentRow.amountText:SetTextColor(1, 1, 1);
         end
 
-        -- get item
-        local item = Item:CreateFromItemID(reagentItemId);
-        if (not item:IsItemEmpty()) then
-            -- wait until loaded
-            item:ContinueOnItemLoad(function()
-                -- update item
-                reagentRow.itemLink = item:GetItemLink();
-                reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
-                reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
-            end);
+        -- check if item id known
+        if (C_Item.DoesItemExistByID(reagentItemId)) then
+            -- get item
+            local item = Item:CreateFromItemID(reagentItemId);
+            if (not item:IsItemEmpty()) then
+                pcall(function() 
+                    -- wait until loaded
+                    item:ContinueOnItemLoad(function()
+                        -- update item
+                        reagentRow.itemLink = item:GetItemLink();
+                        reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
+                        reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
+                    end);
+                end);
+            end
         end
     end
 end

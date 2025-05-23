@@ -247,7 +247,7 @@ function ProfessionMasterAddon:RegisterEvents()
             self:GetService("tooltip"):WatchTooltip();
 
             -- startup
-            self:GetService("timer"):Wait("PlayerLogin", 10, function()
+            self:GetService("timer"):Wait("PlayerLogin", 5, function()
                 -- show loaded message
                 self:GetService("chat"):Write("AddonLoaded");
 
@@ -266,7 +266,7 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- handle trade skill update
         elseif (event == "TRADE_SKILL_UPDATE") or (event == "CRAFT_UPDATE") then
-            self:GetService("own-professions"):GetTradeSkillProfessionData();
+            self:GetService("own-professions"):GetProfessionData();
 
         -- handle craft update
         elseif (event == "GUILD_ROSTER_UPDATE") then
