@@ -157,6 +157,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
     local skillsService = addon:GetService("skills");
+    local bopItems = addon:GetModel("bop-items");
 
     -- check skills
     for i, skill in ipairs(skills) do
