@@ -123,7 +123,11 @@ end
 -- @param itemName Name of item to get link for.
 -- @return Link of the given skill id.
 function ProfessionNamesService:GetSkillLink(professionId, skillId, itemName)
-    return "|cffffd000|Henchant:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    if (professionId == 333) then
+        return "|cffffd000|Henchant:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    else
+        return "|cffffd000|Hspell:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    end
 end
 
 --- Get item color by item link.

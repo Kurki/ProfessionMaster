@@ -6,7 +6,7 @@
 ## Title: Profession Master |cffDA8CFF[PM] - Cataclysm
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 2.2.0
+## Version: 2.2.1
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates, Convert
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 

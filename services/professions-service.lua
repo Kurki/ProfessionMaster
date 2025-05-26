@@ -172,7 +172,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                 local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
 
                 -- get skill link
-                local skillLink;
+                local skillLink = GetSpellLink(skill.skillId);
                 if (addon.isVanilla) then
                     skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
                 else
@@ -211,12 +211,6 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 				local skillInfo = skillsService:GetSkillById(skill.skillId);
 				if (skillInfo) then
 					skillEntry.itemId = skillInfo.itemId;
-
-                    -- enchant items ids not all supported in ara
-                    if ((not skillEntry.itemId) or (addon.isEra and skillEntry.itemId > 30000)) then
-                        -- this enchant item id is not supported in era
-                        skillEntry.itemId = 0;
-                    end
 				end
             end
 
@@ -248,7 +242,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                                 if (not skillEntry.name) then
                                     skillEntry.name = itemName;
                                 end
-                                if (not skillEntry.skillLink and not addon.isEra) then
+                                if (not skillEntry.skillLink) then
                                     skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
                                 end
                             end);
