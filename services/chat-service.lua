@@ -24,8 +24,8 @@ ChatService.__index = ChatService;
 
 --- Initialize service.
 function ChatService:Initialize()
-    -- check if is era server
-    if (addon.isEra) then
+    -- check if is vanilla
+    if (addon.isVanilla) then
         ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", function(...) return self:CheckChat(...) end);
         ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", function(...) return self:CheckChat(...) end);
         ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", function(...) return self:CheckChat(...) end);

@@ -147,8 +147,11 @@ end
 
 -- Get tooltip reagents.
 function TooltipService:GetTooltipReagents(skillId, callback)
+    -- get skills service
+    local skillsService = addon:GetService("skills");
+
     -- get skill reagents
-    local skillInfo = addon:GetModel("all-skills")[skillId];
+    local skillInfo = skillsService:GetSkillById(skillId);
     if (not skillInfo) then
         callback(nil);
         return;

@@ -63,14 +63,14 @@ end
 
 --Get reagents.
 function InventoryService:GetReagents()
-    -- get all skills
-    local allSkills = addon:GetModel("all-skills");
+    -- get skills service
+    local skillsService = addon:GetService("skills");
 
     -- iterate bucket list
     local reagents = {};
     for skillId, skillAmount in pairs(BucketList) do
         -- get skill reagents
-        local skillInfo = allSkills[skillId];
+        local skillInfo = skillsService:GetSkillById(skillId);
         if (skillInfo) then
             -- iterate skill reagents
             for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do

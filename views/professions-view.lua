@@ -124,7 +124,7 @@ function ProfessionsView:Show()
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
-        if (addon.isEra) then
+        if (addon.isVanilla) then
             itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -199, -56);
         else
             itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
@@ -153,7 +153,7 @@ function ProfessionsView:Show()
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        if (addon.isEra) then
+        if (addon.isVanilla) then
             professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -190, -15);
             professionSelection:SetPoint("TOPRIGHT", -20, -31);
         else
@@ -186,8 +186,8 @@ function ProfessionsView:Show()
             end
         end);
 
-        -- check if is not era
-        if (not addon.isEra) then
+        -- check if is not vanilla
+        if (not addon.isVanilla) then
             -- add addon selection
             local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
             addonLabel:SetPoint("TOPRIGHT", -120, -15);
@@ -210,13 +210,35 @@ function ProfessionsView:Show()
                     self:AddSkills();
                 end;
 
-                -- add all date
+                -- add all addons
                 item.text, item.arg1 = self:GetAddonText(nil), nil;
                 UIDropDownMenu_AddButton(item);
 
-                -- add dates
-                for addonId = 0, 4, 1 do
-                    item.text, item.arg1 = self:GetAddonText(addonId), addonId;
+                -- add vanilla
+                item.text, item.arg1 = self:GetAddonText(1), 1;
+                UIDropDownMenu_AddButton(item);
+
+                -- add bcc
+                if (addon.isBccAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(2), 2;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add wrath
+                if (addon.isWrathAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(3), 3;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add cata
+                if (addon.isCataAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(4), 4;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add mop
+                if (addon.isMopAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(5), 5;
                     UIDropDownMenu_AddButton(item);
                 end
             end);
@@ -395,27 +417,27 @@ end
 --- Get Text of addon.
 function ProfessionsView:GetAddonText(addonId)
     -- check classic
-    if (addonId == 0) then
-        return "|T135954:16|t Classic Era";
+    if (addonId == 1) then
+        return "|T135954:16|t Vanilla";
     end
     
     -- check classic
-    if (addonId == 1) then
+    if (addonId == 2) then
         return "|T135804:16|t TBC";
     end
     
     -- check wotlk
-    if (addonId == 2) then
+    if (addonId == 3) then
         return "|T135773:16|t WOTLK";
     end
 
     -- check cata
-    if (addonId == 3) then
+    if (addonId == 4) then
         return "|T134158:16|t Cata";
     end
 
     -- check mop
-    if (addonId == 4) then
+    if (addonId == 5) then
         return "|T132183:16|t MoP";
     end
 
@@ -425,10 +447,10 @@ end
 
 --- Select addon.
 function ProfessionsView:SelectAddon(addonId)
-    -- check if is era
-    if (addon.isEra) then
-        -- select alla ddons in era
-        addonId = 0;
+    -- check if is vanilla
+    if (addon.isVanilla) then
+        -- select all addons in vani
+        addonId = nil;
     end
 
     -- set addon id
@@ -521,7 +543,7 @@ end
 function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     -- get profession and all skills
     local profession = Professions[professionId];
-    local allSkills = addon:GetModel("all-skills");
+    local skillsService = addon:GetService("skills");
 
     -- filter skills
     if (profession) then
@@ -529,7 +551,7 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
             -- check if skill ok
             if (skill.name ~= nil) then
                 -- get skill info
-                local skillInfo = allSkills[skillId];
+                local skillInfo = skillsService:GetSkillById(skillId);
                 if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
                     -- get bucket list amount
                     local bucketListAmount = BucketList[skillId];
@@ -661,8 +683,8 @@ function ProfessionsView:RefreshRows()
             row:SetScript("OnMouseDown", function(_, button)
                 -- check if link should be added to chat window
                 if (button == "LeftButton") and IsShiftKeyDown() and ChatEdit_GetActiveWindow() then
-                    -- check if era
-                    if (addon.isEra) then
+                    -- check if vanilla
+                    if (addon.isVanilla) then
                         if (row.skill.skillLink) then
                             local editbox = GetCurrentKeyBoardFocus();
                             if (editbox) then

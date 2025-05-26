@@ -65,9 +65,8 @@ function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, pro
     local tradeSkillAmount = GetNumTradeSkills();
 
     -- prepare item ids
+    local skillsService = addon:GetService("skills");
     local skills = {};
-    local allSkills = addon:GetModel("all-skills");
-    local allItems = addon:GetModel("all-items");
 
     -- iterate trade skills
     for tradeSkillIndex = 1, tradeSkillAmount do
@@ -78,28 +77,30 @@ function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, pro
         if (tradeSkillName and (tradeSkillType == "optimal" or tradeSkillType == "medium" or tradeSkillType == "easy" or tradeSkillType == "trivial")) then
             -- get link and item id
             local tradeSkillLink = GetTradeSkillItemLink(tradeSkillIndex);
-            local tradeSkillId = tonumber(tradeSkillLink:match("enchant:(%d+)"));
-            local tradeSkillItemId = tonumber(tradeSkillLink:match("item:(%d+)"));
-            if (tradeSkillItemId and (not tradeSkillId)) then
-                tradeSkillId = allItems[tradeSkillItemId];
-            end
-
-            -- get trande skill id
-            if (not tradeSkillId) then
-                local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
-                if (tradeSkillLink) then
-                    tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+            if (tradeSkillLink) then
+                local tradeSkillId = tonumber(tradeSkillLink:match("enchant:(%d+)"));
+                local tradeSkillItemId = tonumber(tradeSkillLink:match("item:(%d+)"));
+                if (tradeSkillItemId and (not tradeSkillId)) then
+                    tradeSkillId = skillsService:GetSkillIdByItemId(tradeSkillItemId);
                 end
-            end 
 
-            -- check trade skill id
-            if (tradeSkillId) then
-                -- add skill
-                table.insert(skills, {
-                    skillId = tradeSkillId,
-                    itemId = tradeSkillItemId or 0,
-                    added = time()
-                });
+                -- get trande skill id
+                if (not tradeSkillId) then
+                    local tradeSkillLink = GetTradeSkillRecipeLink(tradeSkillIndex);
+                    if (tradeSkillLink) then
+                        tradeSkillId = professionNamesService:GetSkillId(tradeSkillLink);
+                    end
+                end 
+
+                -- check trade skill id
+                if (tradeSkillId) then
+                    -- add skill
+                    table.insert(skills, {
+                        skillId = tradeSkillId,
+                        itemId = tradeSkillItemId or 0,
+                        added = time()
+                    });
+                end
             end
         end
     end
@@ -127,9 +128,8 @@ function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, pro
     local craftSkillAmount = GetNumCrafts();
 
     -- prepare item ids
+    local skillsService = addon:GetService("skills");
     local skills = {};
-    local allSkills = addon:GetModel("all-skills");
-    local allItems = addon:GetModel("all-items");
 
     -- iterate craft skills
     for craftSkillIndex = 1, craftSkillAmount do
@@ -140,21 +140,23 @@ function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, pro
         if (craftSkillName and (craftSkillType == "optimal" or craftSkillType == "medium" or craftSkillType == "easy" or craftSkillType == "trivial")) then
             -- get link, id and item id from enchant
             local craftSkillLink = GetCraftItemLink(craftSkillIndex);
-            local craftSkillId = tonumber(craftSkillLink:match("enchant:(%d+)"));
-            local craftSkillItemId = tonumber(craftSkillLink:match("item:(%d+)"));
-            local craftSkill = allSkills[craftSkillId];
-            if (craftSkill and (not craftSkillItemId)) then
-                craftSkillItemId = craftSkill["itemId"];
-            end
+            if (craftSkillLink) then
+                local craftSkillId = tonumber(craftSkillLink:match("enchant:(%d+)"));
+                local craftSkillItemId = tonumber(craftSkillLink:match("item:(%d+)"));
+                local craftSkill = skillsService:GetSkillById(craftSkillId);
+                if (craftSkill and (not craftSkillItemId)) then
+                    craftSkillItemId = craftSkill["itemId"];
+                end
 
-            -- check trade skill id
-            if (craftSkillId) then
-                -- add skill
-                table.insert(skills, {
-                    skillId = craftSkillId,
-                    itemId = craftSkillItemId or 0,
-                    added = time()
-                });
+                -- check trade skill id
+                if (craftSkillId) then
+                    -- add skill
+                    table.insert(skills, {
+                        skillId = craftSkillId,
+                        itemId = craftSkillItemId or 0,
+                        added = time()
+                    });
+                end
             end
         end
     end

@@ -287,8 +287,11 @@ function SkillView:RefreshBucketListAmount()
         row:Hide();
     end
 
+    -- get skills service
+    local skillsService = addon:GetService("skills");
+
     -- get all skills
-    local skillInfo = addon:GetModel("all-skills")[self.skillId];
+    local skillInfo = skillsService:GetSkillById(self.skillId);
     if (not skillInfo) then
         return;
     end

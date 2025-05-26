@@ -156,8 +156,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     local professionNamesService = addon:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
-    local allSkills = addon:GetModel("all-skills");
-    local bopItems = addon:GetModel("bop-items");
+    local skillsService = addon:GetService("skills");
 
     -- check skills
     for i, skill in ipairs(skills) do
@@ -173,7 +172,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
                 -- get skill link
                 local skillLink;
-                if (addon.isEra) then
+                if (addon.isVanilla) then
                     skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
                 else
                     skillLink = GetSpellLink(skill.skillId);
@@ -208,7 +207,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
             -- check if item can be found by skill id
             if (skillEntry.itemId == 0) then
-				local skillInfo = allSkills[skill.skillId];
+				local skillInfo = skillsService:GetSkillById(skill.skillId);
 				if (skillInfo) then
 					skillEntry.itemId = skillInfo.itemId;
 
@@ -353,21 +352,26 @@ end
 function ProfessionsService:Convert()
     local convertData = addon:GetModel('convert-data');
     Convert = {};
-    self:ConvertAddon(0, convertData.CLASSIC);
-    table.sort(Convert);
+    --self:ConvertAddon(1, convertData.CLASSIC);
+    Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
+    Convert.Wrath = self:ConvertAddon("WRATH", convertData.WRATH, convertResult);
+    Convert.Cata = self:ConvertAddon("CATA", convertData.CATA, convertResult);
+    Convert.Mop = {};
 end
-function ProfessionsService:ConvertAddon(addonNumber, convertData)
-    for skillId, skill in pairs(convertData) do
+function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
+    print("Converting " .. addonNumber);
+    local addon = {};
+    for skillId, skill in pairs(data) do
         local convertedSkill = {
-            addon = addonNumber,
             reagents = {},
             itemId = skill[1]
         }
         for i, reagentId in ipairs(skill[6]) do
             convertedSkill.reagents[reagentId] = skill[7][i];
         end
-        Convert[skillId] = convertedSkill;
+        addon[skillId] = convertedSkill;
     end
+    return addon;
 end
 
 -- register service

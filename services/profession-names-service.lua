@@ -50,8 +50,8 @@ function ProfessionNamesService:GetProfessionIdsToShow()
         185
     };
 
-    -- add non era ids
-    if (not addon.isEra) then
+    -- add non vanilla ids
+    if (addon.isBccAtLeast) then
         table.insert(professionIds, 2, 755);
         table.insert(professionIds, 773);
     end
