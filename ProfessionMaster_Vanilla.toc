@@ -1,9 +1,12 @@
 ## Author: Esperanza - Everlook/EU-Alliance
 ## Interface: 11507
-## Title: Profession Master |cffDA8CFF[PM] - Classic Era
+## X-Min-Interface: 11503
+## Category: Profession Master
+## Group: Profession Master
+## Title: Profession Master |cffDA8CFF[PM] - Vanilla
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 2.1.9
+## Version: 2.2.0
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates, Convert
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 
