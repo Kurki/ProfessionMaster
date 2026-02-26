@@ -28,9 +28,9 @@ function LocalesModel:Create()
         -- define en locale
         ["en"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " by Esperanza@Everlook. Use |cffDA8CFF/pm help|r for more informations.",
+            ["AddonLoaded"] = "v" .. addon.version .. " by Kurki. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "Try out the “Profession Master - Guild Trade Skills” add-on, which allows everyone to see the professions of the other guild members.",
+            ["GuildAnnouncement"] = "I'm now sharing my professions. You can use “!who [item]” in chat to find out if I can craft the item for you. If you want to see everything directly or share your professions, get “Profession Master - Guild Trade Skills” on CurseForge.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
@@ -91,10 +91,10 @@ function LocalesModel:Create()
         -- define de locale
         ["de"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " von Esperanza@Everlook. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
+            ["AddonLoaded"] = "v" .. addon.version .. " von Kurki. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
-            ["GuildAnnouncement"] = "Probiert mal das Addon “Profession Master - Guild Trade Skills” aus, damit kann jeder die Berufe der anderen Gildenmitglieder sehen.",
+            ["GuildAnnouncement"] = "Ich teile jetzt meine Berufe. Ihr könnt “!who [item]” im Chat benutzen, um herauszufinden, ob ich euch das Item herstellen kann. Wenn ihr alles direkt sehen möchtet oder eure Berufe teilen möchtet, holt euch “Profession Master - Guild Trade Skills” auf CurseForge.",
             ["You"] = "Du",
 
             -- welcome
@@ -154,9 +154,9 @@ function LocalesModel:Create()
         -- define ru locale
         ["ru"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " от Esperanza@Everlook. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
+            ["AddonLoaded"] = "v" .. addon.version .. " от Kurki. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
             ["VersionOutdated"] = "Ваша версия устарела. Последнюю версию можно скачать на https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "Попробуйте аддон “Profession Master - Guild Trade Skills”, который позволяет всем видеть профессии других членов гильдии.",
+            ["GuildAnnouncement"] = "Я делюсь своими профессиями. Вы можете использовать “!who [item]” в чате, чтобы узнать, могу ли я создать для вас этот предмет. Если хотите видеть всё напрямую или поделиться своими профессиями, скачайте “Profession Master - Guild Trade Skills” на CurseForge.",
             ["LanguageNotSupported"] = "К сожалению, язык вашего клиента не поддерживается ProfessionMaster.",
             ["You"] = "Вы",
 
@@ -217,9 +217,9 @@ function LocalesModel:Create()
         -- define es locale
         ["es"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " por Esperanza@Everlook. Usa |cffDA8CFF/pm help|r para más información.",
+            ["AddonLoaded"] = "v" .. addon.version .. " por Kurki. Usa |cffDA8CFF/pm help|r para más información.",
             ["VersionOutdated"] = "Tu versión está desactualizada. La última versión se puede descargar en https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "¡Prueba el addon “Profession Master - Guild Trade Skills“, que permite a todos ver las profesiones de los demás miembros del gremio!",
+            ["GuildAnnouncement"] = "Ahora comparto mis profesiones. Puedes usar “!who [item]” en el chat para saber si puedo fabricar ese objeto para ti. Si quieres verlo todo directamente o compartir tus profesiones, consigue “Profession Master - Guild Trade Skills” en CurseForge.",
             ["LanguageNotSupported"] = "Lamentablemente, el idioma de tu cliente no es compatible con ProfessionMaster.",
             ["You"] = "Tú",
 
