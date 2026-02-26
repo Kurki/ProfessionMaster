@@ -19,7 +19,7 @@ limitations under the License.
 
 -- define addon name
 local addonName = "Profession Master";
-local addonVersion = GetAddOnMetadata("ProfessionMaster", "version");
+local addonVersion = C_AddOns.GetAddOnMetadata("ProfessionMaster", "version");
 local addonShortcut = "|cffDA8CFF[PM]|r ";
 
 -- define addon
@@ -46,15 +46,25 @@ function ProfessionMasterAddon:Create()
         name = addonName,
         version = addonVersion,
         shortcut = addonShortcut,
-        debug = true,
-        trace = true,
+        debug = false,
+        trace = false,
         frame = CreateFrame("Frame"),
         logLevel = 0,
         loaded = false,
-        isEra = string.find(wowBuild, "1.") == 1
+        isVanilla = string.find(wowBuild, "1.") == 1,
+        isBcc = string.find(wowBuild, "2.") == 1,
+        isWrath = string.find(wowBuild, "3.") == 1,
+        isCata = string.find(wowBuild, "4.") == 1,
+        isMop = string.find(wowBuild, "5.") == 1,
     };
     setmetatable(addon, ProfessionMasterAddon);
     
+    -- set at least addon indicators
+    addon.isMopAtLeast = addon.isMop;
+    addon.isCataAtLeast = addon.isCata or addon.isMopAtLeast;
+    addon.isWrathAtLeast = addon.isWrath or addon.isCataAtLeast;
+    addon.isBccAtLeast = addon.isBcc or addon.isWrathAtLeast;
+
     -- clear types
     addon.serviceTypes = {};
     addon.services = {};
@@ -179,7 +189,7 @@ function ProfessionMasterAddon:LogDebug(class, method, message, ...)
     table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Debug] " .. string.format(message, ...));
 
     -- print out trace
-    --print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
+    print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
 --- Log trace message.
@@ -196,16 +206,11 @@ function ProfessionMasterAddon:LogTrace(class, method, message, ...)
     table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Trace] " .. string.format(message, ...));
 
     -- print out trace
-    -- print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
+    print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
 --- Register addon events.
 function ProfessionMasterAddon:RegisterEvents()
-    -- check if russian
-    if (GetLocale() == "ruRU") then
-        print(addonShortcut .. "Авторы аддона оставляют за собой право не поддерживать игроков из стран, которые ведут себя мизантропически.");
-    end
-
     -- register events
     self.frame:RegisterEvent("ADDON_LOADED");
     self.frame:RegisterEvent("CHAT_MSG_ADDON");
@@ -247,7 +252,7 @@ function ProfessionMasterAddon:RegisterEvents()
             self:GetService("tooltip"):WatchTooltip();
 
             -- startup
-            self:GetService("timer"):Wait("PlayerLogin", 10, function()
+            self:GetService("timer"):Wait("PlayerLogin", 5, function()
                 -- show loaded message
                 self:GetService("chat"):Write("AddonLoaded");
 
@@ -266,7 +271,7 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- handle trade skill update
         elseif (event == "TRADE_SKILL_UPDATE") or (event == "CRAFT_UPDATE") then
-            self:GetService("own-professions"):GetTradeSkillProfessionData();
+            self:GetService("own-professions"):GetProfessionData();
 
         -- handle craft update
         elseif (event == "GUILD_ROSTER_UPDATE") then
@@ -314,60 +319,6 @@ end
 
 -- Migrate data.
 function ProfessionMasterAddon:Migrate()
-    -- check data version
-    if (PMSettings.storeVersion and PMSettings.storeVersion < 3) then
-        -- clear data
-        Professions = {};
-        OwnProfessions = {};
-        SyncTimes = {};
-        CharacterSettings = {}; 
-        PMSettings = {};
-        self:CheckSettings();
-    end
-
-    -- check data version
-    if (PMSettings.storeVersion and PMSettings.storeVersion < 5) then
-        -- check all professions
-        for professionId, profession in pairs(Professions) do  
-            -- prepare valid skills
-            local validSkills = {};
-
-            -- iterate skills
-            for skillId, skill in pairs(profession) do     
-                -- check skill
-                if (skill.name ~= nil and skill.itemId ~= nil) then
-                    validSkills[skillId] = skill;
-                end
-            end
-
-            -- store valid skills
-            Professions[professionId] = validSkills;
-        end
-
-        -- check own professions
-        for characterName, professions in pairs(OwnProfessions) do
-            -- iterate all professions
-            for professionId, skills in pairs(professions) do
-                -- prepare valid skills
-                local validSkills = {};
-
-                -- iterate all skills
-                for skillIndex = 1, #skills do
-                    -- get skill
-                    local skill = skills[skillIndex];
-
-                    -- check skill
-                    if (skill.skillId ~= nil and skill.itemId ~= nil) then
-                        table.insert(validSkills, skill);
-                    end
-                end
-
-                -- store valid skills
-                professions[professionId] = validSkills;
-            end
-        end
-    end
-
     -- set store version
     PMSettings.storeVersion = 5;
 end

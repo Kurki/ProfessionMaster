@@ -39,17 +39,24 @@ end
 --- Get profession ids to show.
 -- @return List of ids.
 function ProfessionNamesService:GetProfessionIdsToShow()
-    return {
+    -- get classic profession ids
+    local professionIds = {
         333,
-        -- 755,
         171,
         197,
         165,
         164,
         202,
-        -- 773,
-        185
+        185,
+        186
     };
+
+    -- add non vanilla ids
+    if (addon.isBccAtLeast) then
+        table.insert(professionIds, 2, 755);
+        table.insert(professionIds, 773);
+    end
+    return professionIds;
 end
 
 --- Get profession name by profession id.
@@ -117,7 +124,11 @@ end
 -- @param itemName Name of item to get link for.
 -- @return Link of the given skill id.
 function ProfessionNamesService:GetSkillLink(professionId, skillId, itemName)
-    return "|cffffd000|Henchant:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    if (professionId == 333) then
+        return "|cffffd000|Henchant:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    else
+        return "|cffffd000|Hspell:" .. skillId .. "|h[" .. self:GetProfessionName(professionId) .. ": " .. itemName .. "]|h|r";
+    end
 end
 
 --- Get item color by item link.

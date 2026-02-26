@@ -52,7 +52,7 @@ function UiService:CreateView(name, width, height, title)
     currentZIndex = currentZIndex + 20;
 
     -- check elv ui
-    if IsAddOnLoaded("ElvUI") then
+    if C_AddOns.IsAddOnLoaded("ElvUI") then
         view:SetScale(ElvUI[1].global.general.UIScale);
     elseif (view:GetScale() > 0.9) then
         view:SetScale(0.9);

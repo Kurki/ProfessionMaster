@@ -18,22 +18,8 @@ limitations under the License.
 --]]
 local addon = _G.professionMaster;
 
--- define icons
-local ProfessionIcons = {
-    [164] = 136241,
-    [165] = 133611,
-    [171] = 136240,
-    [182] = 136065,
-    [185] = 133971,
-    [186] = 136248,
-    [197] = 136249,
-    [202] = 136243,
-    [333] = 136244,
-    [356] = 136245,
-    [393] = 134366,
-    [755] = 134071,
-    [773] = 237171
-};
+-- define all skills
+local PROFESSION_DATA = {};
 
 -- register model
-addon:RegisterModel(ProfessionIcons, "profession-icons");
+addon:RegisterModel(PROFESSION_DATA, "convert-data");

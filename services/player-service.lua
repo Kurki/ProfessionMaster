@@ -112,7 +112,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
     -- iterate all player names
     for _, playerName in ipairs(playerNames) do
         -- check realm
-        if (self:IsSameRealm(playerName)) then
+        if (self:IsSameRealm(playerName) or Guildmates[playerName]) then
             -- get short player name
             local shortPlayerName = self:GetShortName(playerName);
 

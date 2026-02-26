@@ -156,60 +156,61 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     local professionNamesService = addon:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
-    local allSkills = addon:GetModel("all-skills");
+    local skillsService = addon:GetService("skills");
     local bopItems = addon:GetModel("bop-items");
 
     -- check skills
     for i, skill in ipairs(skills) do
         -- check item
         if (not profession[skill.skillId]) then
-            -- get spell
-            local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
+            -- prepare skill entry
+            local skillEntry = nil;
 
-            -- get skill link
-            local skillLink = GetSpellLink(skill.skillId);
-
-            -- add item
-            local skillEntry = {}
-            if skill.enchant then
-              skillEntry = {
-                  name = spellName,
-                  skillLink = skill.enchantLink,
-                  itemId = tonumber(skill.itemId),
-                  itemLink = skill.enchantLink,
-                  itemColor = nil,
-                  icon = spellIcon,
-                  bop = false,
-                  enchant = true,
-                  players = {}
-              };
-            else
-              skillEntry = {
-                  name = spellName,
-                  skillLink = skillLink,
-                  itemId = tonumber(skill.itemId),
-                  itemLink = select(2, GetItemInfo(skill.itemId)),
-                  itemColor = nil,
-                  icon = spellIcon,
-                  bop = false,
-                  players = {}
-              };
-            end
-            profession[skill.skillId] = skillEntry;
-
-            -- use default enchaning color
+            -- check if profession is enchantment
             if (professionId == 333) then
-                skillEntry.itemColor = "FF71D5FF";
+                -- get spell
+                local spellName, _, spellIcon = GetSpellInfo(skill.skillId);
+
+                -- get skill link
+                local skillLink = GetSpellLink(skill.skillId);
+                if (addon.isVanilla) then
+                    skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
+                else
+                    skillLink = GetSpellLink(skill.skillId);
+                end
+
+                -- add item
+                skillEntry = {
+                    name = spellName,
+                    skillLink = skillLink,
+                    itemId = skill.itemId,
+                    itemLink = nil,
+                    itemColor = "FF71D5FF",
+                    icon = spellIcon,
+                    bop = false,
+                    players = {}
+                };
+                profession[skill.skillId] = skillEntry;
+            else
+                -- add item
+                skillEntry = {
+                    name = nil,
+                    skillLink = nil,
+                    itemId = skill.itemId,
+                    itemLink = nil,
+                    itemColor = nil,
+                    icon = nil,
+                    bop = false,
+                    players = {}
+                };
+                profession[skill.skillId] = skillEntry;
             end
 
             -- check if item can be found by skill id
             if (skillEntry.itemId == 0) then
-				local skillInfo = allSkills[skill.skillId];
+				local skillInfo = skillsService:GetSkillById(skill.skillId);
 				if (skillInfo) then
 					skillEntry.itemId = skillInfo.itemId;
-					if (not skillEntry.itemId) then
-						skillEntry.itemId = 0;
-					end
 				end
             end
 
@@ -224,28 +225,29 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
                     end
                 end
 
-                -- get item data
-                if (not skillEntry.enchant) then
-                  local item = Item:CreateFromItemID(skillEntry.itemId);
-                  if (not item:IsItemEmpty()) then
-                      -- wait until loaded
-                      item:ContinueOnItemLoad(function(loadedItem)
-                          -- set values
-                          if (loadedItem) then
-                            local itemName = loadedItem:GetItemName();
-                            local itemLink = loadedItem:GetItemLink();
-                            skillEntry.itemLink = itemLink;
-                            skillEntry.itemColor = professionNamesService:GetItemColor(itemLink);
-                            skillEntry.icon = loadedItem:GetItemIcon();
-                            if (not skillEntry.name) then
-                                skillEntry.name = itemName;
-                            end
-                            if (not skillEntry.skillLink and not addon.isEra) then
-                                skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
-                            end
-                          end
-                      end);
-                  end
+                -- check if item id known
+                if (C_Item.DoesItemExistByID(skillEntry.itemId)) then
+                    -- get item data
+                    local item = Item:CreateFromItemID(skillEntry.itemId);
+                    if (not item:IsItemEmpty()) then
+                        pcall(function()
+                            -- wait until loaded
+                            item:ContinueOnItemLoad(function()
+                                -- set values
+                                local itemName = item:GetItemName();
+                                local itemLink = item:GetItemLink();
+                                skillEntry.itemLink = itemLink;
+                                skillEntry.itemColor = professionNamesService:GetItemColor(itemLink);
+                                skillEntry.icon = item:GetItemIcon();
+                                if (not skillEntry.name) then
+                                    skillEntry.name = itemName;
+                                end
+                                if (not skillEntry.skillLink) then
+                                    skillEntry.skillLink = professionNamesService:GetSkillLink(professionId, skill.skillId, itemName);
+                                end
+                            end);
+                        end);
+                    end
                 end
             end
         end
@@ -339,6 +341,32 @@ function ProfessionsService:FindSkillByName(skillName)
             return skillId, skill, professionId;
         end
     end  
+end
+
+--- Convert data.
+function ProfessionsService:Convert()
+    local convertData = addon:GetModel('convert-data');
+    Convert = {};
+    --self:ConvertAddon(1, convertData.CLASSIC);
+    Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
+    Convert.Wrath = self:ConvertAddon("WRATH", convertData.WRATH, convertResult);
+    Convert.Cata = self:ConvertAddon("CATA", convertData.CATA, convertResult);
+    Convert.Mop = {};
+end
+function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
+    print("Converting " .. addonNumber);
+    local addon = {};
+    for skillId, skill in pairs(data) do
+        local convertedSkill = {
+            reagents = {},
+            itemId = skill[1]
+        }
+        for i, reagentId in ipairs(skill[6]) do
+            convertedSkill.reagents[reagentId] = skill[7][i];
+        end
+        addon[skillId] = convertedSkill;
+    end
+    return addon;
 end
 
 -- register service
