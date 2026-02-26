@@ -287,8 +287,11 @@ function SkillView:RefreshBucketListAmount()
         row:Hide();
     end
 
+    -- get skills service
+    local skillsService = addon:GetService("skills");
+
     -- get all skills
-    local skillInfo = addon:GetModel("all-skills")[self.skillId];
+    local skillInfo = skillsService:GetSkillById(self.skillId);
     if (not skillInfo) then
         return;
     end
@@ -384,16 +387,21 @@ function SkillView:RefreshBucketListAmount()
             row.amountText:SetTextColor(1, 1, 1);
         end
 
-        -- get item
-        local item = Item:CreateFromItemID(reagentItemId);
-        if (not item:IsItemEmpty()) then
-            -- wait until loaded
-            item:ContinueOnItemLoad(function()
-                -- update item
-                row.itemLink = item:GetItemLink();
-                row.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
-                row.itemText:SetText("|c" .. professionNamesService:GetItemColor(row.itemLink) .. item:GetItemName());
-            end);
+        -- check if item id known
+        if (C_Item.DoesItemExistByID(reagentItemId)) then
+            -- get item
+            local item = Item:CreateFromItemID(reagentItemId);
+            if (not item:IsItemEmpty()) then
+                pcall(function() 
+                    -- wait until loaded
+                    item:ContinueOnItemLoad(function()
+                        -- update item
+                        row.itemLink = item:GetItemLink();
+                        row.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
+                        row.itemText:SetText("|c" .. professionNamesService:GetItemColor(row.itemLink) .. item:GetItemName());
+                    end);
+                end);
+            end
         end
     end
 end

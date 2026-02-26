@@ -30,6 +30,7 @@ function LocalesModel:Create()
             -- general
             ["AddonLoaded"] = "v" .. addon.version .. " by Esperanza@Everlook. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Try out the “Profession Master - Guild Trade Skills” add-on, which allows everyone to see the professions of the other guild members.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
@@ -69,7 +70,8 @@ function LocalesModel:Create()
             ["ProfessionsViewBucketList"] = "Shopping List",
             ["ProfessionsViewReagentsForBucketList"] = "Reagents for Shopping List",
             ["ProfessionsViewNotOnBucketList"] = "Other",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffCopy link into Text-Chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
+            ["ProfessionsViewAnnounce"] = "Promote in Guild Chat",
 
             -- skill view
             ["SkillViewPlayers"] = "Players",
@@ -81,7 +83,10 @@ function LocalesModel:Create()
 
             -- purge
             ["AllDataPurged"] = "All data was deleted",
-            ["CharacterPurged"] = "Data of %s was deleted"
+            ["CharacterPurged"] = "Data of %s was deleted",
+
+            -- who
+            ["WhoCraftResponse"] = "I can craft that for you!"
         },
         -- define de locale
         ["de"] = {
@@ -89,6 +94,7 @@ function LocalesModel:Create()
             ["AddonLoaded"] = "v" .. addon.version .. " von Esperanza@Everlook. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
+            ["GuildAnnouncement"] = "Probiert mal das Addon “Profession Master - Guild Trade Skills” aus, damit kann jeder die Berufe der anderen Gildenmitglieder sehen.",
             ["You"] = "Du",
 
             -- welcome
@@ -127,7 +133,8 @@ function LocalesModel:Create()
             ["ProfessionsViewBucketList"] = "Einkaufliste",
             ["ProfessionsViewReagentsForBucketList"] = "Materialien für Einkaufliste",
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufslsite setzen.   |cffDA8CFFShift + Linksklick: |cffffffffLink in Text-Chat kopieren.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufliste setzen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
+            ["ProfessionsViewAnnounce"] = "Im Gildenchat ankündigen",
 
             -- skill view
             ["SkillViewPlayers"] = "Spieler",
@@ -139,7 +146,136 @@ function LocalesModel:Create()
 
             -- purge
             ["AllDataPurged"] = "Alle Daten wurden gelöscht",
-            ["CharacterPurged"] = "Daten von %s wurden gelöscht"
+            ["CharacterPurged"] = "Daten von %s wurden gelöscht",
+
+            -- who
+            ["WhoCraftResponse"] = "Ich kann dir das herstellen!"
+        },
+        -- define ru locale
+        ["ru"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. addon.version .. " от Esperanza@Everlook. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
+            ["VersionOutdated"] = "Ваша версия устарела. Последнюю версию можно скачать на https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Попробуйте аддон “Profession Master - Guild Trade Skills”, который позволяет всем видеть профессии других членов гильдии.",
+            ["LanguageNotSupported"] = "К сожалению, язык вашего клиента не поддерживается ProfessionMaster.",
+            ["You"] = "Вы",
+
+            -- commands
+            ["CommandsTitle"] = "Доступные команды:",
+            ["CommandsOverview"] = "/pm - Показать/скрыть обзор профессий",
+            ["CommandsMinimap"] = "/pm minimap - Показать значок на миникарте",
+            ["CommandsReagents"] = "/pm reagents - Показать/скрыть недостающие реагенты",
+            ["CommandsPurge"] = "/pm purge [all | own | <имя игрока>] - Удалить все данные, ваши данные или данные определенного игрока",
+            ["CommandsPurgeRow1"] = "Доступные команды удаления:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Удалить все данные",
+            ["CommandsPurgeRow3"] = "/pm purge own - Удалить ваши данные",
+            ["CommandsPurgeRow4"] = "/pm purge <имя игрока> - Удалить данные определенного игрока",
+
+            -- welcome
+            ["WelcomeTitle"] = addon.name .. " - Добро пожаловать",
+            ["WelcomeDescription"] = addon.name .. " показывает ваши профессии и профессии всех членов вашей гильдии, которые также используют " .. addon.name .. ", в едином обзоре.\n\n" .. 
+                "Используйте кнопку на миникарте или команду чата /pm, чтобы показать или скрыть соответствующие окна.\n\n" ..
+                "|cffd4af37Откройте окна ваших профессий сейчас, чтобы поделиться ими.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Левый клик:|cffffffff Показать обзор|r",
+            ["MinimapButtonRightClick"] = "|cff999999Правый клик:|cffffffff Показать/скрыть недостающие реагенты|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Правый клик:|cffffffff Скрыть кнопку на миникарте|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "Profession Master - Обзор",
+            ["ProfessionsViewProfession"] = "Профессия",
+            ["ProfessionsViewAllProfessions"] = "Все профессии",
+            ["ProfessionsViewAddon"] = "Аддон",
+            ["ProfessionsViewAllAddons"] = "Все аддоны",
+            ["ProfessionsViewSearch"] = "Поиск",
+            ["ProfessionsViewItem"] = "Предмет",
+            ["ProfessionsViewEnchantment"] = "Зачарование",
+            ["ProfessionsViewPlayers"] = "Игроки",
+            ["ProfessionsViewBucketList"] = "Список покупок",
+            ["ProfessionsViewReagentsForBucketList"] = "Реагенты для списка покупок",
+            ["ProfessionsViewNotOnBucketList"] = "Прочее",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали / Добавить в список покупок.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
+            ["ProfessionsViewAnnounce"] = "Объявить в чате гильдии",
+
+            -- skill view
+            ["SkillViewPlayers"] = "Игроки",
+            ["SkillViewOnBucketList"] = "В списке покупок",
+            ["SkillViewOk"] = "ОК",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Недостающие реагенты",
+
+            -- purge
+            ["AllDataPurged"] = "Все данные были удалены",
+            ["CharacterPurged"] = "Данные %s были удалены",
+
+            -- who
+            ["WhoCraftResponse"] = "Я могу это для тебя сделать!"
+        },
+        -- define es locale
+        ["es"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. addon.version .. " por Esperanza@Everlook. Usa |cffDA8CFF/pm help|r para más información.",
+            ["VersionOutdated"] = "Tu versión está desactualizada. La última versión se puede descargar en https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "¡Prueba el addon “Profession Master - Guild Trade Skills“, que permite a todos ver las profesiones de los demás miembros del gremio!",
+            ["LanguageNotSupported"] = "Lamentablemente, el idioma de tu cliente no es compatible con ProfessionMaster.",
+            ["You"] = "Tú",
+
+            -- commands
+            ["CommandsTitle"] = "Comandos disponibles:",
+            ["CommandsOverview"] = "/pm - Mostrar/Ocultar vista general de profesiones",
+            ["CommandsMinimap"] = "/pm minimap - Mostrar icono del minimapa",
+            ["CommandsReagents"] = "/pm reagents - Mostrar/Ocultar materiales faltantes",
+            ["CommandsPurge"] = "/pm purge [all | own | <nombre del jugador>] - Eliminar todos los datos, tus datos o los de un jugador específico",
+            ["CommandsPurgeRow1"] = "Comandos de eliminación disponibles:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Eliminar todos los datos",
+            ["CommandsPurgeRow3"] = "/pm purge own - Eliminar tus datos",
+            ["CommandsPurgeRow4"] = "/pm purge <nombre del jugador> - Eliminar datos de un jugador específico",
+
+            -- welcome
+            ["WelcomeTitle"] = addon.name .. " - Bienvenido",
+            ["WelcomeDescription"] = addon.name .. " te muestra tus profesiones y las de todos los miembros de tu gremio que también usan " .. addon.name .. " en una sola vista general.\n\n" ..
+                "Usa el botón en tu minimapa o el comando de chat /pm para mostrar u ocultar las ventanas correspondientes.\n\n" ..
+                "|cffd4af37Abre ahora tus ventanas de profesiones para compartir tus profesiones.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Clic izquierdo:|cffffffff Mostrar vista general|r",
+            ["MinimapButtonRightClick"] = "|cff999999Clic derecho:|cffffffff Mostrar/Ocultar materiales faltantes|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic derecho:|cffffffff Ocultar botón del minimapa|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "Profession Master - Vista general",
+            ["ProfessionsViewProfession"] = "Profesión",
+            ["ProfessionsViewAllProfessions"] = "Todas las profesiones",
+            ["ProfessionsViewAddon"] = "Addon",
+            ["ProfessionsViewAllAddons"] = "Todos los addons",
+            ["ProfessionsViewSearch"] = "Buscar",
+            ["ProfessionsViewItem"] = "Objeto",
+            ["ProfessionsViewEnchantment"] = "Encantamiento",
+            ["ProfessionsViewPlayers"] = "Jugadores",
+            ["ProfessionsViewBucketList"] = "Lista de compras",
+            ["ProfessionsViewReagentsForBucketList"] = "Materiales para la lista de compras",
+            ["ProfessionsViewNotOnBucketList"] = "Otros",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles / Añadir a la lista de compras.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
+            ["ProfessionsViewAnnounce"] = "Anunciar en el chat del gremio",
+
+            -- skill view
+            ["SkillViewPlayers"] = "Jugadores",
+            ["SkillViewOnBucketList"] = "En la lista de compras",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Materiales faltantes",
+
+            -- purge
+            ["AllDataPurged"] = "Todos los datos fueron eliminados",
+            ["CharacterPurged"] = "Los datos de %s fueron eliminados",
+
+            -- who
+            ["WhoCraftResponse"] = "¡Puedo fabricarte eso!"
         }
     };
 end

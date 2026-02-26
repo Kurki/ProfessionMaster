@@ -41,21 +41,34 @@ function ProfessionsView:Show()
         -- create view
         local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"));
         view:EnableKeyboard();
-        view:SetPropagateKeyboardInput(true)
-        view:SetScript("OnKeyDown", function(frame, key)
+        view:SetScript("OnKeyDown", function(_, key)
             -- check escape
             if (key == "ESCAPE") then
-                if  (self.skillViewVisible) then
-                    self:HideSkillView()
-                    frame:SetPropagateKeyboardInput(false)
+                if (self.skillViewVisible) then
+                    self:HideSkillView();
                 else
-                    self:Hide()
-                    frame:SetPropagateKeyboardInput(false)
+                    self:Hide();
                 end
-            else
-                frame:SetPropagateKeyboardInput(true)
+            elseif (key == "ENTER") then
+                ChatFrame_OpenChat("", nil, nil);
             end
         end)
+
+        -- set sizeable
+        view:SetResizable(true);
+
+        -- create resize handlers
+        view:SetScript("OnMouseDown", function(self, button)
+            if button == "LeftButton" and IsShiftKeyDown() then
+                self:StartSizing("BOTTOMRIGHT");
+                self:SetUserPlaced(true);
+                self:SetBackdropBorderColor(1, 1, 1, 1);
+            end
+        end);
+        view:SetScript("OnMouseUp", function(self, button)
+            self:StopMovingOrSizing();
+            self:SetBackdropBorderColor(0, 0, 0, 1);
+        end);
         self.view = view;
 
         -- add close button
@@ -127,13 +140,23 @@ function ProfessionsView:Show()
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
-        itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
+        if (addon.isVanilla) then
+            itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -199, -56);
+        else
+            itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
+        end
         itemSearch:SetAutoFocus(false);
         self.itemSearch = itemSearch;
-        itemSearch:SetScript("OnKeyDown", function(frame, key)
+        itemSearch:SetScript("OnKeyDown", function(_, key)
             -- check escape
-            if (key == "ESCAPE") or (key == "ENTER") then
-                frame:ClearFocus()
+            if (key == "ESCAPE") then
+                if (self.skillViewVisible) then
+                    self:HideSkillView();
+                else
+                    self:Hide();
+                end
+            elseif (key == "ENTER") then
+                ChatFrame_OpenChat("", nil, nil);
             end
         end)
         itemSearch:SetScript("OnTextChanged", function()
@@ -143,11 +166,16 @@ function ProfessionsView:Show()
         
         -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        professionLabel:SetPoint("TOPLEFT", 404, -15);
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        professionSelection:SetPoint("TOPRIGHT", -153, -31);
+        if (addon.isVanilla) then
+            professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -190, -15);
+            professionSelection:SetPoint("TOPRIGHT", -20, -31);
+        else
+            professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -323, -15);
+            professionSelection:SetPoint("TOPRIGHT", -153, -31);
+        end
         UIDropDownMenu_SetWidth(professionSelection, 140);
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()
@@ -174,38 +202,63 @@ function ProfessionsView:Show()
             end
         end);
 
-        -- add addon selection
-        local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        addonLabel:SetPoint("TOPRIGHT", -120, -15);
-        addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
-        local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
-        addonSelection:ClearAllPoints();
-        addonSelection:SetPoint("TOPRIGHT", -20, -31);
-        UIDropDownMenu_SetWidth(addonSelection, 110);
-        self.addonSelection = addonSelection;
-        UIDropDownMenu_Initialize(addonSelection, function()
-            -- create item
-            local item = UIDropDownMenu_CreateInfo();
-            item.notCheckable = true;
-            item.func = function(_self, addonId, arg2)
-                -- select addon
-                self:SelectAddon(addonId);
-                self.itemSearch:SetFocus();
+        -- check if is not vanilla
+        if (not addon.isVanilla) then
+            -- add addon selection
+            local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            addonLabel:SetPoint("TOPRIGHT", -120, -15);
+            addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
+            local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
+            addonSelection:ClearAllPoints();
+            addonSelection:SetPoint("TOPRIGHT", -20, -31);
+            UIDropDownMenu_SetWidth(addonSelection, 110);
+            self.addonSelection = addonSelection;
+            UIDropDownMenu_Initialize(addonSelection, function()
+                -- create item
+                local item = UIDropDownMenu_CreateInfo();
+                item.notCheckable = true;
+                item.func = function(_self, addonId, arg2)
+                    -- select addon
+                    self:SelectAddon(addonId);
+                    self.itemSearch:SetFocus();
 
-                -- add skills
-                self:AddSkills();
-            end;
+                    -- add skills
+                    self:AddSkills();
+                end;
 
-            -- add all date
-            item.text, item.arg1 = self:GetAddonText(nil), nil;
-            UIDropDownMenu_AddButton(item);
-
-            -- add dates
-            for addonId = 0, 0, 1 do
-                item.text, item.arg1 = self:GetAddonText(addonId), addonId;
+                -- add all addons
+                item.text, item.arg1 = self:GetAddonText(nil), nil;
                 UIDropDownMenu_AddButton(item);
-            end
-        end);
+
+                -- add vanilla
+                item.text, item.arg1 = self:GetAddonText(1), 1;
+                UIDropDownMenu_AddButton(item);
+
+                -- add bcc
+                if (addon.isBccAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(2), 2;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add wrath
+                if (addon.isWrathAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(3), 3;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add cata
+                if (addon.isCataAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(4), 4;
+                    UIDropDownMenu_AddButton(item);
+                end
+
+                -- add mop
+                if (addon.isMopAtLeast) then
+                    item.text, item.arg1 = self:GetAddonText(5), 5;
+                    UIDropDownMenu_AddButton(item);
+                end
+            end);
+        end
 
         -- add bucket list icon
         local bucketListIcon = skillsFrame:CreateTexture(nil, "OVERLAY");
@@ -262,6 +315,14 @@ function ProfessionsView:Show()
         -- select first profession
         self:SelectProfession(PMSettings.lastProfession or 0);
         self:SelectAddon(PMSettings.lastAddon);
+
+        -- create ok button
+        local okButton = uiService:CreateButton(view, localeService:Get("ProfessionsViewAnnounce"), function()
+            SendChatMessage(localeService:Get("GuildAnnouncement"), "GUILD");
+        end);
+        okButton:SetWidth(200);
+        okButton:SetHeight(20);
+        okButton:SetPoint("BOTTOMRIGHT", -10, 6);
     end
 
     -- hide skill view
@@ -372,18 +433,28 @@ end
 --- Get Text of addon.
 function ProfessionsView:GetAddonText(addonId)
     -- check classic
-    if (addonId == 0) then
-        return "|T135954:16|t Classic Era";
+    if (addonId == 1) then
+        return "|T135954:16|t Vanilla";
     end
     
     -- check classic
-    if (addonId == 1) then
+    if (addonId == 2) then
         return "|T135804:16|t TBC";
     end
     
     -- check wotlk
-    if (addonId == 2) then
+    if (addonId == 3) then
         return "|T135773:16|t WOTLK";
+    end
+
+    -- check cata
+    if (addonId == 4) then
+        return "|T134158:16|t Cata";
+    end
+
+    -- check mop
+    if (addonId == 5) then
+        return "|T132183:16|t MoP";
     end
 
     -- use all addons
@@ -392,12 +463,20 @@ end
 
 --- Select addon.
 function ProfessionsView:SelectAddon(addonId)
+    -- check if is vanilla
+    if (addon.isVanilla) then
+        -- select all addons in vani
+        addonId = nil;
+    end
+
     -- set addon id
     self.addonId = addonId;
     PMSettings.lastAddon = addonId;
 
     -- select dropdown
-    UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
+    if (self.addonSelection) then
+        UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
+    end
 end
 
 --- Add skills.
@@ -480,15 +559,15 @@ end
 function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     -- get profession and all skills
     local profession = Professions[professionId];
-    local allSkills = addon:GetModel("all-skills");
+    local skillsService = addon:GetService("skills");
 
     -- filter skills
     if (profession) then
         for skillId, skill in pairs(profession) do
             -- check if skill ok
-            if (skill.name ~= nil and skill.itemId ~= nil) then
+            if (skill.name ~= nil) then
                 -- get skill info
-                local skillInfo = allSkills[skillId];
+                local skillInfo = skillsService:GetSkillById(skillId);
                 if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
                     -- get bucket list amount
                     local bucketListAmount = BucketList[skillId];
@@ -620,20 +699,20 @@ function ProfessionsView:RefreshRows()
             row:SetScript("OnMouseDown", function(_, button)
                 -- check if link should be added to chat window
                 if (button == "LeftButton") and IsShiftKeyDown() and ChatEdit_GetActiveWindow() then
-                    -- check if era
-                    if (addon.isEra) then
-                        if (row.skill.skillLink) then
+                    -- ctrl+shift+click: insert skill link as [PM: name : id]
+                    if (IsControlKeyDown()) then
+                        if (row.skill.name and row.skillId) then
                             local editbox = GetCurrentKeyBoardFocus();
                             if (editbox) then
                                 editbox:Insert("[PM: " .. row.skill.name .. " : " .. row.skillId .. "]");
                             end
-                        else
-                            ChatEdit_InsertLink(row.skill.itemLink);
                         end
                     else
-                        ChatEdit_InsertLink(row.skill.skillLink);
+                        -- shift+click: insert item link
+                        if (row.skill.itemLink) then
+                            ChatEdit_InsertLink(row.skill.itemLink);
+                        end
                     end
-                    return;
                 elseif (button == "LeftButton") then
                     self:ShowSkillView(row);
                 end
@@ -767,16 +846,21 @@ function ProfessionsView:RefreshBucketListRows()
             reagentRow.amountText:SetTextColor(1, 1, 1);
         end
 
-        -- get item
-        local item = Item:CreateFromItemID(reagentItemId);
-        if (not item:IsItemEmpty()) then
-            -- wait until loaded
-            item:ContinueOnItemLoad(function()
-                -- update item
-                reagentRow.itemLink = item:GetItemLink();
-                reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
-                reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
-            end);
+        -- check if item id known
+        if (C_Item.DoesItemExistByID(reagentItemId)) then
+            -- get item
+            local item = Item:CreateFromItemID(reagentItemId);
+            if (not item:IsItemEmpty()) then
+                pcall(function() 
+                    -- wait until loaded
+                    item:ContinueOnItemLoad(function()
+                        -- update item
+                        reagentRow.itemLink = item:GetItemLink();
+                        reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
+                        reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
+                    end);
+                end);
+            end
         end
     end
 end
