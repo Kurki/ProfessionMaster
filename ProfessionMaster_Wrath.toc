@@ -1,14 +1,15 @@
-## Author: Esperanza - Everlook/EU-Alliance
+## Author: Kurki 
 ## Interface: 30404
 ## X-Min-Interface: 30403
-## Category: Profession Master
-## Group: Profession Master
+## Category: Professions
+## Group: Professions
 ## Title: Profession Master |cffDA8CFF[PM] - Warth
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 2.4.0
+## Version: 2.4.1
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates, Convert
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
+## X-Curse-Project-ID: 574050
 
 libs\LibStub.lua
 libs\CallbackHandler-1.0.lua
