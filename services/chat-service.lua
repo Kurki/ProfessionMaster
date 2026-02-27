@@ -22,6 +22,9 @@ local addon = _G.professionMaster;
 ChatService = {};
 ChatService.__index = ChatService;
 
+-- Prevent double handling of the same message
+ChatService.lastHandledMessage = nil;
+
 --- Initialize service.
 function ChatService:Initialize()
     -- check chat
@@ -129,36 +132,11 @@ function ChatService:ParseWhoArgument(argument)
     return nil, nil;
 end
 
---- Check if any own character (current player or alts on same realm) can craft the given skill/item.
--- @return characterName that can craft it, or nil
-function ChatService:FindCrafterForSkill(targetSkillId, targetItemId)
-    local playerService = addon:GetService("player");
-
-    -- iterate all characters in OwnProfessions
-    for characterName, professions in pairs(OwnProfessions) do
-        -- only check characters on the same realm
-        if (playerService:IsSameRealm(characterName)) then
-            -- iterate all professions of this character
-            for professionId, skills in pairs(professions) do
-                -- iterate all skills
-                for _, skill in ipairs(skills) do
-                    -- match by skill id or item id
-                    if ((targetSkillId and skill.skillId == targetSkillId) or
-                        (targetItemId and skill.itemId == targetItemId)) then
-                        return characterName;
-                    end
-                end
-            end
-        end
-    end
-
-    return nil;
-end
-
 --- Handle !who command.
 -- @param player The player who sent the command.
 -- @param argument Optional argument after !who (link or id).
-function ChatService:HandleWhoCommand(player, argument)
+-- @param isWhisper Whether the command was sent via whisper (not used currently, but could be for different response formatting or privacy).
+function ChatService:HandleWhoCommand(player, argument, isWhisper)
     -- get own player name
     local playerService = addon:GetService("player");
     local currentPlayer = playerService.current;
@@ -168,26 +146,27 @@ function ChatService:HandleWhoCommand(player, argument)
         return;
     end
 
-    -- check if OwnProfessions exist
-    if (not OwnProfessions) then
-        return;
-    end
-
     -- check if argument is provided (item/skill query)
     if (argument and argument ~= "") then
         -- parse the argument
         local targetSkillId, targetItemId = self:ParseWhoArgument(argument);
 
         -- check if we could parse anything
+        local localeService = addon:GetService("locale");
         if (not targetSkillId and not targetItemId) then
+            SendChatMessage("[PM] " .. localeService:Get("WhoCannotCraftResponse"), "WHISPER", nil, player);
             return;
         end
 
         -- find a crafter
-        local crafterName = self:FindCrafterForSkill(targetSkillId, targetItemId);
-        if (crafterName) then
-            local localeService = addon:GetService("locale");
+        local professionsService = addon:GetService("professions");
+        local crafterName, isOwnPlayer = professionsService:FindCrafterForSkill(targetSkillId, targetItemId);
+        if (isOwnPlayer) then
             SendChatMessage("[PM] " .. localeService:Get("WhoCraftResponse"), "WHISPER", nil, player);
+        elseif(crafterName) then
+            SendChatMessage("[PM] " .. playerService:GetShortName(crafterName) .. " " .. localeService:Get("WhoOtherCanCraftResponse"), "WHISPER", nil, player);
+        elseif(isWhisper and isOwnPlayer) then
+            SendChatMessage("[PM] " .. localeService:Get("WhoCannotCraftResponse"), "WHISPER", nil, player);
         end
     end
 end
@@ -199,14 +178,25 @@ function ChatService:CheckChat(_, event, message, player, l, cs, t, flag, channe
         return;
     end
 
+    -- prevent double handling: use player+message as key
+    local messageKey = tostring(player or "") .. "|" .. tostring(message or "");
+    if (self.lastHandledMessage == messageKey) then
+        return;
+    end
+    self.lastHandledMessage = messageKey;
+
+    -- check if is whisper
+    local isWhisper = (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_BN_WHISPER");
+
     -- check for !who command (only in guild, party and raid)
-    if (message and (event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER"
+    if (message and (event == "CHAT_MSG_GUILD" 
         or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER"
-        or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER")) then
+        or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER"
+        or isWhisper)) then
         -- match "!who" optionally followed by an argument (link, id, etc.)
         local whoMatch = message:match("^![Ww][Hh][Oo]%s*(.*)$");
         if (whoMatch ~= nil) then
-            self:HandleWhoCommand(player, whoMatch);
+            self:HandleWhoCommand(player, whoMatch, isWhisper);
         end
     end
 

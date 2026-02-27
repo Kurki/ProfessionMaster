@@ -30,7 +30,7 @@ function LocalesModel:Create()
             -- general
             ["AddonLoaded"] = "v" .. addon.version .. " by Kurki. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "I'm now sharing my professions. You can use “!who [item]” in chat to find out if I can craft the item for you. If you want to see everything directly or share your professions, get “Profession Master - Guild Trade Skills” on CurseForge.",
+            ["GuildAnnouncement"] = "I'm now sharing my professions with Profession Master. Type “!who [item]” and I might be able to tell you who can craft it for you.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
             ["You"] = "You",
 
@@ -86,7 +86,9 @@ function LocalesModel:Create()
             ["CharacterPurged"] = "Data of %s was deleted",
 
             -- who
-            ["WhoCraftResponse"] = "I can craft that for you!"
+            ["WhoCraftResponse"] = "I can craft that for you!",
+            ["WhoCannotCraftResponse"] = "Unfortunately, I don't know anyone who can craft that.",
+            ['WhoOtherCanCraftResponse'] = "can craft that for you!"
         },
         -- define de locale
         ["de"] = {
@@ -94,7 +96,7 @@ function LocalesModel:Create()
             ["AddonLoaded"] = "v" .. addon.version .. " von Kurki. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
-            ["GuildAnnouncement"] = "Ich teile jetzt meine Berufe. Ihr könnt “!who [item]” im Chat benutzen, um herauszufinden, ob ich euch das Item herstellen kann. Wenn ihr alles direkt sehen möchtet oder eure Berufe teilen möchtet, holt euch “Profession Master - Guild Trade Skills” auf CurseForge.",
+            ["GuildAnnouncement"] = "Ich teile jetzt meine Berufe mit Profession Master. Schreibe “!who [item]” und ich kann dir vielleicht sagen, wer das für dich herstellen kann.",
             ["You"] = "Du",
 
             -- welcome
@@ -149,14 +151,16 @@ function LocalesModel:Create()
             ["CharacterPurged"] = "Daten von %s wurden gelöscht",
 
             -- who
-            ["WhoCraftResponse"] = "Ich kann dir das herstellen!"
+            ["WhoCraftResponse"] = "Ich kann dir das herstellen!",
+            ["WhoCannotCraftResponse"] = "Ich kenne leider niemanden der das herstellen kann.",
+            ['WhoOtherCanCraftResponse'] = "kann dir das herstellen!"
         },
         -- define ru locale
         ["ru"] = {
             -- general
             ["AddonLoaded"] = "v" .. addon.version .. " от Kurki. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
             ["VersionOutdated"] = "Ваша версия устарела. Последнюю версию можно скачать на https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "Я делюсь своими профессиями. Вы можете использовать “!who [item]” в чате, чтобы узнать, могу ли я создать для вас этот предмет. Если хотите видеть всё напрямую или поделиться своими профессиями, скачайте “Profession Master - Guild Trade Skills” на CurseForge.",
+            ["GuildAnnouncement"] = "Теперь я делюсь своими профессиями с Profession Master. Напишите “!who [item]”, и я, возможно, смогу сказать, кто может это сделать для вас.",
             ["LanguageNotSupported"] = "К сожалению, язык вашего клиента не поддерживается ProfessionMaster.",
             ["You"] = "Вы",
 
@@ -212,14 +216,16 @@ function LocalesModel:Create()
             ["CharacterPurged"] = "Данные %s были удалены",
 
             -- who
-            ["WhoCraftResponse"] = "Я могу это для тебя сделать!"
+            ["WhoCraftResponse"] = "Я могу это для тебя сделать!",
+            ["WhoCannotCraftResponse"] = "К сожалению, я не знаю никого, кто может это сделать.",
+            ["WhoOtherCanCraftResponse"] = "может это для тебя сделать!"
         },
         -- define es locale
         ["es"] = {
             -- general
             ["AddonLoaded"] = "v" .. addon.version .. " por Kurki. Usa |cffDA8CFF/pm help|r para más información.",
             ["VersionOutdated"] = "Tu versión está desactualizada. La última versión se puede descargar en https://www.curseforge.com/wow/addons/profession-master.",
-            ["GuildAnnouncement"] = "Ahora comparto mis profesiones. Puedes usar “!who [item]” en el chat para saber si puedo fabricar ese objeto para ti. Si quieres verlo todo directamente o compartir tus profesiones, consigue “Profession Master - Guild Trade Skills” en CurseForge.",
+            ["GuildAnnouncement"] = "Ahora comparto mis profesiones con Profession Master. Escribe “!who [item]” y quizás pueda decirte quién puede fabricarlo para ti.",
             ["LanguageNotSupported"] = "Lamentablemente, el idioma de tu cliente no es compatible con ProfessionMaster.",
             ["You"] = "Tú",
 
@@ -275,7 +281,9 @@ function LocalesModel:Create()
             ["CharacterPurged"] = "Los datos de %s fueron eliminados",
 
             -- who
-            ["WhoCraftResponse"] = "¡Puedo fabricarte eso!"
+            ["WhoCraftResponse"] = "¡Puedo fabricarte eso!",
+            ["WhoCannotCraftResponse"] = "Lamentablemente, no conozco a nadie que pueda fabricar eso.",
+            ["WhoOtherCanCraftResponse"] = "puede fabricarte eso!"
         }
     };
 end

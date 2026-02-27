@@ -303,6 +303,69 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
     return nil;
 end
 
+--- Find skill by skill id or item id.
+-- @param targetSkillId Skill id to find (optional if item id provided).
+-- @param targetItemId Item id to find (optional if skill id provided).
+-- @return skillId, skillData, professionId or nil if not found
+function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
+    -- check values
+    if ((not Professions) or ((not targetSkillId) and (not targetItemId))) then
+        return nil;
+    end
+
+    -- check all professions
+    for professionId, profession in pairs(Professions) do     
+        -- check skills professions
+        for skillId, skill in pairs(profession) do     
+            -- check item id
+            if (skill.itemId and skill.itemId == targetItemId) then
+                return skillId, skill, professionId;
+            elseif (skillId == targetSkillId) then
+                return skillId, skill, professionId;
+            end
+        end  
+    end  
+    return nil;
+end
+
+--- Check if any own character (current player or alts on same realm) can craft the given skill/item.
+-- @return characterName that can craft it, or nil
+function ProfessionsService:FindCrafterForSkill(targetSkillId, targetItemId)
+    -- find skill by id or item id
+    local _, skill, _ = self:FindSkillByIdOrItemId(targetSkillId, targetItemId);
+
+    -- check if skill found
+    if (not skill) then
+        return nil;
+    end
+
+    -- find player who can craft the skill from guild
+    local playerService = addon:GetService("player");
+    local guildMateOnline = false;
+    local eligiblePlayers = {};
+    for _, playerName in ipairs(skill.players) do
+        -- check if is same realm and guild mate
+        if (playerService:IsSameRealm(playerName) and Guildmates[playerName]) then
+            -- cheeck if is online
+            if (Guildmates[playerName].online) then
+                guildMateOnline = true;
+            end
+
+            -- check if is own character
+            if (OwnProfessions[playerName]) then
+                return playerName, true;
+            end
+            -- add player to player list
+            table.insert(eligiblePlayers, playerName);
+        end
+    end
+    
+    -- if there are any eligible players, return comma-separated string
+    if (#eligiblePlayers > 0 and (not guildMateOnline)) then
+        return table.concat(eligiblePlayers, ", "), false;
+    end
+end
+
 --- Find skill by skill name.
 function ProfessionsService:FindSkillByName(skillName)
     -- check profession storage
