@@ -54,6 +54,8 @@ function ProfessionNamesService:GetProfessionIdsToShow()
     -- add non vanilla ids
     if (addon.isBccAtLeast) then
         table.insert(professionIds, 2, 755);
+    end
+    if (addon.isWrathAtLeast) then
         table.insert(professionIds, 773);
     end
     return professionIds;
