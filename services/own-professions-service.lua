@@ -1,19 +1,7 @@
 --[[
 
-@author Esperanza - Everlook/EU-Alliance
-@copyright ©2022 The Profession Master Authors. All Rights Reserved.
-
-Licensed under the GNU General Public License, Version 3.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.gnu.org/licenses/gpl-3.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS-IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+@author Kurki
+@copyright ©2026 Profession Master. All Rights Reserved.
 
 --]]
 
@@ -240,8 +228,8 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
     -- iterate all players
     local playerService = self:GetService("player");
     for characterName, professions in pairs(OwnProfessions) do
-        -- check if is same realm and same guild
-        if (playerService:IsSameRealm(characterName)) then
+        -- check if is same realm and same faction
+        if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
              -- iterate all professions
             for professionId, skills in pairs(professions) do
                 self:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, characterName);
@@ -272,8 +260,8 @@ function OwnProfessionsService:SendMyCharacters(playerName)
 
     -- iterate all characters
     for characterName, _ in pairs(OwnProfessions) do
-        -- check if is same realm
-        if (playerService:IsSameRealm(characterName)) then
+        -- check if is same realm and same faction
+        if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- add short name to result
             table.insert(messageCharacters, playerService:GetShortName(characterName));
         end

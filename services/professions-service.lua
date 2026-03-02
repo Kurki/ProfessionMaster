@@ -1,19 +1,7 @@
 --[[
 
-@author Esperanza - Everlook/EU-Alliance
-@copyright ©2022 The Profession Master Authors. All Rights Reserved.
-
-Licensed under the GNU General Public License, Version 3.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.gnu.org/licenses/gpl-3.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS-IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+@author Kurki
+@copyright ©2026 Profession Master. All Rights Reserved.
 
 --]]
 -- create service
@@ -124,10 +112,13 @@ function ProfessionsService:StoreCharacterSet(characterNames)
         return;
     end
 
-    -- get long names
+    -- get long names and tag faction (characters in set are same faction as us)
     local playerService = self:GetService('player');
     for i = 1, #characterNames do
         characterNames[i] = playerService:GetLongName(characterNames[i]);
+        if (not PlayerFactions[characterNames[i]]) then
+            PlayerFactions[characterNames[i]] = playerService.faction;
+        end
     end
 
     -- find existing character set
@@ -164,6 +155,12 @@ end
 
 --- Store player skills.
 function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
+    -- tag player faction if not already known
+    if (not PlayerFactions[playerName]) then
+        local playerService = self:GetService("player");
+        PlayerFactions[playerName] = playerService.faction;
+    end
+
     -- check profession id
     if (not Professions[professionId]) then
         Professions[professionId] = {};
