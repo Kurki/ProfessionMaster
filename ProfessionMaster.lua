@@ -290,6 +290,10 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- handle bag update (debounced)
         elseif (event == "BAG_UPDATE") then
+            -- immediately invalidate inventory cache
+            self:GetService("inventory"):InvalidateInventory();
+
+            -- debounce the actual reagent check
             if (not self.bagUpdatePending) then
                 self.bagUpdatePending = true;
                 C_Timer.After(0.2, function()
