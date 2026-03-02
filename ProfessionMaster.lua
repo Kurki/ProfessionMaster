@@ -288,9 +288,15 @@ function ProfessionMasterAddon:RegisterEvents()
         elseif (event == "PLAYER_REGEN_ENABLED") then
             self.inCombat = nil;
 
-        -- handle bag update
+        -- handle bag update (debounced)
         elseif (event == "BAG_UPDATE") then
-            self:GetService("inventory"):CheckMissingReagents();
+            if (not self.bagUpdatePending) then
+                self.bagUpdatePending = true;
+                C_Timer.After(0.2, function()
+                    self.bagUpdatePending = nil;
+                    self:GetService("inventory"):CheckMissingReagents();
+                end);
+            end
         end
     end);
 end
