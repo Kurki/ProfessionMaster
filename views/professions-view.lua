@@ -31,7 +31,7 @@ function ProfessionsView:Show()
     -- check if view created
     if (self.view == nil) then
         -- prepare visible skill frames
-        self.rows = {};
+        self.rowPool = {};
         self.bucketListReagentRows = {};
         self.skills = {};
         self.professionId = nil;
@@ -160,8 +160,14 @@ function ProfessionsView:Show()
             end
         end)
         itemSearch:SetScript("OnTextChanged", function()
-            -- add skills and hide bucket list
-            self:AddSkills();
+            -- debounce: delay skill filtering by 0.2s
+            if (self.searchPending) then
+                self.searchPending:Cancel();
+            end
+            self.searchPending = C_Timer.NewTimer(0.2, function()
+                self.searchPending = nil;
+                self:AddSkills();
+            end);
         end);
         
         -- add profession selection
@@ -544,13 +550,6 @@ function ProfessionsView:AddSkills()
     -- set scroll height
     self.scrollChild:SetHeight(#self.skills * 20 + (self.bucketListSkillAmount > 0 and 40 or 0));
 
-    -- invalidate all rows
-    for index, row in pairs(self.rows) do
-        -- set invalid an hide
-        row.invalid = true;
-        row:Hide();
-    end
-
     -- refresh rows
     self:RefreshRows();
 end
@@ -620,134 +619,136 @@ end
 
 --- Refresh rows.
 function ProfessionsView:RefreshRows()
-    -- get start and end index
+    -- get visible range
     local startIndex = math.max(math.floor(self.scrollTop / 20) - 3, 1);
     local endIndex = math.min(startIndex + 28, #self.skills);
+    local visibleCount = endIndex - startIndex + 1;
 
     -- get player service
     local playerService = addon:GetService("player");
-    local newRow = false;
 
-    -- iterate rows
-    for rowIndex = startIndex, endIndex do
-        -- getr row and skill
-        local row = self.rows[rowIndex];
-        local professionId = self.skills[rowIndex].professionId;
-        local skillId = self.skills[rowIndex].skillId;
-        local skill = self.skills[rowIndex].skill;
-        local bucketListAmount = self.skills[rowIndex].bucketListAmount;
+    -- ensure pool has enough frames
+    if (not self.rowPool) then
+        self.rowPool = {};
+    end
+    while (#self.rowPool < visibleCount) do
+        local poolIndex = #self.rowPool + 1;
+        local row = CreateFrame("Button", nil, self.scrollChild, BackdropTemplateMixin and "BackdropTemplate");
+        row:SetBackdrop({
+            bgFile = [[Interface\Buttons\WHITE8x8]]
+        });
 
-        -- check if frame crated
-        if (not row) then
-            -- create row frame
-            newRow = true;
-            row = CreateFrame("Button", nil, self.scrollChild, BackdropTemplateMixin and "BackdropTemplate");
-            row:SetBackdrop({
-                bgFile = [[Interface\Buttons\WHITE8x8]]
-            });
-            self.rows[rowIndex] = row;
+        -- add item text
+        local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        itemText:SetPoint("TOPLEFT", 6, -3);
+        row.itemText = itemText;
 
-            -- set background color by index
-            local backgroundColor = nil;
-            if (rowIndex - math.floor(rowIndex / 2) * 2 == 0) then
-                backgroundColor = 0.1;
-            else
-                backgroundColor = 0.15;
+        -- add player text
+        local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        playerText:SetPoint("TOPLEFT", 316, -4);
+        playerText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -26, -4);
+        playerText:SetJustifyH("LEFT");
+        playerText:SetJustifyV("TOP");
+        playerText:SetTextColor(1, 1, 1);
+        row.playerText = playerText;
+
+        -- add bucket list text
+        local bucketListText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        bucketListText:SetPoint("TOPLEFT", row, "TOPRIGHT", -27, -4);
+        bucketListText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 0, -4);
+        bucketListText:SetJustifyH("CENTER");
+        bucketListText:SetJustifyV("TOP");
+        row.bucketListText = bucketListText;
+
+        -- bind row mouse event
+        row:SetScript("OnLeave", function()
+            if (row.bgColor) then
+                row:SetBackdropColor(row.bgColor, row.bgColor, row.bgColor, 0.5);
             end
-            row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+            GameTooltip:Hide();
+        end);
+        row:SetScript("OnEnter", function()
+            row:SetBackdropColor(0.2, 0.2, 0.2);
+            GameTooltip:SetOwner(row, "ANCHOR_LEFT");
+            addon:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
+        end);
 
-            -- add item text
-            local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            itemText:SetPoint("TOPLEFT", 6, -3);
-            row.itemText = itemText;
-
-            -- add player text
-            local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            playerText:SetPoint("TOPLEFT", 316, -4);
-            playerText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -26, -4);
-            playerText:SetJustifyH("LEFT");
-            playerText:SetJustifyV("TOP");
-            playerText:SetTextColor(1, 1, 1);
-            row.playerText = playerText;
-
-            -- add bucket list text
-            local bucketListText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            bucketListText:SetPoint("TOPLEFT", row, "TOPRIGHT", -27, -4);
-            bucketListText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 0, -4);
-            bucketListText:SetJustifyH("CENTER");
-            bucketListText:SetJustifyV("TOP");
-            row.bucketListText = bucketListText;
-
-            -- bind row mouse event
-            row:SetScript("OnLeave", function()
-                -- update background color
-                row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
-
-                -- hide item tool tip
-                GameTooltip:Hide();
-            end);
-            row:SetScript("OnEnter", function()
-                -- update background color
-                row:SetBackdropColor(0.2, 0.2, 0.2);
-
-                -- show item tool tip
-                GameTooltip:SetOwner(row, "ANCHOR_LEFT");
-                addon:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
-            end);
-
-            -- handle row mouse click
-            row:SetScript("OnMouseDown", function(_, button)
-                -- check if link should be added to chat window
-                if (button == "LeftButton") and IsShiftKeyDown() and ChatEdit_GetActiveWindow() then
-                    -- ctrl+shift+click: insert skill link as [PM: name : id]
-                    if (IsControlKeyDown()) then
-                        if (row.skill.name and row.skillId) then
-                            local editbox = GetCurrentKeyBoardFocus();
-                            if (editbox) then
-                                editbox:Insert("[PM: " .. row.skill.name .. " : " .. row.skillId .. "]");
-                            end
-                        end
-                    else
-                        -- shift+click: insert item link
-                        if (row.skill.itemLink) then
-                            ChatEdit_InsertLink(row.skill.itemLink);
+        -- handle row mouse click
+        row:SetScript("OnMouseDown", function(_, button)
+            if (button == "LeftButton") and IsShiftKeyDown() and ChatEdit_GetActiveWindow() then
+                if (IsControlKeyDown()) then
+                    if (row.skill.name and row.skillId) then
+                        local editbox = GetCurrentKeyBoardFocus();
+                        if (editbox) then
+                            editbox:Insert("[PM: " .. row.skill.name .. " : " .. row.skillId .. "]");
                         end
                     end
-                elseif (button == "LeftButton") then
-                    self:ShowSkillView(row);
+                else
+                    if (row.skill.itemLink) then
+                        ChatEdit_InsertLink(row.skill.itemLink);
+                    end
                 end
-            end);
-        end
-
-        -- check if new or invalid
-        if (newRow or row.invalid) then
-            -- calcualte top position
-            local top = (rowIndex - 1) * 20;
-            if (self.bucketListSkillAmount > 0 and bucketListAmount) then
-                top = top + 20;
-            elseif(self.bucketListSkillAmount > 0 and not bucketListAmount) then
-                top = top + 40;
+            elseif (button == "LeftButton") then
+                self:ShowSkillView(row);
             end
-            row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 0, -top);
-            row:SetPoint("BOTTOMRIGHT", self.scrollChild, "TOPRIGHT", -28, -(top + 20));
+        end);
 
-            -- set item text
-            local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
-            row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
+        self.rowPool[poolIndex] = row;
+    end
 
-            -- set player text
-            row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+    -- hide all pooled frames first
+    for _, row in ipairs(self.rowPool) do
+        row:Hide();
+    end
 
-            -- set bucket list text
-            row.bucketListText:SetText(bucketListAmount);
+    -- bind pool frames to visible data
+    for i = 0, visibleCount - 1 do
+        local rowIndex = startIndex + i;
+        local row = self.rowPool[i + 1];
+        local skillData = self.skills[rowIndex];
+        local professionId = skillData.professionId;
+        local skillId = skillData.skillId;
+        local skill = skillData.skill;
+        local bucketListAmount = skillData.bucketListAmount;
 
-            -- show and set valid
-            row:Show();
-            row.professionId = professionId;
-            row.skill = skill;
-            row.skillId = skillId;
-            row.invalid = nil;
+        -- set background color by data index
+        local backgroundColor;
+        if (rowIndex % 2 == 0) then
+            backgroundColor = 0.1;
+        else
+            backgroundColor = 0.15;
         end
+        row.bgColor = backgroundColor;
+        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+
+        -- calculate top position
+        local top = (rowIndex - 1) * 20;
+        if (self.bucketListSkillAmount > 0 and bucketListAmount) then
+            top = top + 20;
+        elseif(self.bucketListSkillAmount > 0 and not bucketListAmount) then
+            top = top + 40;
+        end
+        row:ClearAllPoints();
+        row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 0, -top);
+        row:SetPoint("BOTTOMRIGHT", self.scrollChild, "TOPRIGHT", -28, -(top + 20));
+
+        -- set item text
+        local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
+        row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
+
+        -- set player text
+        row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+
+        -- set bucket list text
+        row.bucketListText:SetText(bucketListAmount);
+
+        -- store data on row
+        row.professionId = professionId;
+        row.skill = skill;
+        row.skillId = skillId;
+
+        -- show
+        row:Show();
     end
 end
 

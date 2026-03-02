@@ -191,13 +191,6 @@ function SkillView:Show(skillRow, professionsView)
     -- update bucket list amount
     self:RefreshBucketListAmount();
 
-    -- invalidate all player rows
-    for index, row in pairs(self.playerRows) do
-        -- set invalid an hide
-        row.invalid = true;
-        row:Hide();
-    end
-
     -- get player names
     self.playerNames = addon:GetService("player"):CombinePlayerNames(skill.players);
     self.playerScrollChild:SetHeight(#self.playerNames * 20);
@@ -207,54 +200,63 @@ function SkillView:Show(skillRow, professionsView)
     self.view:Show();
 end
 
---- Refresh palyer rows.
+--- Refresh player rows (pooled).
 function SkillView:RefreshPlayerRows() 
-    -- get start and end index
+    -- get visible range
     local startIndex = math.max(math.floor(self.playerScrollTop / 20) - 1, 1);
     local endIndex = math.min(startIndex + 25, #self.playerNames);
-    local newRow = false;
+    local visibleCount = math.max(endIndex - startIndex + 1, 0);
 
-    -- iterate rows
-    for rowIndex = startIndex, endIndex do
-        -- get row 
-        local row = self.playerRows[rowIndex];
+    -- ensure pool has enough frames
+    if (not self.playerRowPool) then
+        self.playerRowPool = {};
+    end
+    while (#self.playerRowPool < visibleCount) do
+        local poolIndex = #self.playerRowPool + 1;
+        local row = CreateFrame("Button", nil, self.playerScrollChild, BackdropTemplateMixin and "BackdropTemplate");
+        row:SetBackdrop({
+            bgFile = [[Interface\Buttons\WHITE8x8]]
+        });
 
-        -- check if frame crated
-        if (not row) then
-            -- create row frame
-            newRow = true;
-            row = CreateFrame("Button", nil, self.playerScrollChild, BackdropTemplateMixin and "BackdropTemplate");
-            local top = (rowIndex - 1) * 20;
-            row:SetPoint("TOPLEFT", self.playerScrollChild, "TOPLEFT", 0, -top);
-            row:SetPoint("BOTTOMRIGHT", self.playerScrollChild, "TOPRIGHT", -28, -(top + 20));
-            row:SetBackdrop({
-                bgFile = [[Interface\Buttons\WHITE8x8]]
-            });
-            self.playerRows[rowIndex] = row;
+        -- add name text
+        local nameText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        nameText:SetPoint("TOPLEFT", 6, -4);
+        nameText:SetPoint("BOTTOMRIGHT", -6, -3);
+        nameText:SetJustifyH("LEFT");
+        nameText:SetJustifyV("TOP");
+        row.nameText = nameText;
 
-            -- set background color by index
-            local backgroundColor = nil;
-            if (rowIndex - math.floor(rowIndex / 2) * 2 == 0) then
-                backgroundColor = 0.1;
-            else
-                backgroundColor = 0.15;
-            end
-            row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+        self.playerRowPool[poolIndex] = row;
+    end
 
-            -- add name text
-            local nameText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            nameText:SetPoint("TOPLEFT", 6, -4);
-            nameText:SetPoint("BOTTOMRIGHT", -6, -3);
-            nameText:SetJustifyH("LEFT");
-            nameText:SetJustifyV("TOP");
-            row.nameText = nameText;
+    -- hide all pooled frames
+    for _, row in ipairs(self.playerRowPool) do
+        row:Hide();
+    end
+
+    -- bind pool frames to visible data
+    for i = 0, visibleCount - 1 do
+        local rowIndex = startIndex + i;
+        local row = self.playerRowPool[i + 1];
+
+        -- set background color by data index
+        local backgroundColor;
+        if (rowIndex % 2 == 0) then
+            backgroundColor = 0.1;
+        else
+            backgroundColor = 0.15;
         end
+        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
 
-        -- check if new or invalid
-        if (newRow or row.invalid) then
-            row.nameText:SetText(self.playerNames[rowIndex]);
-            row:Show();
-        end
+        -- position
+        local top = (rowIndex - 1) * 20;
+        row:ClearAllPoints();
+        row:SetPoint("TOPLEFT", self.playerScrollChild, "TOPLEFT", 0, -top);
+        row:SetPoint("BOTTOMRIGHT", self.playerScrollChild, "TOPRIGHT", -28, -(top + 20));
+
+        -- set text and show
+        row.nameText:SetText(self.playerNames[rowIndex]);
+        row:Show();
     end
 end
 
