@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-ChatService = {};
-ChatService.__index = ChatService;
+-- create service
+local ChatService = _G.professionMaster:CreateService("chat");
 
 -- Prevent double handling of the same message
 ChatService.lastHandledMessage = nil;
@@ -54,7 +52,7 @@ function ChatService:Initialize()
                 for professionId, profession in pairs(Professions) do
                     if (profession[skillId]) then
                         GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR");
-                        addon:GetService("tooltip"):ShowTooltip(GameTooltip, professionId, skillId, profession[skillId]);
+                        self:GetService("tooltip"):ShowTooltip(GameTooltip, professionId, skillId, profession[skillId]);
                         return;
                     end
                 end
@@ -68,7 +66,7 @@ end
 
 --- Write message.
 function ChatService:Write(locale, ...)
-    self:WriteBare(addon:GetService("locale"):Get(locale, ...));
+    self:WriteBare(self:GetService("locale"):Get(locale, ...));
 end
 
 --- Write bare message.
@@ -84,7 +82,7 @@ function ChatService:ParseWhoArgument(argument)
     local itemId = tonumber(argument:match("|Hitem:(%d+)"));
     if (itemId) then
         -- resolve item id to skill id
-        local skillId = addon:GetService("skills"):GetSkillIdByItemId(itemId);
+        local skillId = self:GetService("skills"):GetSkillIdByItemId(itemId);
         return skillId, itemId;
     end
 
@@ -92,7 +90,7 @@ function ChatService:ParseWhoArgument(argument)
     local enchantId = tonumber(argument:match("|Henchant:(%d+)"));
     if (enchantId) then
         -- enchant id is the skill id
-        local skillData = addon:GetService("skills"):GetSkillById(enchantId);
+        local skillData = self:GetService("skills"):GetSkillById(enchantId);
         local resolvedItemId = skillData and skillData.itemId or nil;
         return enchantId, resolvedItemId;
     end
@@ -100,7 +98,7 @@ function ChatService:ParseWhoArgument(argument)
     -- try to match a spell link: |Hspell:12345|h[...]|h
     local spellId = tonumber(argument:match("|Hspell:(%d+)"));
     if (spellId) then
-        local skillData = addon:GetService("skills"):GetSkillById(spellId);
+        local skillData = self:GetService("skills"):GetSkillById(spellId);
         local resolvedItemId = skillData and skillData.itemId or nil;
         return spellId, resolvedItemId;
     end
@@ -108,7 +106,7 @@ function ChatService:ParseWhoArgument(argument)
     -- try to match a PM link: [PM: name : 12345]
     local pmSkillId = tonumber(argument:match("%[PM:.*:%s*(%d+)%s*%]"));
     if (pmSkillId) then
-        local skillData = addon:GetService("skills"):GetSkillById(pmSkillId);
+        local skillData = self:GetService("skills"):GetSkillById(pmSkillId);
         local resolvedItemId = skillData and skillData.itemId or nil;
         return pmSkillId, resolvedItemId;
     end
@@ -117,13 +115,13 @@ function ChatService:ParseWhoArgument(argument)
     local numericId = tonumber(argument:match("^%s*(%d+)%s*$"));
     if (numericId) then
         -- first check if it's a known skill id
-        local skillData = addon:GetService("skills"):GetSkillById(numericId);
+        local skillData = self:GetService("skills"):GetSkillById(numericId);
         if (skillData) then
             return numericId, skillData.itemId;
         end
 
         -- otherwise check if it's an item id
-        local skillId = addon:GetService("skills"):GetSkillIdByItemId(numericId);
+        local skillId = self:GetService("skills"):GetSkillIdByItemId(numericId);
         if (skillId) then
             return skillId, numericId;
         end
@@ -138,7 +136,7 @@ end
 -- @param isWhisper Whether the command was sent via whisper (not used currently, but could be for different response formatting or privacy).
 function ChatService:HandleWhoCommand(player, argument, isWhisper)
     -- get own player name
-    local playerService = addon:GetService("player");
+    local playerService = self:GetService("player");
     local currentPlayer = playerService.current;
 
     -- do not respond to own messages
@@ -152,14 +150,14 @@ function ChatService:HandleWhoCommand(player, argument, isWhisper)
         local targetSkillId, targetItemId = self:ParseWhoArgument(argument);
 
         -- check if we could parse anything
-        local localeService = addon:GetService("locale");
+        local localeService = self:GetService("locale");
         if (not targetSkillId and not targetItemId) then
             SendChatMessage("[PM] " .. localeService:Get("WhoCannotCraftResponse"), "WHISPER", nil, player);
             return;
         end
 
         -- find a crafter
-        local professionsService = addon:GetService("professions");
+        local professionsService = self:GetService("professions");
         local crafterName, isOwnPlayer = professionsService:FindCrafterForSkill(targetSkillId, targetItemId);
         if (isOwnPlayer) then
             SendChatMessage("[PM] " .. localeService:Get("WhoCraftResponse"), "WHISPER", nil, player);
@@ -234,5 +232,3 @@ function ChatService:CheckChat(_, event, message, player, l, cs, t, flag, channe
     end
 end
 
--- register service
-addon:RegisterService(ChatService, "chat");

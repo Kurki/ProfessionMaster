@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define message
-PlayerProfessionsMessage = {};
-PlayerProfessionsMessage.__index = PlayerProfessionsMessage;
+-- create model
+local PlayerProfessionsMessage = _G.professionMaster:CreateModel("player-professions-message");
 PlayerProfessionsMessage.prefix = "PlayerProfessions2";
 
 --- Create message model.
@@ -41,7 +39,7 @@ end
 --- Parse message from string.
 function PlayerProfessionsMessage:Parse(value)
     -- split values an prepare message
-    local messageService = addon:GetService("message");
+    local messageService = self:GetService("message");
     local values = messageService:SplitString(value, ":");
     local message = {
         professionId = tonumber(values[1]),
@@ -82,5 +80,3 @@ function PlayerProfessionsMessage:ToString()
     }, ":");  
 end
 
--- register model
-addon:RegisterModel(PlayerProfessionsMessage, "player-professions-message");

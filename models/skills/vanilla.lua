@@ -16,7 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- Vanilla skills (including SoD)
 local vanillaSkills = {
@@ -7599,5 +7598,5 @@ local vanillaSkills = {
     }
 };
 
--- register model
-addon:RegisterModel(vanillaSkills, "vanilla-skills");
+-- create model
+_G.professionMaster:CreateModel("vanilla-skills", vanillaSkills);

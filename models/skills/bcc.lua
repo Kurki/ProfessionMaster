@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
---]] local addon = _G.professionMaster;
+--]]
 
 -- Burning crusade skills
 local bccSkills = {
@@ -3382,5 +3382,5 @@ local bccSkills = {
     [38868] = {["itemId"] = 31673, ["reagents"] = {[31671] = 1}}
 };
 
--- register model
-addon:RegisterModel(bccSkills, "bcc-skills");
+-- create model
+_G.professionMaster:CreateModel("bcc-skills", bccSkills);

@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-PurgeService = {};
-PurgeService.__index = PurgeService;
+-- create service
+local PurgeService = _G.professionMaster:CreateService("purge");
 
 --- Initialize service.
 function PurgeService:Initialize()
@@ -29,7 +27,7 @@ end
 --- Purge data.
 function PurgeService:Purge(context)
     -- get chat service
-    local chatService = addon:GetService("chat");
+    local chatService = self:GetService("chat");
 
     -- check if all data should be purged
     if (context == 'all') then
@@ -43,10 +41,10 @@ function PurgeService:Purge(context)
         BucketList = {};
         Frames = {};
         CharacterSettings = {}; 
-        addon:CheckSettings();
+        self.addon:CheckSettings();
 
         -- rebuild reverse index after purge
-        addon:GetService("professions"):RebuildItemIndex();
+        self:GetService("professions"):RebuildItemIndex();
 
         -- send message
         chatService:Write("AllDataPurged");
@@ -54,7 +52,7 @@ function PurgeService:Purge(context)
     end
 
     -- check if own data should be purged
-    local playerService = addon:GetService('player');
+    local playerService = self:GetService('player');
     if (context == 'own') then
         self:PurgeCharacter(playerService.current);
         Frames = {};
@@ -100,11 +98,9 @@ function PurgeService:PurgeCharacter(characterName)
     PMSettings.storageId = nil;
 
     -- check settings
-    addon:CheckSettings();
+    self.addon:CheckSettings();
 
     -- send message
-    addon:GetService("chat"):Write("CharacterPurged", characterName);
+    self:GetService("chat"):Write("CharacterPurged", characterName);
 end
 
--- register service
-addon:RegisterService(PurgeService, "purge");

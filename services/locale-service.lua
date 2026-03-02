@@ -16,17 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-LocaleService = {};
-LocaleService.__index = LocaleService;
+-- create service
+local LocaleService = _G.professionMaster:CreateService("locale");
 
 --- Initialize service.
 function LocaleService:Initialize()
     -- get current locale name and all locales
     local localeName = string.sub(GetLocale(), 1, 2);
-    local locales = addon:GetModel("locales"):Create();
+    local locales = self:GetModel("locales"):Create();
 
     -- fund locale
     for k, v in pairs(locales) do
@@ -51,5 +49,3 @@ function LocaleService:GetBare(name)
     return self.current[name];
 end
 
--- register service
-addon:RegisterService(LocaleService, "locale");

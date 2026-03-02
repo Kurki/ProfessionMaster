@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- define items as hash set for O(1) lookup
-local BopItems = {
+local BopItems = _G.professionMaster:CreateModel("bop-items", {
     [32581] = true, [32587] = true, [32575] = true, [28438] = true, [32570] = true, [32478] = true, [28442] = true, [10725] = true, [13503] = true, [28439] = true, [30037] = true, 
     [32579] = true, [22462] = true, [28437] = true, [32583] = true, [28441] = true, [32585] = true, [22461] = true, [32473] = true, [32494] = true, [28429] = true, [21871] = true, 
     [32461] = true, [28440] = true, [21870] = true, [21848] = true, [16207] = true, [29525] = true, [30039] = true, [21869] = true, [24128] = true, [28428] = true, [28485] = true, 
@@ -37,7 +36,4 @@ local BopItems = {
     [35182] = true, [21784] = true, [29964] = true, [23565] = true, [35693] = true, [30087] = true, [14153] = true, [14152] = true, [21769] = true, [10545] = true, [23564] = true,
     [21789] = true, [10587] = true, [30073] = true, [30076] = true, [25498] = true, [21763] = true, [21777] = true, [25880] = true, [11604] = true, [12782] = true, [23563] = true, 
     [30070] = true, [30069] = true, [21760] = true, [12773] = true
-};
-
--- register model
-addon:RegisterModel(BopItems, "bop-items");
+});

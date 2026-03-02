@@ -16,10 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- Mists of pandaria skills
-local mopSkills = {};
-
--- register model
-addon:RegisterModel(mopSkills, "mop-skills");
+local mopSkills = _G.professionMaster:CreateModel("mop-skills", {});

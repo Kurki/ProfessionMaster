@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define message
-RequestProfessionsMessage = {};
-RequestProfessionsMessage.__index = RequestProfessionsMessage;
+-- create model
+local RequestProfessionsMessage = _G.professionMaster:CreateModel("request-professions-message");
 RequestProfessionsMessage.prefix = "RequestProfessions2";
 
 --- Create message model.
@@ -36,7 +34,7 @@ end
 
 --- Parse message from string.
 function RequestProfessionsMessage:Parse(value)
-    local values = addon:GetService("message"):SplitString(value, ":");
+    local values = self:GetService("message"):SplitString(value, ":");
     local message = {
         storageId = values[1],
         lastSyncDate = tonumber(values[2]),
@@ -55,5 +53,3 @@ function RequestProfessionsMessage:ToString()
     }, ":");
 end
 
--- register model
-addon:RegisterModel(RequestProfessionsMessage, "request-professions-message");

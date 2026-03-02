@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define message
-HelloMessage = {};
-HelloMessage.__index = HelloMessage;
+-- create model
+local HelloMessage = _G.professionMaster:CreateModel("hello-message");
 HelloMessage.prefix = "Hello";
 
 --- Create message model.
@@ -34,7 +32,7 @@ end
 
 --- Parse message from string.
 function HelloMessage:Parse(value)
-    local messageService = addon:GetService("message");
+    local messageService = self:GetService("message");
     local values = messageService:SplitString(value, ":");
     local message = {
         storageId = values[1]
@@ -47,6 +45,3 @@ end
 function HelloMessage:ToString()
     return self.storageId;  
 end
-
--- register model
-addon:RegisterModel(HelloMessage, "hello-message");

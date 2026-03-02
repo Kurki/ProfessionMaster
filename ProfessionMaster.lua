@@ -70,18 +70,21 @@ function ProfessionMasterAddon:Create()
     addon.services = {};
     addon.viewTypes = {};
     addon.modelTypes = {};
+    addon.eventHandlers = {};
 
     -- register events
     addon:RegisterEvents();
     return addon;
 end
 
---- Register service.
--- @param ServiceType Service type definition.
+--- Create service.
 -- @param name Name of service.
-function ProfessionMasterAddon:RegisterService(ServiceType, name)
-    -- add to service types
-    self.serviceTypes[name] = ServiceType;
+-- @return Service type definition.
+function ProfessionMasterAddon:CreateService(name)
+    local serviceType = {};
+    serviceType.__index = serviceType;
+    self.serviceTypes[name] = serviceType;
+    return serviceType;
 end
 
 --- Check settings.
@@ -100,20 +103,40 @@ function ProfessionMasterAddon:CheckSettings()
     end
 end
 
---- Register view.
--- @param ViewType View type definition.
+--- Create view.
 -- @param name Name of view.
-function ProfessionMasterAddon:RegisterView(ViewType, name)
-    -- add to view types
-    self.viewTypes[name] = ViewType;
+-- @return View type definition.
+function ProfessionMasterAddon:CreateView(name)
+    local viewType = {};
+    viewType.__index = viewType;
+    self.viewTypes[name] = viewType;
+    return viewType;
 end
 
---- Register model.
--- @param ModelType Model type definition.
+--- Create model.
 -- @param name Name of model.
-function ProfessionMasterAddon:RegisterModel(ModelType, name)
-    -- add to model types
-    self.modelTypes[name] = ModelType;
+-- @param initialData Optional initial data table for data-only models.
+-- @return Model type definition.
+function ProfessionMasterAddon:CreateModel(name, initialData)
+    local modelType;
+    if (initialData) then
+        -- data model: store as-is, no injection
+        modelType = initialData;
+    else
+        -- class model: inject helpers
+        modelType = {
+            addon = self,
+            GetService = function(_self, serviceName)
+                return self:GetService(serviceName);
+            end,
+            GetModel = function(_self, modelName)
+                return self:GetModel(modelName);
+            end,
+        };
+        modelType.__index = modelType;
+    end
+    self.modelTypes[name] = modelType;
+    return modelType;
 end
 
 --- Get service.
@@ -121,27 +144,48 @@ end
 function ProfessionMasterAddon:GetService(name)
     -- check if service created
     if (self.services[name] == nil) then
-        -- create service
-        local service = {};
+        -- create service with injected helpers
+        local service = {
+            addon = self,
+            GetService = function(_self, serviceName)
+                return self:GetService(serviceName);
+            end,
+            GetModel = function(_self, modelName)
+                return self:GetModel(modelName);
+            end,
+            HandleEvent = function(_self, eventName, callback)
+                return self:HandleEvent(eventName, callback);
+            end
+        };
         setmetatable(service, self.serviceTypes[name]);
         self.services[name] = service;
 
         -- initialize service
-        service:Initialize();
+        if (service.Initialize) then
+            service:Initialize();
+        end
     end
 
     -- get service
     return self.services[name];
 end
 
---- Create view.
+--- Create new view instance.
 -- @param name Name of view.
-function ProfessionMasterAddon:CreateView(name)
-    -- get to view type
+function ProfessionMasterAddon:NewView(name)
+    -- get view type
     local viewType = self.viewTypes[name];
 
-    -- create view
-    local view = {};
+    -- create view with injected helpers
+    local view = {
+        addon = self,
+        GetService = function(_self, serviceName)
+            return self:GetService(serviceName);
+        end,
+        GetModel = function(_self, modelName)
+            return self:GetModel(modelName);
+        end
+    };
     setmetatable(view, viewType);
     return view;
 end
@@ -209,98 +253,123 @@ function ProfessionMasterAddon:LogTrace(class, method, message, ...)
     print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
+--- Handle event.
+-- @param name Event name.
+-- @param callback Callback function, triggered on event.
+function ProfessionMasterAddon:HandleEvent(name, callback)
+    -- check if event not handled before
+    if (self.eventHandlers[name] == nil) then
+        -- create event handler array for the given event name
+        self.eventHandlers[name] = {};
+
+        -- watch event
+        self.frame:RegisterEvent(name);
+    end
+
+    -- add callback to event handler
+    table.insert(self.eventHandlers[name], callback);
+end
+
 --- Register addon events.
 function ProfessionMasterAddon:RegisterEvents()
-    -- register events
-    self.frame:RegisterEvent("ADDON_LOADED");
-    self.frame:RegisterEvent("CHAT_MSG_ADDON");
-    self.frame:RegisterEvent("PLAYER_LOGIN");
-    self.frame:RegisterEvent("TRADE_SKILL_UPDATE");
-    self.frame:RegisterEvent("CRAFT_UPDATE");
-    self.frame:RegisterEvent("GUILD_ROSTER_UPDATE");
-    self.frame:RegisterEvent("PLAYER_REGEN_DISABLED");
-    self.frame:RegisterEvent("PLAYER_REGEN_ENABLED");
-    self.frame:RegisterEvent("BAG_UPDATE");
-
     -- handle on event
-    self.frame:SetScript("OnEvent", function(_self, event, prefix, message, channel, sender)
-        -- handle chat messaage
-        if (event == "ADDON_LOADED" and prefix == "ProfessionMaster") then
-            -- startup
+    self.frame:SetScript("OnEvent", function(_self, event, ...)
+        -- dispatch to registered handlers
+        if (self.eventHandlers[event]) then
+            for _, handler in ipairs(self.eventHandlers[event]) do
+                handler(...);
+            end
+        end
+    end);
+
+    -- handle addon loaded
+    self:HandleEvent("ADDON_LOADED", function(addonName)
+        if (addonName == "ProfessionMaster") then
             self:CheckSettings();
+            self:GetService("commands");
+        end
+    end);
 
-        -- handle chat messaage
-        elseif (event == "CHAT_MSG_ADDON") then
-            -- startup
-            self:GetService("message"):HandleMessage(prefix, message, sender);
+    -- handle chat message
+    self:HandleEvent("CHAT_MSG_ADDON", function(prefix, message, channel, sender)
+        self:GetService("message"):HandleMessage(prefix, message, sender);
+    end);
 
-        -- handle login
-        elseif (event == "PLAYER_LOGIN") then
-            -- unregister event
-            _self:UnregisterEvent("PLAYER_LOGIN")
+    -- handle login
+    self:HandleEvent("PLAYER_LOGIN", function()
+        self.frame:UnregisterEvent("PLAYER_LOGIN");
 
-            -- crete professions view
-            self.professionsView = self:CreateView("professions");
+        -- create professions view
+        self.professionsView = self:NewView("professions");
 
-            -- migrate data
-            self:Migrate();
+        -- migrate data
+        self:Migrate();
 
-            -- create minimap icon
-            self:GetService("ui"):CreateMinimapIcon();
+        -- create minimap icon
+        self:GetService("ui"):CreateMinimapIcon();
 
-            -- watch tooltip
-            self:GetService("tooltip"):WatchTooltip();
+        -- watch tooltip
+        self:GetService("tooltip"):WatchTooltip();
 
-            -- startup
-            self:GetService("timer"):Wait("PlayerLogin", 5, function()
-                -- show loaded message
-                self:GetService("chat"):Write("AddonLoaded");
+        -- startup
+        self:GetService("timer"):Wait("PlayerLogin", 5, function()
+            -- show loaded message
+            self:GetService("chat"):Write("AddonLoaded");
 
-                -- broadcast version
-                self:GetService("message"):SendToGuild(self:GetModel("version-broadcast-message"):Create());
+            -- broadcast version
+            self:GetService("message"):SendToGuild(self:GetModel("version-broadcast-message"):Create());
 
-                -- check welcome
-                self:GetService("own-professions"):CheckWelcome();
+            -- check welcome
+            self:GetService("own-professions"):CheckWelcome();
 
-                -- say hello to guild
-                self:GetService("professions"):SayHelloToGuild();
+            -- say hello to guild
+            self:GetService("professions"):SayHelloToGuild();
 
-                -- check missing reagents
+            -- check missing reagents
+            self:GetService("inventory"):CheckMissingReagents();
+        end);
+    end);
+
+    -- handle trade skill update
+    self:HandleEvent("TRADE_SKILL_UPDATE", function()
+        self:GetService("own-professions"):GetProfessionData();
+    end);
+
+    -- handle craft update
+    self:HandleEvent("CRAFT_UPDATE", function()
+        self:GetService("own-professions"):GetProfessionData();
+    end);
+
+    -- handle guild roster update
+    self:HandleEvent("GUILD_ROSTER_UPDATE", function()
+        self:GetService("player"):RefreshGuildmates();
+    end);
+
+    -- handle combat enter
+    self:HandleEvent("PLAYER_REGEN_DISABLED", function()
+        self.inCombat = true;
+        if (self.professionsView and self.professionsView.visible) then
+            self.professionsView:Hide();
+        end
+    end);
+
+    -- handle combat leave
+    self:HandleEvent("PLAYER_REGEN_ENABLED", function()
+        self.inCombat = nil;
+    end);
+
+    -- handle bag update (debounced)
+    self:HandleEvent("BAG_UPDATE", function()
+        -- immediately invalidate inventory cache
+        self:GetService("inventory"):InvalidateInventory();
+
+        -- debounce the actual reagent check
+        if (not self.bagUpdatePending) then
+            self.bagUpdatePending = true;
+            C_Timer.After(0.2, function()
+                self.bagUpdatePending = nil;
                 self:GetService("inventory"):CheckMissingReagents();
             end);
-
-        -- handle trade skill update
-        elseif (event == "TRADE_SKILL_UPDATE") or (event == "CRAFT_UPDATE") then
-            self:GetService("own-professions"):GetProfessionData();
-
-        -- handle craft update
-        elseif (event == "GUILD_ROSTER_UPDATE") then
-            self:GetService("player"):RefreshGuildmates();
-
-        -- handle combat enter
-        elseif (event == "PLAYER_REGEN_DISABLED") then
-            self.inCombat = true;
-            if (self.professionsView.visible) then
-                self.professionsView:Hide();
-            end
-
-        -- handle combat leave
-        elseif (event == "PLAYER_REGEN_ENABLED") then
-            self.inCombat = nil;
-
-        -- handle bag update (debounced)
-        elseif (event == "BAG_UPDATE") then
-            -- immediately invalidate inventory cache
-            self:GetService("inventory"):InvalidateInventory();
-
-            -- debounce the actual reagent check
-            if (not self.bagUpdatePending) then
-                self.bagUpdatePending = true;
-                C_Timer.After(0.2, function()
-                    self.bagUpdatePending = nil;
-                    self:GetService("inventory"):CheckMissingReagents();
-                end);
-            end
         end
     end);
 end

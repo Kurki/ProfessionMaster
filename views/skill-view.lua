@@ -16,18 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define view
-SkillView = {};
-SkillView.__index = SkillView;
+-- create view
+local SkillView = _G.professionMaster:CreateView("skill-view");
 
 --- Show professions view.
 -- @param skillRow Skill row.
 function SkillView:Show(skillRow, professionsView)
     -- get services
-    local uiService = addon:GetService("ui");
-    local localeService = addon:GetService("locale");
+    local uiService = self:GetService("ui");
+    local localeService = self:GetService("locale");
 
     -- get skilla nd skill id
     local skill = skillRow.skill;
@@ -123,7 +120,7 @@ function SkillView:Show(skillRow, professionsView)
             professionsView:CheckBucketList();
 
             -- check missing ragents
-            addon:GetService("inventory"):CheckMissingReagents();
+            self:GetService("inventory"):CheckMissingReagents();
         end);
         self.amountPlusButton = amountPlusButton;
 
@@ -146,7 +143,7 @@ function SkillView:Show(skillRow, professionsView)
             professionsView:CheckBucketList();
 
             -- check missing ragents
-            addon:GetService("inventory"):CheckMissingReagents();
+            self:GetService("inventory"):CheckMissingReagents();
         end);
         self.amountMinusButton = amountMinusButton;
 
@@ -165,7 +162,7 @@ function SkillView:Show(skillRow, professionsView)
             professionsView:CheckBucketList();
 
             -- check missing ragents
-            addon:GetService("inventory"):CheckMissingReagents();
+            self:GetService("inventory"):CheckMissingReagents();
         end);
         self.clearButton = clearButton;
 
@@ -182,7 +179,7 @@ function SkillView:Show(skillRow, professionsView)
     self.parentSkillRow = skillRow;
     self.skill = skill;
     self.skillId = skillId;
-    self.view.titleLabel:SetText(addon.shortcut .. (skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name));
+    self.view.titleLabel:SetText(self.addon.shortcut .. (skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name));
 
     -- set position
     self.view:ClearAllPoints();
@@ -192,7 +189,7 @@ function SkillView:Show(skillRow, professionsView)
     self:RefreshBucketListAmount();
 
     -- get player names
-    self.playerNames = addon:GetService("player"):CombinePlayerNames(skill.players);
+    self.playerNames = self:GetService("player"):CombinePlayerNames(skill.players);
     self.playerScrollChild:SetHeight(#self.playerNames * 20);
     self:RefreshPlayerRows();
 
@@ -290,7 +287,7 @@ function SkillView:RefreshBucketListAmount()
     end
 
     -- get skills service
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
 
     -- get all skills
     local skillInfo = skillsService:GetSkillById(self.skillId);
@@ -299,10 +296,10 @@ function SkillView:RefreshBucketListAmount()
     end
 
     -- get service
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
 
     -- scan inventory
-    local inventoryService = addon:GetService("inventory");
+    local inventoryService = self:GetService("inventory");
     inventoryService:ScanInventory();
 
     -- show reagents
@@ -414,6 +411,3 @@ function SkillView:Hide()
         self.view:Hide();
     end
 end
-
--- register view
-addon:RegisterView(SkillView, "skill-view");

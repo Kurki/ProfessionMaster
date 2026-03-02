@@ -16,18 +16,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define view
-MissingReagentsView = {};
-MissingReagentsView.__index = MissingReagentsView;
+-- create view
+local MissingReagentsView = _G.professionMaster:CreateView("missing-reagents");
 
 --- Show missing view.
 function MissingReagentsView:Show(missingReagents)
     -- get services
-    local uiService = addon:GetService("ui");
-    local localeService = addon:GetService("locale");
-    local professionNamesService = addon:GetService("profession-names");
+    local uiService = self:GetService("ui");
+    local localeService = self:GetService("locale");
+    local professionNamesService = self:GetService("profession-names");
 
     -- check if view created
     if (self.view == nil) then
@@ -47,7 +45,7 @@ function MissingReagentsView:Show(missingReagents)
         closeButton:SetWidth(24);
         closeButton:SetPoint("TOPRIGHT", -7, -8);
         closeButton:SetScript("OnClick", function()
-            addon:GetService("inventory"):ToggleMissingReagents();
+            self:GetService("inventory"):ToggleMissingReagents();
         end);
         closeButton:Hide();
 
@@ -141,6 +139,3 @@ function MissingReagentsView:Hide()
         self.visible = false;
     end
 end
-
--- register view
-addon:RegisterView(MissingReagentsView, "missing-reagents");

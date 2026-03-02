@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
---]] local addon = _G.professionMaster;
+--]]
 
 -- Cataclysm skills
 local cataSkills = {
@@ -1754,5 +1754,5 @@ local cataSkills = {
     [92163] = {["itemId"] = 64885, ["reagents"] = {}}
 };
 
--- register model
-addon:RegisterModel(cataSkills, "cata-skills");
+-- create model
+_G.professionMaster:CreateModel("cata-skills", cataSkills);

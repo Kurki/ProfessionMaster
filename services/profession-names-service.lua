@@ -16,15 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define service
-ProfessionNamesService = {};
-ProfessionNamesService.__index = ProfessionNamesService;
+-- create service
+local ProfessionNamesService = _G.professionMaster:CreateService("profession-names");
 
 --- Initialize service.
 function ProfessionNamesService:Initialize()
-    self.professionSpells = addon:GetModel("profession-spells");
+    self.professionSpells = self:GetModel("profession-spells");
 
     -- build profession names from game spell data (works in all locales and versions)
     self.professionNames = {};
@@ -41,7 +38,7 @@ function ProfessionNamesService:Initialize()
 
     -- warn if nothing loaded at all
     if (not next(self.professionNames)) then
-        addon:GetService("chat"):Write("LanguageNotSupported");
+        self:GetService("chat"):Write("LanguageNotSupported");
     end
 end
 
@@ -61,10 +58,10 @@ function ProfessionNamesService:GetProfessionIdsToShow()
     };
 
     -- add non vanilla ids
-    if (addon.isBccAtLeast) then
+    if (self.addon.isBccAtLeast) then
         table.insert(professionIds, 2, 755);
     end
-    if (addon.isWrathAtLeast) then
+    if (self.addon.isWrathAtLeast) then
         table.insert(professionIds, 773);
     end
     return professionIds;
@@ -93,7 +90,7 @@ function ProfessionNamesService:GetProfessionIcon(professionId)
     end
 
     -- get profession name
-    return addon:GetModel("profession-icons")[professionId];
+    return self:GetModel("profession-icons")[professionId];
 end
 
 --- Get profession id by profession name.
@@ -148,6 +145,3 @@ end
 function ProfessionNamesService:GetItemColor(itemLink)
     return string.sub(itemLink, 3, 10);
 end
-
--- register service
-addon:RegisterService(ProfessionNamesService, "profession-names");

@@ -16,11 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define service
-UiService = {};
-UiService.__index = UiService;
+-- create service
+local UiService = _G.professionMaster:CreateService("ui");
 
 -- current z index
 local currentZIndex = 1000;
@@ -61,7 +58,7 @@ function UiService:CreateView(name, width, height, title)
     -- add title
     local titleLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
     titleLabel:SetPoint("TOPLEFT", 16, -14);
-    titleLabel:SetText(addon.shortcut .. (title or ""));
+    titleLabel:SetText(self.addon.shortcut .. (title or ""));
     view.titleLabel = titleLabel;
 
     -- set moveable
@@ -150,7 +147,7 @@ end
 -- create scroll frame
 function UiService:CreateScrollFrame(container)
     -- create scroll frame and child
-    local frameId = addon:GenerateString(10);
+    local frameId = self.addon:GenerateString(10);
     local parentFrame = CreateFrame("Frame", "ScrollParentFrame" .. frameId, container, BackdropTemplateMixin and "BackdropTemplate");
     local scrollFrame = CreateFrame("ScrollFrame", "ScrollFrame" .. frameId, parentFrame, "UIPanelScrollFrameTemplate");
     local scrollChild = CreateFrame("Frame");
@@ -183,7 +180,7 @@ end
 
 function UiService:CreateTab(container, caption)
     -- get tab id
-    local tabId = addon:GenerateString(10);
+    local tabId = self.addon:GenerateString(10);
 
     -- generate tab
     local tab = CreateFrame("Button", "Tab" .. tabId, container, "OptionsFrameTabButtonTemplate");
@@ -221,7 +218,7 @@ end
 
 --- Create check button.
 function UiService:CreateCheckButton(container, width, text, tooltip)
-    local checkButton = CreateFrame("CheckButton", "CheckButton" .. addon:GenerateString(10),
+    local checkButton = CreateFrame("CheckButton", "CheckButton" .. self.addon:GenerateString(10),
                             container, "ChatConfigCheckButtonTemplate");
     checkButton.tooltip = tooltip;
     local checkButtonText = getglobal(checkButton:GetName() .. 'Text');
@@ -263,6 +260,8 @@ end
 
 -- Create minimap icon.
 function UiService:CreateMinimapIcon()
+    local service = self;
+
     -- get lib
     local libDbIcon = LibStub("LibDBIcon-1.0");
 
@@ -272,19 +271,19 @@ function UiService:CreateMinimapIcon()
         label = "Profession Master",
 		icon = "Interface\\Icons\\Inv_misc_book_05",
 		OnClick = function(_, button)
-            if (button == "LeftButton" and not addon.inCombat) then
-                addon.professionsView:ToggleVisibility();
+            if (button == "LeftButton" and not service.addon.inCombat) then
+                service.addon.professionsView:ToggleVisibility();
             elseif (button == "RightButton") then
                 if (IsShiftKeyDown()) then
                     libDbIcon:Hide("ProfessionMaster");
                     PMSettings.minimapButton.hide = true;
                 else
-                    addon:GetService("inventory"):ToggleMissingReagents();
+                    service:GetService("inventory"):ToggleMissingReagents();
                 end
             end
 		end,
 		OnTooltipShow = function(tooltip)
-            local localeService = addon:GetService("locale");
+            local localeService = service:GetService("locale");
             tooltip:SetText(localeService:Get("MinimapButtonTitle"));
             tooltip:AddLine(" ");
             tooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
@@ -297,5 +296,3 @@ function UiService:CreateMinimapIcon()
 	libDbIcon:Register("ProfessionMaster", dataObj, PMSettings.minimapButton);
 end
 
--- register service
-addon:RegisterService(UiService, "ui");

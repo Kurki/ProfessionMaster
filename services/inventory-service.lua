@@ -16,15 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-InventoryService = {};
-InventoryService.__index = InventoryService;
+-- create service
+local InventoryService = _G.professionMaster:CreateService("inventory");
 
 --- Initialize service.
 function InventoryService:Initialize()
-    self.missingReagentsView = addon:CreateView("missing-reagents");
+    self.missingReagentsView = self.addon:NewView("missing-reagents");
     self.inventory = {};
     self.inventoryDirty = true;
 end
@@ -52,7 +50,7 @@ function InventoryService:ScanInventory()
     self.inventoryDirty = false;
 
     -- log trace
-    addon:LogTrace("InventoryService", "ScanInventory", "Scanning inventory...");
+    self.addon:LogTrace("InventoryService", "ScanInventory", "Scanning inventory...");
 
     -- iterate all bags
     for bag = 0, NUM_BAG_SLOTS do
@@ -83,7 +81,7 @@ end
 --Get reagents.
 function InventoryService:GetReagents()
     -- get skills service
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
 
     -- iterate bucket list
     local reagents = {};
@@ -164,5 +162,3 @@ function InventoryService:ToggleMissingReagents()
     self:CheckMissingReagents();
 end
 
--- register service
-addon:RegisterService(InventoryService, "inventory");

@@ -16,17 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define message
-VersionBroadcastMessage = {};
-VersionBroadcastMessage.__index = VersionBroadcastMessage;
+-- create model
+local VersionBroadcastMessage = _G.professionMaster:CreateModel("version-broadcast-message");
 VersionBroadcastMessage.prefix = "VersionBroadcast";
 
 --- Create message model.
 function VersionBroadcastMessage:Create()
     local message = {
-        version = addon.version
+        version = self.addon.version
     }
     setmetatable(message, VersionBroadcastMessage);
     return message;
@@ -34,7 +32,7 @@ end
 
 --- Parse message from string.
 function VersionBroadcastMessage:Parse(value)
-    local values = addon:GetService("message"):SplitString(value, ":");
+    local values = self:GetService("message"):SplitString(value, ":");
     local message = {
         version = values[1]
     }
@@ -49,5 +47,3 @@ function VersionBroadcastMessage:ToString()
     }, ":");
 end
 
--- register model
-addon:RegisterModel(VersionBroadcastMessage, "version-broadcast-message");
