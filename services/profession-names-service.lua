@@ -24,16 +24,25 @@ ProfessionNamesService.__index = ProfessionNamesService;
 
 --- Initialize service.
 function ProfessionNamesService:Initialize()
-    -- get profession names
-    local professionNames = addon:GetModel("profession-names")[GetLocale()];
-    if (not professionNames) then
-        addon:GetService("chat"):Write("LanguageNotSupported");
-        return;
+    self.professionSpells = addon:GetModel("profession-spells");
+
+    -- build profession names from game spell data (works in all locales and versions)
+    self.professionNames = {};
+    self.professionIds = {};
+
+    for skillLineId, spellId in pairs(self.professionSpells) do
+        -- GetSpellInfo works in Classic Era, BCC, Wrath, Cata, MoP for any valid spell ID
+        local spellName = GetSpellInfo(spellId);
+        if (spellName) then
+            self.professionNames[skillLineId] = spellName;
+            self.professionIds[spellName] = skillLineId;
+        end
     end
 
-    -- store profession names and ids
-    self.professionNames = professionNames;
-    self.professionIds = tInvert(professionNames);
+    -- warn if nothing loaded at all
+    if (not next(self.professionNames)) then
+        addon:GetService("chat"):Write("LanguageNotSupported");
+    end
 end
 
 --- Get profession ids to show.
