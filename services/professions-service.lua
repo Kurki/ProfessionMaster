@@ -24,6 +24,27 @@ ProfessionsService.__index = ProfessionsService;
 
 --- Initialize service.
 function ProfessionsService:Initialize()
+    -- build reverse index from existing saved data
+    self:RebuildItemIndex();
+end
+
+--- Rebuild the itemId -> {skillId, professionId} reverse index from Professions.
+-- Call once at init or after data migration.
+function ProfessionsService:RebuildItemIndex()
+    self.itemIndex = {};
+    if (not Professions) then
+        return;
+    end
+    for professionId, profession in pairs(Professions) do
+        for skillId, skill in pairs(profession) do
+            if (skill.itemId and skill.itemId ~= 0) then
+                self.itemIndex[skill.itemId] = {
+                    skillId = skillId,
+                    professionId = professionId
+                };
+            end
+        end
+    end
 end
 
 --- Check message.
@@ -214,6 +235,15 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 				end
             end
 
+            -- update reverse index
+            if (skillEntry.itemId and skillEntry.itemId ~= 0) then
+                if (not self.itemIndex) then self.itemIndex = {}; end
+                self.itemIndex[skillEntry.itemId] = {
+                    skillId = skill.skillId,
+                    professionId = professionId
+                };
+            end
+
             -- check if skill has item
             if (skillEntry and skillEntry.itemId ~= 0 and skillEntry.itemId ~= nil and type(skillEntry.itemId) == "number") then
                 -- check if bop
@@ -278,28 +308,22 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
         return nil;
     end
 
-    -- split link
-    local itemLinkParts = addon:GetService("message"):SplitString(itemLink, ":");
-    if (#itemLinkParts < 3 or (not itemLinkParts[2])) then
-        return nil;
-    end
-
-    -- get item id
-    local itemId = tonumber(itemLinkParts[2]);
+    -- extract item id from link using pattern match (avoids SplitString allocation)
+    local itemId = tonumber(itemLink:match("item:(%d+)"));
     if ((not itemId) or itemId == 0) then
         return nil;
     end
 
-    -- check all professions
-    for professionId, profession in pairs(Professions) do     
-        -- check skills professions
-        for skillId, skill in pairs(profession) do     
-            -- check item id
-            if (skill.itemId and skill.itemId == itemId) then
-                return skillId, skill, professionId;
+    -- use reverse index for O(1) lookup
+    if (self.itemIndex) then
+        local entry = self.itemIndex[itemId];
+        if (entry) then
+            local profession = Professions[entry.professionId];
+            if (profession and profession[entry.skillId]) then
+                return entry.skillId, profession[entry.skillId], entry.professionId;
             end
-        end  
-    end  
+        end
+    end
     return nil;
 end
 
@@ -313,18 +337,25 @@ function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
         return nil;
     end
 
-    -- check all professions
-    for professionId, profession in pairs(Professions) do     
-        -- check skills professions
-        for skillId, skill in pairs(profession) do     
-            -- check item id
-            if (skill.itemId and skill.itemId == targetItemId) then
-                return skillId, skill, professionId;
-            elseif (skillId == targetSkillId) then
-                return skillId, skill, professionId;
+    -- try reverse index for item id (O(1))
+    if (targetItemId and self.itemIndex) then
+        local entry = self.itemIndex[targetItemId];
+        if (entry) then
+            local profession = Professions[entry.professionId];
+            if (profession and profession[entry.skillId]) then
+                return entry.skillId, profession[entry.skillId], entry.professionId;
             end
-        end  
-    end  
+        end
+    end
+
+    -- try direct skill id lookup across professions (O(P) instead of O(P*S))
+    if (targetSkillId) then
+        for professionId, profession in pairs(Professions) do
+            if (profession[targetSkillId]) then
+                return targetSkillId, profession[targetSkillId], professionId;
+            end
+        end
+    end
     return nil;
 end
 
