@@ -27,6 +27,7 @@ function MessageService:Initialize()
     -- handle addon messages
     self.messageVersion = 1;
     self.messagePrefix = "PmV" .. self.messageVersion;
+    self.splitPatternCache = {};
     C_ChatInfo.RegisterAddonMessagePrefix(self.messagePrefix);
 end
 
@@ -55,9 +56,18 @@ end
 
 --- Split string.
 function MessageService:SplitString(value, separator)
+    -- get or build cached pattern
+    local pattern = self.splitPatternCache[separator];
+    if (not pattern) then
+        pattern = "([^" .. separator .. "]+)";
+        self.splitPatternCache[separator] = pattern;
+    end
+
     local result = {};
-    for part in string.gmatch(value, "([^" .. separator .. "]+)") do
-        table.insert(result, part);
+    local n = 0;
+    for part in string.gmatch(value, pattern) do
+        n = n + 1;
+        result[n] = part;
     end
     return result;
 end

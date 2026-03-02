@@ -22,13 +22,42 @@ local addon = _G.professionMaster;
 PlayerService = {};
 PlayerService.__index = PlayerService;
 
--- get realm name
-local realmName = string.gsub(GetRealmName(), "%s+", "");
-
 --- Initialize service.
 function PlayerService:Initialize()
+    -- get realm name and name cache
+    self.realmName = string.gsub(GetRealmName(), "%s+", "");
+    self.nameCache = {};
+
     -- get player name
     self.current = self:GetLongName(GetUnitName("player"));
+end
+
+--- Parse a player name into short name and realm check (cached).
+function PlayerService:ParsePlayerName(name)
+    local cached = self.nameCache[name];
+    if (cached) then
+        return cached;
+    end
+
+    local dashPos = string.find(name, "-", 1, true);
+    local result;
+    if (dashPos) then
+        local realm = string.sub(name, dashPos + 1);
+        local short = string.sub(name, 1, dashPos - 1);
+        local isSameRealm = (realm == self.realmName);
+        result = {
+            short = isSameRealm and short or name,
+            sameRealm = isSameRealm
+        };
+    else
+        result = {
+            short = name,
+            sameRealm = false
+        };
+    end
+
+    self.nameCache[name] = result;
+    return result;
 end
 
 --- Refresh guildmates.
@@ -59,26 +88,12 @@ end
 
 --- Get player short name.
 function PlayerService:GetShortName(name)
-    -- split by "-"
-    local parts = addon:GetService("message"):SplitString(name, "-");
-
-    -- check if realm is same realm
-    if (#parts > 1 and parts[2] == realmName) then
-        -- only return player name
-        return parts[1];
-    end
-
-    -- different realm, return full name
-    return name;
+    return self:ParsePlayerName(name).short;
 end
 
 --- Check is if is same realm
 function PlayerService:IsSameRealm(name)
-    -- split by "-"
-    local parts = addon:GetService("message"):SplitString(name, "-");
-
-    -- check if realm is same realm
-    return #parts > 1 and parts[2] == realmName;
+    return self:ParsePlayerName(name).sameRealm;
 end
 
 --- Check name and add realm if not set.
@@ -90,7 +105,7 @@ function PlayerService:GetLongName(name)
 
     -- check if realm already included
     if (string.find(name, "-") == nil) then
-        name = name .. "-" .. realmName;
+        name = name .. "-" .. self.realmName;
     end
     return name;
 end

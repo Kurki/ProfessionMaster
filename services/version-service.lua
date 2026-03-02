@@ -25,6 +25,12 @@ VersionService.__index = VersionService;
 --- Initialize service.
 function VersionService:Initialize()
     self.outdatedVersionNotified = false;
+
+    -- cache own version parts (never changes at runtime)
+    self.ownVersionParts = {};
+    for part in string.gmatch(addon.version, "([^.]+)") do
+        table.insert(self.ownVersionParts, tonumber(part));
+    end
 end
 
 --- Check message.
@@ -42,25 +48,15 @@ end
 -- @param version Sent version.
 -- @return True, if the own version is lower.
 function VersionService:OwnIsLower(version)
-    -- split versions
-    local messageService = addon:GetService("message");
-    local currentVersionParts = messageService:SplitString(addon.version, ".");
-    local givenVersionParts = messageService:SplitString(version, ".");
-
-    -- iterate version
-    for i = 1, 3 do
-        -- check if given version part is higher
-        if (tonumber(givenVersionParts[i]) > tonumber(currentVersionParts[i])) then
-            return true;
-        end
-
-        -- check if given version part is lower
-        if (tonumber(givenVersionParts[i]) < tonumber(currentVersionParts[i])) then
-            return false;
-        end
+    -- parse given version (own is cached)
+    local i = 0;
+    for part in string.gmatch(version, "([^.]+)") do
+        i = i + 1;
+        local given = tonumber(part);
+        local own = self.ownVersionParts[i] or 0;
+        if (given > own) then return true; end
+        if (given < own) then return false; end
     end
-
-    -- same version
     return false;
 end
 
@@ -68,25 +64,15 @@ end
 -- @param version Sent version.
 -- @return True, if own version is higher.
 function VersionService:OwnIsHigher(version)
-    -- split versions
-    local messageService = addon:GetService("message");
-    local currentVersionParts = messageService:SplitString(addon.version, ".");
-    local givenVersionParts = messageService:SplitString(version, ".");
-
-    -- iterate version
-    for i = 1, 3 do
-        -- check if given version part is lower
-        if (tonumber(givenVersionParts[i]) < tonumber(currentVersionParts[i])) then
-            return true;
-        end
-
-        -- check if given version part is higher
-        if (tonumber(givenVersionParts[i]) > tonumber(currentVersionParts[i])) then
-            return false;
-        end
+    -- parse given version (own is cached)
+    local i = 0;
+    for part in string.gmatch(version, "([^.]+)") do
+        i = i + 1;
+        local given = tonumber(part);
+        local own = self.ownVersionParts[i] or 0;
+        if (given < own) then return true; end
+        if (given > own) then return false; end
     end
-
-    -- same version
     return false;
 end
 
