@@ -2,6 +2,6 @@
     <Script file="bop-items.lua" />
     <Script file="convert-data.lua" />
     <Script file="locales.lua" />
-    <Script file="profession-names.lua" />
     <Script file="profession-icons.lua" />
+    <Script file="profession-spells.lua" />
 </Ui>
