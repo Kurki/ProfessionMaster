@@ -1,19 +1,7 @@
 --[[
 
-@author Esperanza - Everlook/EU-Alliance
-@copyright ©2022 The Profession Master Authors. All Rights Reserved.
-
-Licensed under the GNU General Public License, Version 3.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.gnu.org/licenses/gpl-3.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS-IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+@author Kurki
+@copyright ©2026 Profession Master. All Rights Reserved.
 
 --]]
 
@@ -28,6 +16,11 @@ function PlayerService:Initialize()
 
     -- get player name
     self.current = self:GetLongName(GetUnitName("player"));
+
+    -- store current player faction (H = Horde, A = Alliance)
+    local factionGroup = UnitFactionGroup("player");
+    self.faction = (factionGroup == "Horde") and "H" or "A";
+    PlayerFactions[self.current] = self.faction;
 end
 
 --- Parse a player name into short name and realm check (cached).
@@ -94,6 +87,14 @@ function PlayerService:IsSameRealm(name)
     return self:ParsePlayerName(name).sameRealm;
 end
 
+--- Check if player belongs to the same faction.
+-- Players without a stored faction (legacy data) are treated as neutral.
+function PlayerService:IsSameFaction(name)
+    local storedFaction = PlayerFactions[name];
+    -- nil = neutral (backward compatible), otherwise must match
+    return storedFaction == nil or storedFaction == self.faction;
+end
+
 --- Check name and add realm if not set.
 function PlayerService:GetLongName(name)
     -- check if name is null
@@ -124,8 +125,8 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
 
     -- iterate all player names
     for _, playerName in ipairs(playerNames) do
-        -- check realm
-        if (self:IsSameRealm(playerName) or Guildmates[playerName]) then
+        -- check realm and faction
+        if ((self:IsSameRealm(playerName) or Guildmates[playerName]) and self:IsSameFaction(playerName)) then
             -- get short player name
             local shortPlayerName = self:GetShortName(playerName);
 
