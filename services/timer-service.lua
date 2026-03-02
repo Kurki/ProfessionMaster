@@ -29,36 +29,29 @@ end
 
 -- start timer
 function TimerService:Start(name, seconds, callback)
-    -- check if timer not exists
-    if (self.timers[name] == nil) then
-        local timer = CreateFrame("Frame");
-        timer:SetScript("OnUpdate", function(_self, elapsed)
-            timer.currentSecond = timer.currentSecond - elapsed;
-            if (timer.currentSecond <= 0) then
-                -- reset current second
-                timer.currentSecond = timer.currentSecond + 1;
+    -- stop existing timer with same name
+    self:Stop(name);
 
-                -- reduce second and call callback
-                timer.seconds = timer.seconds - 1;
-                timer.callback(timer.seconds);
-
-                -- check if 0 seconds reached
-                if (timer.seconds == 0) then
-                    -- stop timer
-                    self:Stop(name);
-                end
-            end
-        end);
-        self.timers[name] = timer;
-    end
-
-    -- store / reset values
-    self.timers[name].currentSecond = 1;
-    self.timers[name].seconds = seconds;
-    self.timers[name].callback = callback;
+    -- create timer state
+    local timer = {
+        seconds = seconds,
+        callback = callback
+    };
+    self.timers[name] = timer;
 
     -- call with initial seconds
     callback(seconds);
+
+    -- create a 1-second ticker (event-driven, no per-frame overhead)
+    timer.ticker = C_Timer.NewTicker(1, function()
+        timer.seconds = timer.seconds - 1;
+        timer.callback(timer.seconds);
+
+        -- check if 0 seconds reached
+        if (timer.seconds <= 0) then
+            self:Stop(name);
+        end
+    end, seconds);
 end
 
 -- stop timer
@@ -68,9 +61,10 @@ function TimerService:Stop(name)
         return;
     end
 
-    -- remove script and stop frame
-    self.timers[name]:SetScript("OnUpdate", nil);
-    self.timers[name]:Hide();
+    -- cancel ticker
+    if (self.timers[name].ticker) then
+        self.timers[name].ticker:Cancel();
+    end
     self.timers[name] = nil;
 end
 
