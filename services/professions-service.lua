@@ -246,14 +246,8 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
             -- check if skill has item
             if (skillEntry and skillEntry.itemId ~= 0 and skillEntry.itemId ~= nil and type(skillEntry.itemId) == "number") then
-                -- check if bop
-                for _, itemId in ipairs(bopItems) do
-                    -- check if is bop
-                    if (skillEntry.itemId == itemId) then
-                        skillEntry.bop = true;
-                        break;
-                    end
-                end
+                -- check if bop (O(1) hash set lookup)
+                skillEntry.bop = bopItems[skillEntry.itemId] or false;
 
                 -- check if item id known
                 if (C_Item.DoesItemExistByID(skillEntry.itemId)) then
