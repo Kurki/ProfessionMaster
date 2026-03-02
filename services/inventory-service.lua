@@ -25,12 +25,31 @@ InventoryService.__index = InventoryService;
 --- Initialize service.
 function InventoryService:Initialize()
     self.missingReagentsView = addon:CreateView("missing-reagents");
+    self.inventory = {};
+    self.inventoryDirty = true;
 end
 
--- Scan inventory.
+-- Mark inventory cache as dirty (needs rescan).
+function InventoryService:InvalidateInventory()
+    self.inventoryDirty = true;
+end
+
+-- Scan inventory (only if cache is dirty).
 function InventoryService:ScanInventory()
+    -- skip scan if cache is still valid
+    if (not self.inventoryDirty) then
+        return;
+    end
+
     -- clear inventory
-    self.inventory = {};
+    if (self.inventory) then
+        wipe(self.inventory);
+    else
+        self.inventory = {};
+    end
+
+    -- mark cache as clean
+    self.inventoryDirty = false;
 
     -- log trace
     addon:LogTrace("InventoryService", "ScanInventory", "Scanning inventory...");
