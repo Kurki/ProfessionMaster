@@ -45,6 +45,9 @@ function PurgeService:Purge(context)
         CharacterSettings = {}; 
         addon:CheckSettings();
 
+        -- rebuild reverse index after purge
+        addon:GetService("professions"):RebuildItemIndex();
+
         -- send message
         chatService:Write("AllDataPurged");
         return;
