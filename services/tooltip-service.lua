@@ -78,22 +78,30 @@ function TooltipService:CheckTooltip(tooltip)
     -- prepare skill 
     local skillId, skill, professionId = nil;
 
-    -- check for item link
-    local _, itemLink = GameTooltip:GetItem();
+    -- check for item link (use actual tooltip, not hardcoded GameTooltip)
+    local _, itemLink = tooltip:GetItem();
     if (itemLink) then
         -- find skill by item link
         skillId, skill, professionId = addon:GetService("professions"):FindSkillByItemLink(itemLink);
     end
 
-    -- check if skill not found yet
+    -- check for spell id (direct lookup, works for all professions including smelting)
     if (not skill) then
-        -- check if small text is reagents
-        local text1 = GameTooltipTextLeft1:GetText();
-        local text2 = GameTooltipTextLeft2:GetText();
-        local text3 = GameTooltipTextLeft3:GetText();
-        if (text1 and (text2 and string.find(text2, SPELL_REAGENTS) == 1 or text3 and string.find(text3, SPELL_REAGENTS) == 1)) then
-            -- find skill by name
-            skillId, skill, professionId = addon:GetService("professions"):FindSkillByName(text1);
+        local _, spellId = tooltip:GetSpell();
+        if (spellId) then
+            skillId, skill, professionId = addon:GetService("professions"):FindSkillByIdOrItemId(spellId, nil);
+        end
+    end
+
+    -- fallback: text-based lookup via tooltip lines
+    if (not skill) then
+        local tooltipName = tooltip:GetName();
+        if (tooltipName) then
+            local text1Obj = _G[tooltipName .. "TextLeft1"];
+            local text1 = text1Obj and text1Obj:GetText();
+            if (text1 and string.find(text1, ":")) then
+                skillId, skill, professionId = addon:GetService("professions"):FindSkillByName(text1);
+            end
         end
     end
 
