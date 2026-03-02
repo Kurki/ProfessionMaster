@@ -91,9 +91,19 @@ function ProfessionsView:Show()
         });
         bucketListFrame:SetBackdropColor(0, 0, 0, 0.5);
         bucketListFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
-        bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
+        bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -302, -36);
         bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 30);
         self.bucketListFrame = bucketListFrame;
+
+        -- add bucket list scroll frame
+        local uiService = self:GetService("ui");
+        local bucketListScrollParent, bucketListScrollChild, bucketListScrollElement = uiService:CreateScrollFrame(bucketListFrame);
+        bucketListScrollParent:SetPoint("TOPLEFT", bucketListFrame, "TOPLEFT", 2, -35);
+        bucketListScrollParent:SetPoint("BOTTOMRIGHT", bucketListFrame, "BOTTOMRIGHT", -2, 2);
+        bucketListScrollParent:SetBackdropColor(0, 0, 0, 0);
+        bucketListScrollChild:SetWidth(bucketListScrollParent:GetWidth());
+        self.bucketListScrollChild = bucketListScrollChild;
+        self.bucketListScrollElement = bucketListScrollElement;
 
         -- add footer
         local footerLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
@@ -103,7 +113,7 @@ function ProfessionsView:Show()
         -- add bucket list group text
         local bucketListTitleText = bucketListFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         bucketListTitleText:SetPoint("TOPLEFT", 13, -15);
-        bucketListTitleText:SetText(localeService:Get("ProfessionsViewReagentsForBucketList"));
+        bucketListTitleText:SetText(localeService:Get("ProfessionsViewBucketList"));
 
         -- add bucket list clear button
         local bucketListClearButton = CreateFrame("Button", nil, bucketListFrame);
@@ -345,7 +355,7 @@ function ProfessionsView:CheckBucketList()
 
     -- Check bucket list
     if (hasBucketList) then
-        self.skillsFrame:SetPoint("BOTTOMRIGHT", -260, 30);
+        self.skillsFrame:SetPoint("BOTTOMRIGHT", -310, 30);
         self.bucketListFrame:Show();
     else
         self.skillsFrame:SetPoint("BOTTOMRIGHT", -12, 30);
@@ -745,56 +755,77 @@ function ProfessionsView:RefreshBucketListRows()
         row:Hide();
     end
 
-    -- get reagents
-    local reagents = self:GetService("inventory"):GetReagents();
-
-    -- get service
+    -- get services
+    local inventoryService = self:GetService("inventory");
+    local skillsService = self:GetService("skills");
     local professionNamesService = self:GetService("profession-names");
 
-    -- show reagents
-    local reagentRowAmount = 0;
-    for reagentItemId, reagent in pairs(reagents) do
-        reagentRowAmount = reagentRowAmount + 1;
-        if (#self.bucketListReagentRows < reagentRowAmount) then
+    -- scan inventory once
+    inventoryService:ScanInventory();
+
+    -- build tree
+    local treeRows = self:BuildBucketListTree(skillsService, inventoryService);
+
+    -- calculate vertical positions with spacing before root nodes
+    local currentTop = 0;
+    for i, treeRow in ipairs(treeRows) do
+        if (treeRow.isSeparator) then
+            currentTop = currentTop + 10;
+            treeRow.top = currentTop;
+            currentTop = currentTop + 8;
+        else
+            if (treeRow.isNode and i > 1) then
+                currentTop = currentTop + 6;
+            end
+            treeRow.top = currentTop;
+            currentTop = currentTop + 20;
+        end
+    end
+
+    -- render separator line
+    if (not self.bucketListSeparator) then
+        local sep = self.bucketListScrollChild:CreateTexture(nil, "OVERLAY");
+        sep:SetColorTexture(0.4, 0.4, 0.4, 0.6);
+        sep:SetHeight(1);
+        self.bucketListSeparator = sep;
+    end
+    self.bucketListSeparator:Hide();
+
+    -- render tree rows
+    local rowIndex = 0;
+    for _, treeRow in ipairs(treeRows) do
+        -- handle separator
+        if (treeRow.isSeparator) then
+            self.bucketListSeparator:ClearAllPoints();
+            self.bucketListSeparator:SetPoint("TOPLEFT", self.bucketListScrollChild, "TOPLEFT", 10, -treeRow.top);
+            self.bucketListSeparator:SetPoint("RIGHT", self.bucketListScrollChild, "RIGHT", -30, 0);
+            self.bucketListSeparator:Show();
+        else
+
+        rowIndex = rowIndex + 1;
+        if (#self.bucketListReagentRows < rowIndex) then
             -- create row frame
-            local reagentRow = CreateFrame("Button", nil, self.bucketListFrame, BackdropTemplateMixin and "BackdropTemplate");
-            local top = 35 + ((reagentRowAmount - 1) * 20);
-            reagentRow:SetPoint("TOPLEFT", self.bucketListFrame, "TOPLEFT", 10, -top);
-            reagentRow:SetPoint("BOTTOMRIGHT", self.bucketListFrame, "TOPRIGHT", -10, -(top + 20));
+            local reagentRow = CreateFrame("Button", nil, self.bucketListScrollChild, BackdropTemplateMixin and "BackdropTemplate");
             reagentRow:SetBackdrop({
                 bgFile = [[Interface\Buttons\WHITE8x8]]
             });
 
-            -- set background color by index
-            local backgroundColor = nil;
-            if (reagentRowAmount - math.floor(reagentRowAmount / 2) * 2 == 0) then
-                backgroundColor = 0.1;
-            else
-                backgroundColor = 0.15;
-            end
-            reagentRow:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
-
             -- bind row mouse events
             reagentRow:SetScript("OnLeave", function()
-                -- update background color
-                reagentRow:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
-
-                -- hide item tool tip
+                reagentRow:SetBackdropColor(reagentRow.bgColor, reagentRow.bgColor, reagentRow.bgColor, 0.5);
                 GameTooltip:Hide();
             end);
             reagentRow:SetScript("OnEnter", function()
-                -- update background color
                 reagentRow:SetBackdropColor(0.2, 0.2, 0.2);
-
-                -- show item tool tip
-                GameTooltip:SetOwner(reagentRow, "ANCHOR_LEFT");
-                GameTooltip:SetHyperlink(reagentRow.itemLink);
-                GameTooltip:Show();
+                if (reagentRow.itemLink) then
+                    GameTooltip:SetOwner(reagentRow, "ANCHOR_LEFT");
+                    GameTooltip:SetHyperlink(reagentRow.itemLink);
+                    GameTooltip:Show();
+                end
             end);
 
             -- add icon text
             local iconText = reagentRow:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            iconText:SetPoint("TOPLEFT", 3, -3);
             reagentRow.iconText = iconText;
 
             -- add amount text
@@ -805,7 +836,6 @@ function ProfessionsView:RefreshBucketListRows()
 
             -- add item text
             local itemText = reagentRow:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            itemText:SetPoint("TOPLEFT", 24, -4);
             itemText:SetPoint("BOTTOMRIGHT", amountText, "BOTTOMLEFT", -8, 0);
             itemText:SetJustifyH("LEFT");
             itemText:SetJustifyV("TOP");
@@ -816,32 +846,65 @@ function ProfessionsView:RefreshBucketListRows()
         end
 
         -- get row
-        local reagentRow = self.bucketListReagentRows[reagentRowAmount];
+        local reagentRow = self.bucketListReagentRows[rowIndex];
+        local indent = treeRow.indent;
+        local top = treeRow.top;
+        reagentRow:ClearAllPoints();
+        reagentRow:SetPoint("TOPLEFT", self.bucketListScrollChild, "TOPLEFT", 8 + indent * 12, -top);
+        reagentRow:SetPoint("BOTTOMRIGHT", self.bucketListScrollChild, "TOPRIGHT", -26, -(top + 20));
+
+        -- set background color
+        local backgroundColor;
+        if (treeRow.isNode) then
+            backgroundColor = 0.2;
+        elseif (rowIndex % 2 == 0) then
+            backgroundColor = 0.08;
+        else
+            backgroundColor = 0.12;
+        end
+        reagentRow.bgColor = backgroundColor;
+        reagentRow:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+
+        -- position icon and item text
+        reagentRow.iconText:ClearAllPoints();
+        reagentRow.iconText:SetPoint("TOPLEFT", 3, -3);
+        reagentRow.itemText:ClearAllPoints();
+        reagentRow.itemText:SetPoint("TOPLEFT", 24, -4);
+        reagentRow.itemText:SetPoint("BOTTOMRIGHT", reagentRow.amountText, "BOTTOMLEFT", -8, 0);
+
         reagentRow:Show();
+        reagentRow.itemLink = nil;
 
         -- update amount
-        if (reagent.amount > 0) then
-            reagentRow.amountText:SetText(math.min(reagent.stocks, reagent.amount) .. "/" .. reagent.amount);
+        local stocks = treeRow.stocks;
+        local amount = treeRow.amount;
+        if (amount > 0) then
+            reagentRow.amountText:SetText(math.min(stocks, amount) .. "/" .. amount);
+            if (stocks >= amount) then
+                reagentRow.amountText:SetTextColor(0, 1, 0);
+            else
+                reagentRow.amountText:SetTextColor(1, 1, 1);
+            end
         else
             reagentRow.amountText:SetText("");
         end
-        
-        -- set if amount required
-        if (reagent.amount > 0 and reagent.stocks >= reagent.amount) then
-            reagentRow.amountText:SetTextColor(0, 1, 0);
+
+        -- set text style based on node type
+        if (treeRow.isNode) then
+            reagentRow.itemText:SetFontObject("GameFontNormal");
+            reagentRow.amountText:SetFontObject("GameFontNormal");
         else
-            reagentRow.amountText:SetTextColor(1, 1, 1);
+            reagentRow.itemText:SetFontObject("GameFontHighlightSmall");
+            reagentRow.amountText:SetFontObject("GameFontHighlightSmall");
         end
 
-        -- check if item id known
-        if (C_Item.DoesItemExistByID(reagentItemId)) then
-            -- get item
+        -- load item info
+        local reagentItemId = treeRow.itemId;
+        if (reagentItemId and C_Item.DoesItemExistByID(reagentItemId)) then
             local item = Item:CreateFromItemID(reagentItemId);
             if (not item:IsItemEmpty()) then
-                pcall(function() 
-                    -- wait until loaded
+                pcall(function()
                     item:ContinueOnItemLoad(function()
-                        -- update item
                         reagentRow.itemLink = item:GetItemLink();
                         reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
                         reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
@@ -849,5 +912,192 @@ function ProfessionsView:RefreshBucketListRows()
                 end);
             end
         end
+    end -- if not separator
+    end -- for treeRows
+
+    -- update scroll child height
+    self.bucketListScrollChild:SetHeight(currentTop + 5);
+end
+
+--- Build a flat tree of bucket list nodes and their reagents.
+-- Top-level nodes are bucket list items and promoted craftable reagents.
+-- Each node shows its direct reagents indented below, scaled to the missing amount.
+-- @param skillsService Skills service reference.
+-- @param inventoryService Inventory service reference.
+-- @return Array of { itemId, amount, stocks, indent, isNode }.
+function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
+    local directRows = {};
+    local derivedRows = {};
+    local visited = {};
+
+    -- collect initial nodes from bucket list
+    local currentNodes = {};
+    for skillId, skillAmount in pairs(BucketList) do
+        local skillInfo = skillsService:GetSkillById(skillId);
+        if (skillInfo and skillInfo.itemId) then
+            table.insert(currentNodes, {
+                itemId = skillInfo.itemId,
+                skillId = skillId,
+                amount = skillAmount,
+            });
+        end
     end
+
+    -- first pass: direct bucket list items and their reagents
+    local nextReagents = {};
+    local leafReagents = {};
+    for _, node in ipairs(currentNodes) do
+        local stocks = inventoryService:GetItemAmount(node.itemId);
+
+        -- add main node row
+        table.insert(directRows, {
+            itemId = node.itemId,
+            amount = node.amount,
+            stocks = stocks,
+            indent = 0,
+            isNode = true,
+        });
+
+        -- calculate missing quantity
+        local missing = math.max(0, node.amount - stocks);
+
+        -- add reagent rows for missing amount
+        if (missing > 0) then
+            local skillInfo = skillsService:GetSkillById(node.skillId);
+            if (skillInfo and skillInfo.reagents) then
+                for reagentItemId, reagentPerCraft in pairs(skillInfo.reagents) do
+                    local needed = missing * reagentPerCraft;
+                    local reagentStocks = inventoryService:GetItemAmount(reagentItemId);
+                    local reagentMissing = math.max(0, needed - reagentStocks);
+
+                    -- always show reagents under parent
+                    table.insert(directRows, {
+                        itemId = reagentItemId,
+                        amount = needed,
+                        stocks = reagentStocks,
+                        indent = 1,
+                        isNode = false,
+                    });
+
+                    -- only promote missing reagents
+                    if (reagentMissing > 0) then
+                        local reagentSkillId = skillsService:GetSkillIdByItemId(reagentItemId);
+                        if (reagentSkillId) then
+                            if (not visited[reagentItemId]) then
+                                if (not nextReagents[reagentItemId]) then
+                                    nextReagents[reagentItemId] = { skillId = reagentSkillId, amount = 0 };
+                                end
+                                nextReagents[reagentItemId].amount = nextReagents[reagentItemId].amount + needed;
+                            end
+                        else
+                            if (not leafReagents[reagentItemId]) then
+                                leafReagents[reagentItemId] = 0;
+                            end
+                            leafReagents[reagentItemId] = leafReagents[reagentItemId] + needed;
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- subsequent passes: derived craftable reagents
+    currentNodes = {};
+    for reagentItemId, info in pairs(nextReagents) do
+        visited[reagentItemId] = true;
+        table.insert(currentNodes, {
+            itemId = reagentItemId,
+            skillId = info.skillId,
+            amount = info.amount,
+        });
+    end
+
+    while (#currentNodes > 0) do
+        local nextLevel = {};
+
+        for _, node in ipairs(currentNodes) do
+            local stocks = inventoryService:GetItemAmount(node.itemId);
+
+            table.insert(derivedRows, {
+                itemId = node.itemId,
+                amount = node.amount,
+                stocks = stocks,
+                indent = 0,
+                isNode = true,
+            });
+
+            local missing = math.max(0, node.amount - stocks);
+            if (missing > 0) then
+                local skillInfo = skillsService:GetSkillById(node.skillId);
+                if (skillInfo and skillInfo.reagents) then
+                    for reagentItemId, reagentPerCraft in pairs(skillInfo.reagents) do
+                        local needed = missing * reagentPerCraft;
+                        local reagentStocks = inventoryService:GetItemAmount(reagentItemId);
+                        local reagentMissing = math.max(0, needed - reagentStocks);
+
+                        table.insert(derivedRows, {
+                            itemId = reagentItemId,
+                            amount = needed,
+                            stocks = reagentStocks,
+                            indent = 1,
+                            isNode = false,
+                        });
+
+                        if (reagentMissing > 0) then
+                            local reagentSkillId = skillsService:GetSkillIdByItemId(reagentItemId);
+                            if (reagentSkillId) then
+                                if (not visited[reagentItemId]) then
+                                    if (not nextLevel[reagentItemId]) then
+                                        nextLevel[reagentItemId] = { skillId = reagentSkillId, amount = 0 };
+                                    end
+                                    nextLevel[reagentItemId].amount = nextLevel[reagentItemId].amount + needed;
+                                end
+                            else
+                                if (not leafReagents[reagentItemId]) then
+                                    leafReagents[reagentItemId] = 0;
+                                end
+                                leafReagents[reagentItemId] = leafReagents[reagentItemId] + needed;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        currentNodes = {};
+        for reagentItemId, info in pairs(nextLevel) do
+            visited[reagentItemId] = true;
+            table.insert(currentNodes, {
+                itemId = reagentItemId,
+                skillId = info.skillId,
+                amount = info.amount,
+            });
+        end
+    end
+
+    -- add non-craftable leaf reagents as root nodes in derived section
+    for reagentItemId, totalNeeded in pairs(leafReagents) do
+        local stocks = inventoryService:GetItemAmount(reagentItemId);
+        table.insert(derivedRows, {
+            itemId = reagentItemId,
+            amount = totalNeeded,
+            stocks = stocks,
+            indent = 0,
+            isNode = true,
+        });
+    end
+
+    -- combine: direct rows, separator, derived rows
+    local treeRows = {};
+    for _, row in ipairs(directRows) do
+        table.insert(treeRows, row);
+    end
+    if (#derivedRows > 0) then
+        table.insert(treeRows, { isSeparator = true });
+        for _, row in ipairs(derivedRows) do
+            table.insert(treeRows, row);
+        end
+    end
+
+    return treeRows;
 end
