@@ -66,24 +66,42 @@ function MissingReagentsView:Show(missingReagents)
         reagentRowAmount = reagentRowAmount + 1;
         if (#self.reagentRows < reagentRowAmount) then
             -- create row frame
-            local row = CreateFrame("Frame", nil, self.view, BackdropTemplateMixin and "BackdropTemplate");
-            local top = 35 + ((reagentRowAmount - 1) * 16);
-            row:SetPoint("TOPLEFT", self.view, "TOPLEFT", 16, -top);
-            row:SetPoint("BOTTOMRIGHT", self.view, "TOPRIGHT", -16, -(top + 20));
+            local row = CreateFrame("Button", nil, self.view, BackdropTemplateMixin and "BackdropTemplate");
+            local top = 33 + ((reagentRowAmount - 1) * 16);
+            row:SetPoint("TOPLEFT", self.view, "TOPLEFT", 10, -top);
+            row:SetPoint("BOTTOMRIGHT", self.view, "TOPRIGHT", -10, -(top + 18));
+            row:SetBackdrop({
+                bgFile = [[Interface\Buttons\WHITE8x8]]
+            });
+            row:SetBackdropColor(0, 0, 0, 0);
+
+            -- hover highlight
+            row:SetScript("OnEnter", function()
+                row:SetBackdropColor(0.3, 0.3, 0.3, 0.5);
+            end);
+            row:SetScript("OnLeave", function()
+                row:SetBackdropColor(0, 0, 0, 0);
+            end);
+
+            -- shift+click to insert item link into chat
+            row:SetScript("OnMouseDown", function(_, button)
+                if (button == "LeftButton") and IsShiftKeyDown() and row.itemLink then
+                    ChatEdit_InsertLink(row.itemLink);
+                end
+            end);
 
             -- add amount text
             local amountText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            amountText:SetPoint("TOPRIGHT", 0, 0);
+            amountText:SetPoint("RIGHT", -6, 0);
             amountText:SetJustifyH("RIGHT");
             amountText:SetTextColor(1, 1, 1);
             row.amountText = amountText;
 
             -- add item text
             local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            itemText:SetPoint("TOPLEFT", 0, 0);
-            itemText:SetPoint("BOTTOMRIGHT", amountText, "BOTTOMLEFT", -8, 0);
+            itemText:SetPoint("LEFT", 6, 0);
+            itemText:SetPoint("RIGHT", amountText, "LEFT", -8, 0);
             itemText:SetJustifyH("LEFT");
-            itemText:SetJustifyV("TOP");
             row.itemText = itemText;
 
             -- add row
