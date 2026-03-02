@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-SkillsService = {};
-SkillsService.__index = SkillsService;
+-- create service
+local SkillsService = _G.professionMaster:CreateService("skills");
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -29,26 +27,26 @@ function SkillsService:Initialize()
     self.allItems = {};
 
     -- add vanilla
-    self:AddAddonSkills(1, addon:GetModel('vanilla-skills'));
+    self:AddAddonSkills(1, self:GetModel('vanilla-skills'));
 
     -- add bcc
-    if (addon.isBccAtLeast) then
-        self:AddAddonSkills(2, addon:GetModel('bcc-skills'));
+    if (self.addon.isBccAtLeast) then
+        self:AddAddonSkills(2, self:GetModel('bcc-skills'));
     end
 
     -- add wrath
-    if (addon.isWrathAtLeast) then
-        self:AddAddonSkills(3, addon:GetModel('wrath-skills'));
+    if (self.addon.isWrathAtLeast) then
+        self:AddAddonSkills(3, self:GetModel('wrath-skills'));
     end
 
     -- add cata
-    if (addon.isCataAtLeast) then
-        self:AddAddonSkills(4, addon:GetModel('cata-skills'));
+    if (self.addon.isCataAtLeast) then
+        self:AddAddonSkills(4, self:GetModel('cata-skills'));
     end
 
     -- add mop
-    if (addon.isMopAtLeast) then
-        self:AddAddonSkills(5, addon:GetModel('mop-skills'));
+    if (self.addon.isMopAtLeast) then
+        self:AddAddonSkills(5, self:GetModel('mop-skills'));
     end
 
     -- index skill by item id
@@ -90,6 +88,3 @@ function SkillsService:AddAddonSkills(addonNumber, addonData)
         self.allSkills[addonSkillId] = skill;
     end
 end
-
--- register service
-addon:RegisterService(SkillsService, "skills");

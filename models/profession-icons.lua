@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- define icons
-local ProfessionIcons = {
+local ProfessionIcons = _G.professionMaster:CreateModel("profession-icons", {
     [164] = 136241,
     [165] = 133611,
     [171] = 136240,
@@ -33,7 +32,4 @@ local ProfessionIcons = {
     [393] = 134366,
     [755] = 134071,
     [773] = 237171
-};
-
--- register model
-addon:RegisterModel(ProfessionIcons, "profession-icons");
+});

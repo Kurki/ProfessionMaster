@@ -16,11 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define model
-LocalesModel = {};
-LocalesModel.__index = LocalesModel;
+-- create model
+local LocalesModel = _G.professionMaster:CreateModel("locales");
 
 -- Create model.
 function LocalesModel:Create()
@@ -28,7 +25,7 @@ function LocalesModel:Create()
         -- define en locale
         ["en"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " by Kurki. Use |cffDA8CFF/pm help|r for more informations.",
+            ["AddonLoaded"] = "v" .. self.addon.version .. " by Kurki. Use |cffDA8CFF/pm help|r for more informations.",
             ["VersionOutdated"] = "Your version is outdated. The latest version can be downloaded from https://www.curseforge.com/wow/addons/profession-master.",
             ["GuildAnnouncement"] = "I'm now sharing my professions with Profession Master. Type “!who [item]” and I might be able to tell you who can craft it for you.",
             ["LanguageNotSupported"] = "Unfortunately, the language of your client is not supported by ProfessionMaster.",
@@ -46,13 +43,13 @@ function LocalesModel:Create()
             ["CommandsPurgeRow4"] = "/pm purge <player name> - Delete data of a specific player",
 
             -- welcome
-            ["WelcomeTitle"] = addon.name .. " - Welcome",
-            ["WelcomeDescription"] = addon.name .. " shows you your profession and the professions of all your guild members who also use " .. addon.name .. " in a single overview.\n\n" .. 
+            ["WelcomeTitle"] = self.addon.name .. " - Welcome",
+            ["WelcomeDescription"] = self.addon.name .. " shows you your profession and the professions of all your guild members who also use " .. self.addon.name .. " in a single overview.\n\n" .. 
                 "Use the button on your minimap or the chat command /pm to show or hide the corresponding windows.\n\n" ..
                 "|cffd4af37Open your profession windows now to share your professions.",
 
             -- minimap button
-            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Left Click:|cffffffff Show overview|r",
             ["MinimapButtonRightClick"] = "|cff999999Right Click:|cffffffff Show/Hide missing Reagents|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Right Click:|cffffffff Hide minimap button|r",
@@ -93,15 +90,15 @@ function LocalesModel:Create()
         -- define de locale
         ["de"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " von Kurki. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
+            ["AddonLoaded"] = "v" .. self.addon.version .. " von Kurki. Benutze |cffDA8CFF/pm help|r für weitere Informationen.",
             ["VersionOutdated"] = "Deine Version ist veraltet. Die neueste Version kann unter https://www.curseforge.com/wow/addons/profession-master heruntergeladen werden.",
             ["LanguageNotSupported"] = "Leider wird die Sprache deines Clients nicht von ProfessionMaster unterstützt.",
             ["GuildAnnouncement"] = "Ich teile jetzt meine Berufe mit Profession Master. Schreibe “!who [item]” und ich kann dir vielleicht sagen, wer das für dich herstellen kann.",
             ["You"] = "Du",
 
             -- welcome
-            ["WelcomeTitle"] = addon.name .. " - Willkommen",
-            ["WelcomeDescription"] = addon.name .. " zeigt dir deine und die Berufe all deiner Gildenmitglieder, die auch " .. addon.name .. " nutzen, in einer einzigen Übersicht an.\n\n" ..
+            ["WelcomeTitle"] = self.addon.name .. " - Willkommen",
+            ["WelcomeDescription"] = self.addon.name .. " zeigt dir deine und die Berufe all deiner Gildenmitglieder, die auch " .. self.addon.name .. " nutzen, in einer einzigen Übersicht an.\n\n" ..
                 "Benutze die Schaltfläche an deiner Minimap oder den Chat-Befehl /pm um die entsprechenden Fenster ein- oder auszublenden.\n\n" .. 
                 "|cffd4af37Öffne jetzt deine Berufsfenster, um deine Berufe zu teilen.",
 
@@ -117,7 +114,7 @@ function LocalesModel:Create()
             ["CommandsPurgeRow4"] = "/pm purge <Spielername> - Lösche Daten von einem spezifischen Spieler",
 
             -- minimap button
-            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Linksklick:|cffffffff Übersicht anzeigen|r",
             ["MinimapButtonRightClick"] = "|cff999999Rechtsklick:|cffffffff Fehlende Materialien ein-/ausblenden|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
@@ -158,7 +155,7 @@ function LocalesModel:Create()
         -- define ru locale
         ["ru"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " от Kurki. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
+            ["AddonLoaded"] = "v" .. self.addon.version .. " от Kurki. Используйте |cffDA8CFF/pm help|r для дополнительной информации.",
             ["VersionOutdated"] = "Ваша версия устарела. Последнюю версию можно скачать на https://www.curseforge.com/wow/addons/profession-master.",
             ["GuildAnnouncement"] = "Теперь я делюсь своими профессиями с Profession Master. Напишите “!who [item]”, и я, возможно, смогу сказать, кто может это сделать для вас.",
             ["LanguageNotSupported"] = "К сожалению, язык вашего клиента не поддерживается ProfessionMaster.",
@@ -176,13 +173,13 @@ function LocalesModel:Create()
             ["CommandsPurgeRow4"] = "/pm purge <имя игрока> - Удалить данные определенного игрока",
 
             -- welcome
-            ["WelcomeTitle"] = addon.name .. " - Добро пожаловать",
-            ["WelcomeDescription"] = addon.name .. " показывает ваши профессии и профессии всех членов вашей гильдии, которые также используют " .. addon.name .. ", в едином обзоре.\n\n" .. 
+            ["WelcomeTitle"] = self.addon.name .. " - Добро пожаловать",
+            ["WelcomeDescription"] = self.addon.name .. " показывает ваши профессии и профессии всех членов вашей гильдии, которые также используют " .. self.addon.name .. ", в едином обзоре.\n\n" .. 
                 "Используйте кнопку на миникарте или команду чата /pm, чтобы показать или скрыть соответствующие окна.\n\n" ..
                 "|cffd4af37Откройте окна ваших профессий сейчас, чтобы поделиться ими.",
 
             -- minimap button
-            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Левый клик:|cffffffff Показать обзор|r",
             ["MinimapButtonRightClick"] = "|cff999999Правый клик:|cffffffff Показать/скрыть недостающие реагенты|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Правый клик:|cffffffff Скрыть кнопку на миникарте|r",
@@ -223,7 +220,7 @@ function LocalesModel:Create()
         -- define es locale
         ["es"] = {
             -- general
-            ["AddonLoaded"] = "v" .. addon.version .. " por Kurki. Usa |cffDA8CFF/pm help|r para más información.",
+            ["AddonLoaded"] = "v" .. self.addon.version .. " por Kurki. Usa |cffDA8CFF/pm help|r para más información.",
             ["VersionOutdated"] = "Tu versión está desactualizada. La última versión se puede descargar en https://www.curseforge.com/wow/addons/profession-master.",
             ["GuildAnnouncement"] = "Ahora comparto mis profesiones con Profession Master. Escribe “!who [item]” y quizás pueda decirte quién puede fabricarlo para ti.",
             ["LanguageNotSupported"] = "Lamentablemente, el idioma de tu cliente no es compatible con ProfessionMaster.",
@@ -241,13 +238,13 @@ function LocalesModel:Create()
             ["CommandsPurgeRow4"] = "/pm purge <nombre del jugador> - Eliminar datos de un jugador específico",
 
             -- welcome
-            ["WelcomeTitle"] = addon.name .. " - Bienvenido",
-            ["WelcomeDescription"] = addon.name .. " te muestra tus profesiones y las de todos los miembros de tu gremio que también usan " .. addon.name .. " en una sola vista general.\n\n" ..
+            ["WelcomeTitle"] = self.addon.name .. " - Bienvenido",
+            ["WelcomeDescription"] = self.addon.name .. " te muestra tus profesiones y las de todos los miembros de tu gremio que también usan " .. self.addon.name .. " en una sola vista general.\n\n" ..
                 "Usa el botón en tu minimapa o el comando de chat /pm para mostrar u ocultar las ventanas correspondientes.\n\n" ..
                 "|cffd4af37Abre ahora tus ventanas de profesiones para compartir tus profesiones.",
 
             -- minimap button
-            ["MinimapButtonTitle"] = addon.shortcut .. addon.name,
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Clic izquierdo:|cffffffff Mostrar vista general|r",
             ["MinimapButtonRightClick"] = "|cff999999Clic derecho:|cffffffff Mostrar/Ocultar materiales faltantes|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic derecho:|cffffffff Ocultar botón del minimapa|r",
@@ -287,6 +284,3 @@ function LocalesModel:Create()
         }
     };
 end
-
--- register model
-addon:RegisterModel(LocalesModel, "locales");

@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-VersionService = {};
-VersionService.__index = VersionService;
+-- create service
+local VersionService = _G.professionMaster:CreateService("version");
 
 --- Initialize service.
 function VersionService:Initialize()
@@ -28,7 +26,7 @@ function VersionService:Initialize()
 
     -- cache own version parts (never changes at runtime)
     self.ownVersionParts = {};
-    for part in string.gmatch(addon.version, "([^.]+)") do
+    for part in string.gmatch(self.addon.version, "([^.]+)") do
         table.insert(self.ownVersionParts, tonumber(part));
     end
 end
@@ -36,7 +34,7 @@ end
 --- Check message.
 function VersionService:CheckMessage(prefix, sender, message)
     -- check if version broadcast sent
-    local versionBroadcastMessage = addon:GetModel("version-broadcast-message");
+    local versionBroadcastMessage = self:GetModel("version-broadcast-message");
     if (prefix == versionBroadcastMessage.prefix) then
         -- handle version broadcast
         self:CheckAndNotify(sender, versionBroadcastMessage:Parse(message).version, true);
@@ -89,13 +87,11 @@ function VersionService:CheckAndNotify(sender, version, isBroadcast)
         end
 
         -- notify user version outdated
-        addon:GetService("chat"):Write("VersionOutdated"); 
+        self:GetService("chat"):Write("VersionOutdated"); 
         self.outdatedVersionNotified = true;
     elseif (self:OwnIsHigher(version)) then
         -- send own version to player
-        addon:GetService("message"):SendToPlayer(sender, addon:GetModel("version-broadcast-message"):Create());
+        self:GetService("message"):SendToPlayer(sender, self:GetModel("version-broadcast-message"):Create());
     end
 end
 
--- register service
-addon:RegisterService(VersionService, "version");

@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
---]] local addon = _G.professionMaster;
+--]]
 
 -- Warth of the lich king skills
 local wrathSkills = {
@@ -3677,5 +3677,5 @@ local wrathSkills = {
     [13858] = {["itemId"] = 38833, ["reagents"] = {[11137] = 6}}
 };
 
--- register model
-addon:RegisterModel(wrathSkills, "wrath-skills");
+-- create model
+_G.professionMaster:CreateModel("wrath-skills", wrathSkills);

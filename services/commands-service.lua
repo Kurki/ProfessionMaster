@@ -16,28 +16,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- handle command line 
-local function CommandHandler(parameters)
+-- create service
+local CommandsService = _G.professionMaster:CreateService("commands");
+
+--- Initialize service.
+function CommandsService:Initialize()
+    -- register slash command
+    local service = self;
+    SLASH_ProfessionMaster1 = "/pm";
+    SlashCmdList["ProfessionMaster"] = function(parameters)
+        service:HandleCommand(parameters);
+    end;
+end
+
+--- Handle command line.
+function CommandsService:HandleCommand(parameters)
     -- check if no parameters entered
-    if (string.len(parameters) <= 0 and not addon.inCombat) then
+    if (string.len(parameters) <= 0 and not self.addon.inCombat) then
         -- show / hide overview
-        addon.professionsView:ToggleVisibility();
+        self.addon.professionsView:ToggleVisibility();
         return;
     end
 
     -- check if overview should be shown
-    if (string.lower(parameters) == "overview" and not addon.inCombat) then
+    if (string.lower(parameters) == "overview" and not self.addon.inCombat) then
         -- show / hide overview
-        addon.professionsView:ToggleVisibility();
+        self.addon.professionsView:ToggleVisibility();
         return;
     end
 
     -- check if help should be shown
     if (string.lower(parameters) == "help") then
         -- write help
-        local chatService = addon:GetService("chat");
+        local chatService = self:GetService("chat");
         chatService:Write("CommandsTitle");
         chatService:Write("CommandsOverview");
         chatService:Write("CommandsReagents");
@@ -50,7 +62,7 @@ local function CommandHandler(parameters)
 
     -- check if overview shoulkd be shown
     if (string.lower(parameters) == "test") then
-        addon:GetService("own-professions"):StoreAndSendOwnProfession(171, {
+        self:GetService("own-professions"):StoreAndSendOwnProfession(171, {
             {
                 skillId = 17187,
                 itemId = 12360,
@@ -62,13 +74,13 @@ local function CommandHandler(parameters)
 
     -- check if overview shoulkd be shown
     if (string.lower(parameters) == "convert") then
-        addon:GetService("professions"):Convert();
+        self:GetService("professions"):Convert();
         return;
     end
 
     -- check if overview shoulkd be shown
     if (string.lower(parameters) == "reagents") then
-        addon:GetService("inventory"):ToggleMissingReagents();
+        self:GetService("inventory"):ToggleMissingReagents();
         return;
     end
 
@@ -81,7 +93,7 @@ local function CommandHandler(parameters)
 
     -- check if purge information must be shown
     if (string.lower(parameters) == "purge") then
-        local chatService = addon:GetService("chat");
+        local chatService = self:GetService("chat");
         chatService:Write("CommandsPurgeRow1");
         chatService:Write("CommandsPurgeRow2");
         chatService:Write("CommandsPurgeRow3");
@@ -91,21 +103,17 @@ local function CommandHandler(parameters)
 
     --check if data msut be purged
     if (string.find(parameters, "purge") == 1 and string.len(parameters) > 6) then
-        addon:GetService("purge"):Purge(string.sub(parameters, 7));
+        self:GetService("purge"):Purge(string.sub(parameters, 7));
     end
 
     -- check if history should be shown
     if (string.lower(parameters) == "debug") then
-        addon:ToggleDebug();
+        self.addon:ToggleDebug();
         return;
     end
 
     -- check if history should be shown
     if (string.lower(parameters) == "trace") then
-        addon:ToggleTrace();
+        self.addon:ToggleTrace();
     end
 end
-
--- register handler
-SLASH_ProfessionMaster1 = "/pm"
-SlashCmdList["ProfessionMaster"] = CommandHandler;

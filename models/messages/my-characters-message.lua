@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define message
-MyCharactersMessage = {};
-MyCharactersMessage.__index = MyCharactersMessage;
+-- create model
+local MyCharactersMessage = _G.professionMaster:CreateModel("my-characters-message");
 MyCharactersMessage.prefix = "MyCharacters";
 
 --- Create message model.
@@ -34,7 +32,7 @@ end
 
 --- Parse message from string.
 function MyCharactersMessage:Parse(value)
-    local messageService = addon:GetService("message");
+    local messageService = self:GetService("message");
     local values = messageService:SplitString(value, ":");
     local message = {
         characterNames = messageService:SplitString(values[1], ",");
@@ -48,5 +46,3 @@ function MyCharactersMessage:ToString()
     return table.concat(self.characterNames, ",");  
 end
 
--- register model
-addon:RegisterModel(MyCharactersMessage, "my-characters-message");

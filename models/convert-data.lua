@@ -16,10 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- define all skills
-local PROFESSION_DATA = {};
-
--- register model
-addon:RegisterModel(PROFESSION_DATA, "convert-data");
+local PROFESSION_DATA = _G.professionMaster:CreateModel("convert-data", {});

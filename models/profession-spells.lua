@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
 -- SkillLine ID -> base Spell ID mapping (used to get localized names via GetSpellInfo)
-local ProfessionSpells = {
+local ProfessionSpells = _G.professionMaster:CreateModel("profession-spells", {
     [164] = 2018,   -- Blacksmithing
     [165] = 2108,   -- Leatherworking
     [171] = 2259,   -- Alchemy
@@ -33,7 +32,4 @@ local ProfessionSpells = {
     [393] = 8613,   -- Skinning
     [755] = 25229,  -- Jewelcrafting
     [773] = 45357,  -- Inscription
-};
-
--- register model
-addon:RegisterModel(ProfessionSpells, "profession-spells");
+});

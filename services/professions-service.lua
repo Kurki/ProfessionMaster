@@ -16,11 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define service
-ProfessionsService = {};
-ProfessionsService.__index = ProfessionsService;
+-- create service
+local ProfessionsService = _G.professionMaster:CreateService("professions");
 
 --- Initialize service.
 function ProfessionsService:Initialize()
@@ -50,7 +47,7 @@ end
 --- Check message.
 function ProfessionsService:CheckMessage(prefix, sender, message)
     -- check if is hello message
-    local HelloMessage = addon:GetModel("hello-message");
+    local HelloMessage = self:GetModel("hello-message");
     if (prefix == HelloMessage.prefix) then
         -- request professions from player
         local helloMessage = HelloMessage:Parse(message);
@@ -59,16 +56,16 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
     end
 
     -- check if is request profession message
-    local RequestProfessionsMessage = addon:GetModel("request-professions-message");
+    local RequestProfessionsMessage = self:GetModel("request-professions-message");
     if (prefix == RequestProfessionsMessage.prefix) then
         -- send all own professions to sender
         local rpMessage = RequestProfessionsMessage:Parse(message);
-        addon:GetService("own-professions"):SendOwnProfessionsToPlayer(sender, rpMessage.storageId, rpMessage.lastSyncDate, rpMessage.sendBack);
+        self:GetService("own-professions"):SendOwnProfessionsToPlayer(sender, rpMessage.storageId, rpMessage.lastSyncDate, rpMessage.sendBack);
         return;
     end
 
     -- check if is my characters message
-    local MyCharactersMessage = addon:GetModel("my-characters-message");
+    local MyCharactersMessage = self:GetModel("my-characters-message");
     if (prefix == MyCharactersMessage.prefix) then
         -- store charater set
         local mcMessage = MyCharactersMessage:Parse(message);
@@ -77,7 +74,7 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
     end
 
     -- check if is player profession message
-    local PlayerProfessionsMessage = addon:GetModel("player-professions-message");
+    local PlayerProfessionsMessage = self:GetModel("player-professions-message");
     if (prefix == PlayerProfessionsMessage.prefix) then
         -- parse message
         local ppMessage = PlayerProfessionsMessage:Parse(message);
@@ -94,7 +91,7 @@ end
 --- Say hello to guild.
 function ProfessionsService:SayHelloToGuild()
     -- send hello message to guild
-    addon:GetService("message"):SendToGuild(addon:GetModel("hello-message"):Create(PMSettings.storageId));
+    self:GetService("message"):SendToGuild(self:GetModel("hello-message"):Create(PMSettings.storageId));
 end
 
 --- Request profession from other player.
@@ -103,7 +100,7 @@ function ProfessionsService:RequestProfessionsFromPlayer(playerName, playerStora
     local lastSyncDate = self:GetLastSyncDate(playerStorageId);
 
     -- send request professions message to player
-    addon:GetService("message"):SendToPlayer(playerName, addon:GetModel("request-professions-message"):Create(PMSettings.storageId, lastSyncDate, sendBack));
+    self:GetService("message"):SendToPlayer(playerName, self:GetModel("request-professions-message"):Create(PMSettings.storageId, lastSyncDate, sendBack));
 end
 
 --- Get last sync date of storage.
@@ -128,7 +125,7 @@ function ProfessionsService:StoreCharacterSet(characterNames)
     end
 
     -- get long names
-    local playerService = addon:GetService('player');
+    local playerService = self:GetService('player');
     for i = 1, #characterNames do
         characterNames[i] = playerService:GetLongName(characterNames[i]);
     end
@@ -174,11 +171,11 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
     -- get profession
     local profession = Professions[professionId];
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
-    local skillsService = addon:GetService("skills");
-    local bopItems = addon:GetModel("bop-items");
+    local skillsService = self:GetService("skills");
+    local bopItems = self:GetModel("bop-items");
 
     -- check skills
     for i, skill in ipairs(skills) do
@@ -194,7 +191,7 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
                 -- get skill link
                 local skillLink = GetSpellLink(skill.skillId);
-                if (addon.isVanilla) then
+                if (self.addon.isVanilla) then
                     skillLink = "|cFF71D5FF|Henchant:" .. skill.skillId .. "|h[" .. spellName .. "]|h|r";
                 else
                     skillLink = GetSpellLink(skill.skillId);
@@ -365,7 +362,7 @@ function ProfessionsService:FindCrafterForSkill(targetSkillId, targetItemId)
     end
 
     -- find player who can craft the skill from guild
-    local playerService = addon:GetService("player");
+    local playerService = self:GetService("player");
     local guildMateOnline = false;
     local eligiblePlayers = {};
     for _, playerName in ipairs(skill.players) do
@@ -409,7 +406,7 @@ function ProfessionsService:FindSkillByName(skillName)
     local skillName = string.sub(skillName, separatorPos + 1);
 
     -- find profession id by name
-    local professionId = addon:GetService("profession-names"):GetProfessionId(professionName);
+    local professionId = self:GetService("profession-names"):GetProfessionId(professionName);
     if (not professionId) then
         return nil;
     end
@@ -433,7 +430,7 @@ end
 
 --- Convert data.
 function ProfessionsService:Convert()
-    local convertData = addon:GetModel('convert-data');
+    local convertData = self:GetModel('convert-data');
     Convert = {};
     --self:ConvertAddon(1, convertData.CLASSIC);
     Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
@@ -443,7 +440,7 @@ function ProfessionsService:Convert()
 end
 function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
     print("Converting " .. addonNumber);
-    local addon = {};
+    local result = {};
     for skillId, skill in pairs(data) do
         local convertedSkill = {
             reagents = {},
@@ -452,10 +449,7 @@ function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
         for i, reagentId in ipairs(skill[6]) do
             convertedSkill.reagents[reagentId] = skill[7][i];
         end
-        addon[skillId] = convertedSkill;
+        result[skillId] = convertedSkill;
     end
-    return addon;
+    return result;
 end
-
--- register service
-addon:RegisterService(ProfessionsService, "professions");

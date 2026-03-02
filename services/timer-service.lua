@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-TimerService = {};
-TimerService.__index = TimerService;
+-- create service
+local TimerService = _G.professionMaster:CreateService("timer");
 
 --- Initialize service.
 function TimerService:Initialize()
@@ -79,6 +77,3 @@ function TimerService:Wait(name, seconds, callback)
         end
     end);
 end
-
--- register service
-addon:RegisterService(TimerService, "timer");

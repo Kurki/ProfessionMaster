@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-OwnProfessionsService = {};
-OwnProfessionsService.__index = OwnProfessionsService;
+-- create service
+local OwnProfessionsService = _G.professionMaster:CreateService("own-professions");
 
 --- Initialize service.
 function OwnProfessionsService:Initialize()
@@ -29,7 +27,7 @@ end
 --- Get own profession data.
 function OwnProfessionsService:GetProfessionData()
     -- check if is in combat
-    if (addon.inCombat) then
+    if (self.addon.inCombat) then
         return;
     end
 
@@ -37,7 +35,7 @@ function OwnProfessionsService:GetProfessionData()
     local professionIsLink, professionPlayerName = IsTradeSkillLinked();
     if (professionIsLink) then
         -- get long name
-        professionPlayerName = addon:GetService("player"):GetLongName(professionPlayerName);
+        professionPlayerName = self:GetService("player"):GetLongName(professionPlayerName);
 
         -- check if is guild mate
         if (not Guildmates or not Guildmates[professionPlayerName]) then
@@ -55,7 +53,7 @@ end
 --- Get own trade skill profession data. 
 function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, professionPlayerName)
     -- get and check profession id
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
     local professionId = professionNamesService:GetProfessionId(GetTradeSkillLine());
     if (not professionId) then
         return;
@@ -65,7 +63,7 @@ function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, pro
     local tradeSkillAmount = GetNumTradeSkills();
 
     -- prepare item ids
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
     local skills = {};
 
     -- iterate trade skills
@@ -108,7 +106,7 @@ function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, pro
     -- chck if is link
     if (professionIsLink) then
         -- add to player professions
-        addon:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
+        self:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
     else
         -- store own profession
         self:StoreAndSendOwnProfession(professionId, skills);
@@ -118,7 +116,7 @@ end
 --- Get own craft skill profession data. 
 function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, professionPlayerName)
     -- get and check profession id
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
     local professionId = professionNamesService:GetProfessionId(GetCraftDisplaySkillLine());
     if (not professionId) then
         return;
@@ -128,7 +126,7 @@ function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, pro
     local craftSkillAmount = GetNumCrafts();
 
     -- prepare item ids
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
     local skills = {};
 
     -- iterate craft skills
@@ -164,7 +162,7 @@ function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, pro
     -- chck if is link
     if (professionIsLink) then
         -- add to player professions
-        addon:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
+        self:GetService("professions"):StorePlayerSkills(professionPlayerName, professionId, skills);
     else
         -- store own profession
         self:StoreAndSendOwnProfession(professionId, skills);
@@ -180,7 +178,7 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
     local newSkills = {};
 
     -- check player
-    local playerName = addon:GetService("player").current;
+    local playerName = self:GetService("player").current;
     if (not OwnProfessions[playerName]) then
         -- add player name
         OwnProfessions[playerName] = {};
@@ -226,8 +224,8 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
     end
 
     -- add to player professions
-    local professionsService = addon:GetService("professions");
-    professionsService:StorePlayerSkills(addon:GetService("player").current, professionId, newSkills);
+    local professionsService = self:GetService("professions");
+    professionsService:StorePlayerSkills(self:GetService("player").current, professionId, newSkills);
 
     -- send hello message
     professionsService:SayHelloToGuild();
@@ -240,7 +238,7 @@ end
 -- @param sendBack Indicates if can sync back.
 function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStorageId, lastSyncDate, sendBack)
     -- iterate all players
-    local playerService = addon:GetService("player");
+    local playerService = self:GetService("player");
     for characterName, professions in pairs(OwnProfessions) do
         -- check if is same realm and same guild
         if (playerService:IsSameRealm(characterName)) then
@@ -257,7 +255,7 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
     -- check if should send back
     if (sendBack) then
         -- request professions from other player
-        addon:GetService("professions"):RequestProfessionsFromPlayer(playerName, playerStorageId, false);
+        self:GetService("professions"):RequestProfessionsFromPlayer(playerName, playerStorageId, false);
     end
 end
 
@@ -268,9 +266,9 @@ function OwnProfessionsService:SendMyCharacters(playerName)
     local messageCharacters = {};
 
     -- get services and model
-    local messageService = addon:GetService("message");
-    local playerService = addon:GetService("player");
-    local MyCharactersMessage = addon:GetModel("my-characters-message");
+    local messageService = self:GetService("message");
+    local playerService = self:GetService("player");
+    local MyCharactersMessage = self:GetModel("my-characters-message");
 
     -- iterate all characters
     for characterName, _ in pairs(OwnProfessions) do
@@ -299,8 +297,8 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
     local messageSkills = {};
 
     -- get service and model
-    local messageService = addon:GetService("message");
-    local PlayerProfessionsMessage = addon:GetModel("player-professions-message");
+    local messageService = self:GetService("message");
+    local PlayerProfessionsMessage = self:GetModel("player-professions-message");
 
     -- iterate all skills
     for skillIndex = 1, #skills do
@@ -336,14 +334,12 @@ function OwnProfessionsService:CheckWelcome()
     end
 
     -- check if player professions read
-    local playerName = addon:GetService("player").current;
+    local playerName = self:GetService("player").current;
     if (OwnProfessions[playerName]) then
         return;
     end
 
     -- show welcome view
-    addon:CreateView("welcome"):Show();
+    self.addon:NewView("welcome"):Show();
 end
 
--- register service
-addon:RegisterService(OwnProfessionsService, "own-professions");

@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-PlayerService = {};
-PlayerService.__index = PlayerService;
+-- create service
+local PlayerService = _G.professionMaster:CreateService("player");
 
 --- Initialize service.
 function PlayerService:Initialize()
@@ -118,7 +116,7 @@ end
 --- Format palyer names.
 function PlayerService:CombinePlayerNames(playerNames, maxAmount)
     -- prepare values
-    local localeService = addon:GetService("locale");
+    local localeService = self:GetService("locale");
     local containsCurrentPlayer = false;
     local ownPlayerNames = {};
     local onlinePlayers = {};
@@ -308,6 +306,3 @@ function PlayerService:FindCharacterSet(characterName)
     end
     return nil;
 end
-
--- register service
-addon:RegisterService(PlayerService, "player");

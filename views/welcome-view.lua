@@ -16,18 +16,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define view
-WelcomeView = {};
-WelcomeView.__index = WelcomeView;
+-- create view
+local WelcomeView = _G.professionMaster:CreateView("welcome");
 
 --- Show welcome view.
 function WelcomeView:Show()
     -- get services
-    local uiService = addon:GetService("ui");
-    local localeService = addon:GetService("locale");
-    local professionNamesService = addon:GetService("profession-names");
+    local uiService = self:GetService("ui");
+    local localeService = self:GetService("locale");
+    local professionNamesService = self:GetService("profession-names");
 
     -- check if view created
     if (self.view == nil) then
@@ -67,6 +65,3 @@ function WelcomeView:Hide()
         self.visible = false;
     end
 end
-
--- register view
-addon:RegisterView(WelcomeView, "welcome");

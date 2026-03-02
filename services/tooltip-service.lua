@@ -16,11 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
-
--- define service
-TooltipService = {};
-TooltipService.__index = TooltipService;
+-- create service
+local TooltipService = _G.professionMaster:CreateService("tooltip");
 
 --- Initialize service.
 function TooltipService:Initialize()
@@ -82,14 +79,14 @@ function TooltipService:CheckTooltip(tooltip)
     local _, itemLink = tooltip:GetItem();
     if (itemLink) then
         -- find skill by item link
-        skillId, skill, professionId = addon:GetService("professions"):FindSkillByItemLink(itemLink);
+        skillId, skill, professionId = self:GetService("professions"):FindSkillByItemLink(itemLink);
     end
 
     -- check for spell id (direct lookup, works for all professions including smelting)
     if (not skill) then
         local _, spellId = tooltip:GetSpell();
         if (spellId) then
-            skillId, skill, professionId = addon:GetService("professions"):FindSkillByIdOrItemId(spellId, nil);
+            skillId, skill, professionId = self:GetService("professions"):FindSkillByIdOrItemId(spellId, nil);
         end
     end
 
@@ -100,7 +97,7 @@ function TooltipService:CheckTooltip(tooltip)
             local text1Obj = _G[tooltipName .. "TextLeft1"];
             local text1 = text1Obj and text1Obj:GetText();
             if (text1 and string.find(text1, ":")) then
-                skillId, skill, professionId = addon:GetService("professions"):FindSkillByName(text1);
+                skillId, skill, professionId = self:GetService("professions"):FindSkillByName(text1);
             end
         end
     end
@@ -111,10 +108,10 @@ function TooltipService:CheckTooltip(tooltip)
     end
 
     -- get player names
-    local playerNames = addon:GetService("player"):CombinePlayerNames(skill.players, 5);
+    local playerNames = self:GetService("player"):CombinePlayerNames(skill.players, 5);
 
     -- get profession icon
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
     local professionIcon = professionNamesService:GetProfessionIcon(professionId);
 
     -- get icon and name of profession
@@ -137,7 +134,7 @@ function TooltipService:ShowTooltip(tooltip, professionId, skillId, skill)
 
     -- clear tooltip
     tooltip:ClearLines();
-    tooltip:SetText(addon:GetService("profession-names"):GetProfessionName(professionId) .. ": " .. skill.name);
+    tooltip:SetText(self:GetService("profession-names"):GetProfessionName(professionId) .. ": " .. skill.name);
 
     -- add reagents
     self:GetTooltipReagents(skillId, function(reagents)
@@ -147,8 +144,8 @@ function TooltipService:ShowTooltip(tooltip, professionId, skillId, skill)
         end
 
         -- add players
-        local playerNames = addon:GetService("player"):CombinePlayerNames(skill.players, 5);
-        tooltip:AddLine("|cffffffff" .. addon:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
+        local playerNames = self:GetService("player"):CombinePlayerNames(skill.players, 5);
+        tooltip:AddLine("|cffffffff" .. self:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
         tooltip:Show();
     end);
 end
@@ -156,7 +153,7 @@ end
 -- Get tooltip reagents.
 function TooltipService:GetTooltipReagents(skillId, callback)
     -- get skills service
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
 
     -- get skill reagents
     local skillInfo = skillsService:GetSkillById(skillId);
@@ -166,7 +163,7 @@ function TooltipService:GetTooltipReagents(skillId, callback)
     end
 
     -- scan inventory
-    local inventoryService = addon:GetService("inventory");
+    local inventoryService = self:GetService("inventory");
     inventoryService:ScanInventory();
 
     -- count reaegnts
@@ -221,6 +218,3 @@ function TooltipService:GetTooltipReagents(skillId, callback)
         end
     end
 end
-
--- register service
-addon:RegisterService(TooltipService, "tooltip");

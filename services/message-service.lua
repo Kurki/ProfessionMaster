@@ -16,11 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define service
-MessageService = {};
-MessageService.__index = MessageService;
+-- create service
+local MessageService = _G.professionMaster:CreateService("message");
 
 --- Initialize service.
 function MessageService:Initialize()
@@ -38,10 +36,10 @@ function MessageService:HandleMessage(prefix, message, sender)
         return;
     end
 
-    addon:LogTrace("MessageService", "HandleMessage", "Got message from " .. sender .. ": " .. message);
+    self.addon:LogTrace("MessageService", "HandleMessage", "Got message from " .. sender .. ": " .. message);
 
     -- check if own player
-    if (addon:GetService("player"):IsCurrentPlayer(sender)) then
+    if (self:GetService("player"):IsCurrentPlayer(sender)) then
          return;
     end
 
@@ -50,8 +48,8 @@ function MessageService:HandleMessage(prefix, message, sender)
     local messageContent = string.sub(message, #messagePrefix + 2);
 
     -- check message
-    addon:GetService("professions"):CheckMessage(messagePrefix, sender, messageContent);
-    addon:GetService("version"):CheckMessage(messagePrefix, sender, messageContent);
+    self:GetService("professions"):CheckMessage(messagePrefix, sender, messageContent);
+    self:GetService("version"):CheckMessage(messagePrefix, sender, messageContent);
 end
 
 --- Split string.
@@ -91,7 +89,7 @@ function MessageService:SendToGroup(message)
     elseif (IsInGroup()) then
         return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "PARTY");
     else
-        return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "WHISPER", addon:GetService("player").current);
+        return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "WHISPER", self:GetService("player").current);
     end
 end
 
@@ -106,7 +104,7 @@ function MessageService:SendToGuild(message)
 
     -- build message string
     local messageString = message.prefix .. ":" .. message:ToString();
-    addon:LogTrace("MessageService", "SendToGuild", "GUILD Message: " .. messageString);
+    self.addon:LogTrace("MessageService", "SendToGuild", "GUILD Message: " .. messageString);
     return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "GUILD");
 end
 
@@ -117,7 +115,7 @@ end
 function MessageService:SendToPlayer(player, message)
     -- build message string
     local messageString = message.prefix .. ":" .. message:ToString();
-    addon:LogTrace("MessageService", "SendToPlayer", "Player Message to " .. player .. ": " .. messageString);
+    self.addon:LogTrace("MessageService", "SendToPlayer", "Player Message to " .. player .. ": " .. messageString);
     return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "WHISPER", player);
 end
 
@@ -134,6 +132,3 @@ function MessageService:SendToPlayers(players, message)
         C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "WHISPER", player);
     end
 end
-
--- register service
-addon:RegisterService(MessageService, "message");

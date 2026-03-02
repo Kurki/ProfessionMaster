@@ -16,17 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local addon = _G.professionMaster;
 
--- define view
-ProfessionsView = {};
-ProfessionsView.__index = ProfessionsView;
+-- create view
+local ProfessionsView = _G.professionMaster:CreateView("professions");
 
 --- Show professions view.
 function ProfessionsView:Show()
     -- get services
-    local uiService = addon:GetService("ui");
-    local localeService = addon:GetService("locale");
+    local uiService = self:GetService("ui");
+    local localeService = self:GetService("locale");
 
     -- check if view created
     if (self.view == nil) then
@@ -35,7 +33,7 @@ function ProfessionsView:Show()
         self.bucketListReagentRows = {};
         self.skills = {};
         self.professionId = nil;
-        self.skillView = addon:CreateView("skill-view");
+        self.skillView = self.addon:NewView("skill-view");
         self.scrollTop = 0;
 
         -- create view
@@ -81,7 +79,7 @@ function ProfessionsView:Show()
         end);
 
         -- get profession ids
-        local professionIds = addon:GetService("profession-names"):GetProfessionIdsToShow();
+        local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
 
         -- add skills frame
         local skillsFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
@@ -131,7 +129,7 @@ function ProfessionsView:Show()
             -- clear and refresh bucket list
             BucketList = {};
             self:CheckBucketList();
-            addon:GetService("inventory"):CheckMissingReagents();
+            self:GetService("inventory"):CheckMissingReagents();
         end);
 
         -- add item search box
@@ -140,7 +138,7 @@ function ProfessionsView:Show()
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
-        if (addon.isVanilla) then
+        if (self.addon.isVanilla) then
             itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -199, -56);
         else
             itemSearch:SetPoint("BOTTOMRIGHT", skillsFrame, "TOPRIGHT", -332, -56);
@@ -175,7 +173,7 @@ function ProfessionsView:Show()
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
-        if (addon.isVanilla) then
+        if (self.addon.isVanilla) then
             professionLabel:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -190, -15);
             professionSelection:SetPoint("TOPRIGHT", -20, -31);
         else
@@ -209,7 +207,7 @@ function ProfessionsView:Show()
         end);
 
         -- check if is not vanilla
-        if (not addon.isVanilla) then
+        if (not self.addon.isVanilla) then
             -- add addon selection
             local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
             addonLabel:SetPoint("TOPRIGHT", -120, -15);
@@ -241,25 +239,25 @@ function ProfessionsView:Show()
                 UIDropDownMenu_AddButton(item);
 
                 -- add bcc
-                if (addon.isBccAtLeast) then
+                if (self.addon.isBccAtLeast) then
                     item.text, item.arg1 = self:GetAddonText(2), 2;
                     UIDropDownMenu_AddButton(item);
                 end
 
                 -- add wrath
-                if (addon.isWrathAtLeast) then
+                if (self.addon.isWrathAtLeast) then
                     item.text, item.arg1 = self:GetAddonText(3), 3;
                     UIDropDownMenu_AddButton(item);
                 end
 
                 -- add cata
-                if (addon.isCataAtLeast) then
+                if (self.addon.isCataAtLeast) then
                     item.text, item.arg1 = self:GetAddonText(4), 4;
                     UIDropDownMenu_AddButton(item);
                 end
 
                 -- add mop
-                if (addon.isMopAtLeast) then
+                if (self.addon.isMopAtLeast) then
                     item.text, item.arg1 = self:GetAddonText(5), 5;
                     UIDropDownMenu_AddButton(item);
                 end
@@ -418,11 +416,11 @@ end
 function ProfessionsView:GetProfessionText(professionId)
     -- check if all selected
     if (professionId == 0) then
-        return "|T133745:16|t " .. addon:GetService("locale"):Get("ProfessionsViewAllProfessions");
+        return "|T133745:16|t " .. self:GetService("locale"):Get("ProfessionsViewAllProfessions");
     end
 
     -- get icon and name of profession
-    local service = addon:GetService("profession-names");
+    local service = self:GetService("profession-names");
     return "|T" .. service:GetProfessionIcon(professionId) .. ":16|t  " .. service:GetProfessionName(professionId);
 end
 
@@ -464,13 +462,13 @@ function ProfessionsView:GetAddonText(addonId)
     end
 
     -- use all addons
-    return "|T135749:16|t " .. addon:GetService("locale"):Get("ProfessionsViewAllAddons");
+    return "|T135749:16|t " .. self:GetService("locale"):Get("ProfessionsViewAllAddons");
 end
 
 --- Select addon.
 function ProfessionsView:SelectAddon(addonId)
     -- check if is vanilla
-    if (addon.isVanilla) then
+    if (self.addon.isVanilla) then
         -- select all addons in vani
         addonId = nil;
     end
@@ -488,8 +486,8 @@ end
 --- Add skills.
 function ProfessionsView:AddSkills()
     -- get services
-    local messageService = addon:GetService("message");
-    local localeService = addon:GetService("locale");
+    local messageService = self:GetService("message");
+    local localeService = self:GetService("locale");
 
     -- set skill text
     if (self.professionId == 333) then
@@ -512,7 +510,7 @@ function ProfessionsView:AddSkills()
     self.bucketListSkillAmount = 0;
     if (self.professionId == 0) then
         -- get profession ids
-        local professionIds = addon:GetService("profession-names"):GetProfessionIdsToShow();
+        local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
         for i, professionId in ipairs(professionIds) do
             self:AddFilteredSkills(professionId, self.addonId, searchParts);    
         end
@@ -558,7 +556,7 @@ end
 function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     -- get profession and all skills
     local profession = Professions[professionId];
-    local skillsService = addon:GetService("skills");
+    local skillsService = self:GetService("skills");
 
     -- filter skills
     if (profession) then
@@ -625,7 +623,7 @@ function ProfessionsView:RefreshRows()
     local visibleCount = endIndex - startIndex + 1;
 
     -- get player service
-    local playerService = addon:GetService("player");
+    local playerService = self:GetService("player");
 
     -- ensure pool has enough frames
     if (not self.rowPool) then
@@ -670,7 +668,7 @@ function ProfessionsView:RefreshRows()
         row:SetScript("OnEnter", function()
             row:SetBackdropColor(0.2, 0.2, 0.2);
             GameTooltip:SetOwner(row, "ANCHOR_LEFT");
-            addon:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
+            self:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
         end);
 
         -- handle row mouse click
@@ -760,10 +758,10 @@ function ProfessionsView:RefreshBucketListRows()
     end
 
     -- get reagents
-    local reagents = addon:GetService("inventory"):GetReagents();
+    local reagents = self:GetService("inventory"):GetReagents();
 
     -- get service
-    local professionNamesService = addon:GetService("profession-names");
+    local professionNamesService = self:GetService("profession-names");
 
     -- show reagents
     local reagentRowAmount = 0;
@@ -865,6 +863,3 @@ function ProfessionsView:RefreshBucketListRows()
         end
     end
 end
-
--- register view
-addon:RegisterView(ProfessionsView, "professions");
