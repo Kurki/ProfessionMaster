@@ -772,7 +772,7 @@ function ProfessionsView:RefreshBucketListRows()
         if (treeRow.isSeparator) then
             currentTop = currentTop + 10;
             treeRow.top = currentTop;
-            currentTop = currentTop + 8;
+            currentTop = currentTop + 23;  -- increased from 8 to 23 to make room for missing reagents header
         else
             if (treeRow.isNode and i > 1) then
                 currentTop = currentTop + 6;
@@ -791,8 +791,16 @@ function ProfessionsView:RefreshBucketListRows()
     end
     self.bucketListSeparator:Hide();
 
+    -- create missing reagents header if not exists
+    if (not self.bucketListMissingReagentsHeader) then
+        local header = self.bucketListScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        self.bucketListMissingReagentsHeader = header;
+    end
+    self.bucketListMissingReagentsHeader:Hide();
+
     -- render tree rows
     local rowIndex = 0;
+    local localeService = self:GetService("locale");
     for _, treeRow in ipairs(treeRows) do
         -- handle separator
         if (treeRow.isSeparator) then
@@ -800,6 +808,12 @@ function ProfessionsView:RefreshBucketListRows()
             self.bucketListSeparator:SetPoint("TOPLEFT", self.bucketListScrollChild, "TOPLEFT", 10, -treeRow.top);
             self.bucketListSeparator:SetPoint("RIGHT", self.bucketListScrollChild, "RIGHT", -30, 0);
             self.bucketListSeparator:Show();
+
+            -- show missing reagents header below separator
+            self.bucketListMissingReagentsHeader:ClearAllPoints();
+            self.bucketListMissingReagentsHeader:SetPoint("TOPLEFT", self.bucketListScrollChild, "TOPLEFT", 10, -(treeRow.top + 9));
+            self.bucketListMissingReagentsHeader:SetText(localeService:Get("ProfessionsViewMissingReagents"));
+            self.bucketListMissingReagentsHeader:Show();
         else
 
         rowIndex = rowIndex + 1;
@@ -879,10 +893,15 @@ function ProfessionsView:RefreshBucketListRows()
         local stocks = treeRow.stocks;
         local amount = treeRow.amount;
         if (amount > 0) then
-            reagentRow.amountText:SetText(math.min(stocks, amount) .. "/" .. amount);
-            if (stocks >= amount) then
-                reagentRow.amountText:SetTextColor(0, 1, 0);
+            if (treeRow.itemId and treeRow.itemId > 0) then
+                reagentRow.amountText:SetText(math.min(stocks, amount) .. "/" .. amount);
+                if (stocks >= amount) then
+                    reagentRow.amountText:SetTextColor(0, 1, 0);
+                else
+                    reagentRow.amountText:SetTextColor(1, 1, 1);
+                end
             else
+                reagentRow.amountText:SetText(amount);
                 reagentRow.amountText:SetTextColor(1, 1, 1);
             end
         else
@@ -898,9 +917,9 @@ function ProfessionsView:RefreshBucketListRows()
             reagentRow.amountText:SetFontObject("GameFontHighlightSmall");
         end
 
-        -- load item info
+        -- load item or spell info
         local reagentItemId = treeRow.itemId;
-        if (reagentItemId and C_Item.DoesItemExistByID(reagentItemId)) then
+        if (reagentItemId and reagentItemId > 0 and C_Item.DoesItemExistByID(reagentItemId)) then
             local item = Item:CreateFromItemID(reagentItemId);
             if (not item:IsItemEmpty()) then
                 pcall(function()
@@ -910,6 +929,13 @@ function ProfessionsView:RefreshBucketListRows()
                         reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
                     end);
                 end);
+            end
+        elseif (treeRow.skillId) then
+            local spellName, _, spellIcon = GetSpellInfo(treeRow.skillId);
+            if (spellName) then
+                reagentRow.itemLink = GetSpellLink(treeRow.skillId);
+                reagentRow.iconText:SetText("|T" .. (spellIcon or 136243) .. ":16|t");
+                reagentRow.itemText:SetText("|cFF71D5FF" .. spellName);
             end
         end
     end -- if not separator
@@ -924,7 +950,7 @@ end
 -- Each node shows its direct reagents indented below, scaled to the missing amount.
 -- @param skillsService Skills service reference.
 -- @param inventoryService Inventory service reference.
--- @return Array of { itemId, amount, stocks, indent, isNode }.
+-- @return Array of { itemId, skillId, amount, stocks, indent, isNode }.
 function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     local directRows = {};
     local derivedRows = {};
@@ -934,7 +960,7 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     local currentNodes = {};
     for skillId, skillAmount in pairs(BucketList) do
         local skillInfo = skillsService:GetSkillById(skillId);
-        if (skillInfo and skillInfo.itemId) then
+        if (skillInfo) then
             table.insert(currentNodes, {
                 itemId = skillInfo.itemId,
                 skillId = skillId,
@@ -947,11 +973,15 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     local nextReagents = {};
     local leafReagents = {};
     for _, node in ipairs(currentNodes) do
-        local stocks = inventoryService:GetItemAmount(node.itemId);
+        local stocks = 0;
+        if (node.itemId and node.itemId > 0) then
+            stocks = inventoryService:GetItemAmount(node.itemId);
+        end
 
         -- add main node row
         table.insert(directRows, {
             itemId = node.itemId,
+            skillId = node.skillId,
             amount = node.amount,
             stocks = stocks,
             indent = 0,
@@ -959,7 +989,12 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
         });
 
         -- calculate missing quantity
-        local missing = math.max(0, node.amount - stocks);
+        local missing;
+        if (node.itemId and node.itemId > 0) then
+            missing = math.max(0, node.amount - stocks);
+        else
+            missing = node.amount;
+        end
 
         -- add reagent rows for missing amount
         if (missing > 0) then
@@ -1012,21 +1047,32 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
         });
     end
 
+    -- check current nodes
     while (#currentNodes > 0) do
         local nextLevel = {};
 
         for _, node in ipairs(currentNodes) do
-            local stocks = inventoryService:GetItemAmount(node.itemId);
+            local stocks = 0;
+            if (node.itemId and node.itemId > 0) then
+                stocks = inventoryService:GetItemAmount(node.itemId);
+            end
 
             table.insert(derivedRows, {
                 itemId = node.itemId,
+                skillId = node.skillId,
                 amount = node.amount,
                 stocks = stocks,
                 indent = 0,
                 isNode = true,
             });
 
-            local missing = math.max(0, node.amount - stocks);
+            -- calculate missing
+            local missing;
+            if (node.itemId and node.itemId > 0) then
+                missing = math.max(0, node.amount - stocks);
+            else
+                missing = node.amount;
+            end
             if (missing > 0) then
                 local skillInfo = skillsService:GetSkillById(node.skillId);
                 if (skillInfo and skillInfo.reagents) then
@@ -1100,4 +1146,16 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     end
 
     return treeRows;
+end
+--- Format price in copper to display string.
+-- @param copper Amount in copper.
+-- @return Formatted price string.
+function ProfessionsView:FormatPrice(copper)
+    if (copper >= 10000) then
+        return string.format('%.2f|cffffaa00g|r', copper / 10000);
+    elseif (copper >= 100) then
+        return string.format('%.1f|cffc7b377s|r', copper / 100);
+    else
+        return copper .. '|cff95524c|rp';
+    end
 end
