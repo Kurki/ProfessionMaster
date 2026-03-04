@@ -28,13 +28,12 @@ function MissingReagentsView:Show(missingReagents)
         self.view = view;
 
         -- add close button
-        local closeButton = CreateFrame("Button", nil, view, "UIPanelCloseButton");
-        closeButton:SetHeight(24);
-        closeButton:SetWidth(24);
-        closeButton:SetPoint("TOPRIGHT", -7, -8);
-        closeButton:SetScript("OnClick", function()
+        local closeButton = uiService:CreateFlatCloseButton(view, function()
             self:GetService("inventory"):ToggleMissingReagents();
         end);
+        closeButton:SetHeight(20);
+        closeButton:SetWidth(20);
+        closeButton:SetPoint("TOPRIGHT", -12, -8);
         closeButton:Hide();
 
         -- bind events

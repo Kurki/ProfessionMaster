@@ -43,7 +43,7 @@ function LocalesModel:Create()
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Right Click:|cffffffff Hide minimap button|r",
 
             -- provession view
-            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Overview v" .. self.addon.version,
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Overview - v" .. self.addon.version,
             ["ProfessionsViewProfession"] = "Profession",
             ["ProfessionsViewAllProfessions"] = "All Professions",
             ["ProfessionsViewAddon"] = "Addon",
@@ -108,7 +108,7 @@ function LocalesModel:Create()
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
 
             -- provession view
-            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Übersicht v" .. self.addon.version,
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Übersicht - v" .. self.addon.version,
             ["ProfessionsViewProfession"] = "Beruf",
             ["ProfessionsViewAllProfessions"] = "Alle Berufe",
             ["ProfessionsViewAddon"] = "Addon",
@@ -173,7 +173,7 @@ function LocalesModel:Create()
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Правый клик:|cffffffff Скрыть кнопку на миникарте|r",
 
             -- profession view
-            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Обзор v" .. self.addon.version,
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Обзор - v" .. self.addon.version,
             ["ProfessionsViewProfession"] = "Профессия",
             ["ProfessionsViewAllProfessions"] = "Все профессии",
             ["ProfessionsViewAddon"] = "Аддон",
@@ -238,7 +238,7 @@ function LocalesModel:Create()
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic derecho:|cffffffff Ocultar botón del minimapa|r",
 
             -- profession view
-            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Vista general v" .. self.addon.version,
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Vista general - v" .. self.addon.version,
             ["ProfessionsViewProfession"] = "Profesión",
             ["ProfessionsViewAllProfessions"] = "Todas las profesiones",
             ["ProfessionsViewAddon"] = "Addon",

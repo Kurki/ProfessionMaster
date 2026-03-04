@@ -31,13 +31,12 @@ function SkillView:Show(skillRow, professionsView)
         self.view = view;
 
         -- add close button
-        local closeButton = CreateFrame("Button", nil, view, "UIPanelCloseButton");
-        closeButton:SetHeight(24);
-        closeButton:SetWidth(24);
-        closeButton:SetPoint("TOPRIGHT", -5, -7);
-        closeButton:SetScript("OnClick", function()
+        local closeButton = uiService:CreateFlatCloseButton(view, function()
             professionsView:HideSkillView();
         end);
+        closeButton:SetHeight(22);
+        closeButton:SetWidth(22);
+        closeButton:SetPoint("TOPRIGHT", -12, -8);
 
         -- add players frame
         local playersFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
@@ -49,7 +48,7 @@ function SkillView:Show(skillRow, professionsView)
         playersFrame:SetBackdropColor(0, 0, 0, 0.5);
         playersFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
         playersFrame:SetPoint("TOPLEFT", 12, -36);
-        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 40);
+        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 42);
         self.playersFrame = playersFrame;
 
         -- add players label
@@ -80,7 +79,7 @@ function SkillView:Show(skillRow, professionsView)
         bucketListFrame:SetBackdropColor(0, 0, 0, 0.5);
         bucketListFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
         bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
-        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 40);
+        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 42);
         self.bucketListFrame = bucketListFrame;
 
         -- add bucket list label
@@ -94,14 +93,7 @@ function SkillView:Show(skillRow, professionsView)
         self.bucketListAmountText = bucketListAmountText;
 
         -- amount plus button
-        local amountPlusButton = CreateFrame("Button", nil, bucketListFrame);
-        amountPlusButton:SetHeight(20);
-        amountPlusButton:SetWidth(20);
-        amountPlusButton:SetPoint("LEFT", bucketListAmountText, "RIGHT", 10, 0);
-        amountPlusButton:SetPushedTexture("Interface\\Buttons\\UI-AttributeButton-Encourage-Down");
-        amountPlusButton:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
-        amountPlusButton:SetNormalTexture("Interface\\Buttons\\UI-AttributeButton-Encourage-Up");
-        amountPlusButton:SetScript("OnClick", function()
+        local amountPlusButton = uiService:CreateFlatSquareButton(bucketListFrame, "+", function()
             -- update amount
             BucketList[self.skillId] = self.bucketListAmount + 1;
             self:RefreshBucketListAmount();
@@ -109,18 +101,12 @@ function SkillView:Show(skillRow, professionsView)
 
             -- check missing ragents
             self:GetService("inventory"):CheckMissingReagents();
-        end);
+        end, 20);
+        amountPlusButton:SetPoint("LEFT", bucketListAmountText, "RIGHT", 10, 0);
         self.amountPlusButton = amountPlusButton;
 
         -- amount minus button
-        local amountMinusButton = CreateFrame("Button", nil, bucketListFrame);
-        amountMinusButton:SetHeight(20);
-        amountMinusButton:SetWidth(20);
-        amountMinusButton:SetPoint("LEFT", amountPlusButton, "RIGHT", 3, 0);
-        amountMinusButton:SetPushedTexture("Interface\\Buttons\\UI-MinusButton-Down");
-        amountMinusButton:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight");
-        amountMinusButton:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up");
-        amountMinusButton:SetScript("OnClick", function()
+        local amountMinusButton = uiService:CreateFlatSquareButton(bucketListFrame, "-", function()
             -- update amount
             if (self.bucketListAmount <= 1) then
                 BucketList[self.skillId] = nil;
@@ -132,18 +118,12 @@ function SkillView:Show(skillRow, professionsView)
 
             -- check missing ragents
             self:GetService("inventory"):CheckMissingReagents();
-        end);
+        end, 20);
+        amountMinusButton:SetPoint("LEFT", amountPlusButton, "RIGHT", 3, 0);
         self.amountMinusButton = amountMinusButton;
 
         -- add clear button
-        local clearButton = CreateFrame("Button", nil, bucketListFrame);
-        clearButton:SetHeight(32);
-        clearButton:SetWidth(32);
-        clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", -5, -1.5);
-        clearButton:SetPushedTexture("Interface\\Buttons\\CancelButton-Down");
-        clearButton:SetHighlightTexture("Interface\\Buttons\\CancelButton-Highlight");
-        clearButton:SetNormalTexture("Interface\\Buttons\\CancelButton-Up");
-        clearButton:SetScript("OnClick", function()
+        local clearButton = uiService:CreateFlatSquareButton(bucketListFrame, "x", function()
             -- update amount
             BucketList[self.skillId] = nil;
             self:RefreshBucketListAmount();
@@ -151,16 +131,17 @@ function SkillView:Show(skillRow, professionsView)
 
             -- check missing ragents
             self:GetService("inventory"):CheckMissingReagents();
-        end);
+        end, 20);
+        clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", 3, 0);
         self.clearButton = clearButton;
 
         -- create ok button
-        local okButton = uiService:CreateButton(view, localeService:Get("SkillViewOk"), function()
+        local okButton = uiService:CreateFlatButton(view, localeService:Get("SkillViewOk"), function()
             professionsView:HideSkillView();
         end);
         okButton:SetWidth(100);
-        okButton:SetHeight(27);
-        okButton:SetPoint("BOTTOMRIGHT", -10, 8);
+        okButton:SetHeight(22);
+        okButton:SetPoint("BOTTOMRIGHT", -12, 8);
     end
 
     -- update item text and skill id
