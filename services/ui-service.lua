@@ -19,7 +19,7 @@ function UiService:Initialize()
 end
 
 -- create frame
-function UiService:CreateView(name, width, height, title)
+function UiService:CreateView(name, width, height, title, showShortcut)
     -- create view
     local view = CreateFrame("Frame", nil, nil, BackdropTemplateMixin and "BackdropTemplate");
     view:SetFrameStrata("HIGH");
@@ -46,7 +46,11 @@ function UiService:CreateView(name, width, height, title)
     -- add title
     local titleLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
     titleLabel:SetPoint("TOPLEFT", 16, -14);
-    titleLabel:SetText(self.addon.shortcut .. (title or ""));
+    local titleText = title or "";
+    if (showShortcut ~= false) then
+        titleText = self.addon.shortcut .. titleText;
+    end
+    titleLabel:SetText(titleText);
     view.titleLabel = titleLabel;
 
     -- set moveable

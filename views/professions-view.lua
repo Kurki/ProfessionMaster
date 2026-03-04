@@ -25,7 +25,7 @@ function ProfessionsView:Show()
         self.scrollTop = 0;
 
         -- create view
-        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"));
+        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"), false);
         view:EnableKeyboard();
         view:SetScript("OnKeyDown", function(_, key)
             -- check escape
