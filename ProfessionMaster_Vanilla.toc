@@ -2,11 +2,16 @@
 ## Interface: 11508
 ## X-Min-Interface: 11508
 ## Category: Professions
+## Category-deDE: Berufe
+## X-Category: Professions
+## X-Category-deDE: Berufe
 ## Group: Professions
-## Title: Profession Master |cffDA8CFF[PM] - Vanilla
+## Title: |cffDA8CFFProfession Master |c999999FFVanilla
+## Title-deDE: |cffDA8CFFProfession Master |c999999FFVanilla
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
 ## Version: 3.1.0
+## IconTexture: Interface\AddOns\ProfessionMaster\icons\pm.png
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates, Convert, PlayerFactions
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 ## X-Curse-Project-ID: 574050
