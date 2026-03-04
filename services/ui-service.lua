@@ -85,6 +85,65 @@ function UiService:CreateButton(container, text, onClick)
     return button;
 end
 
+--- Create flat button.
+-- @param container Container of button.
+-- @param text Text of button.
+-- @param onClick Callback function, triggered on button click.
+function UiService:CreateFlatButton(container, text, onClick)
+    local button = CreateFrame("Button", nil, container, BackdropTemplateMixin and "BackdropTemplate");
+    button:SetBackdrop({
+        bgFile = [[Interface/Buttons/WHITE8X8]],
+        edgeFile = [[Interface/Buttons/WHITE8X8]],
+        edgeSize = 1
+    });
+    button:SetBackdropColor(0.12, 0.12, 0.12, 0.95);
+    button:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    button:SetText(text);
+    button:SetNormalFontObject("GameFontNormal");
+    button:SetHighlightFontObject("GameFontHighlight");
+
+    button:SetScript("OnMouseDown", function(self)
+        self:SetBackdropColor(0.08, 0.08, 0.08, 0.95);
+        self:SetBackdropBorderColor(0.28, 0.28, 0.28, 0.4);
+    end);
+    button:SetScript("OnMouseUp", function(self)
+        self:SetBackdropColor(0.12, 0.12, 0.12, 0.95);
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    end);
+    button:SetScript("OnEnter", function(self)
+        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.62);
+    end);
+    button:SetScript("OnLeave", function(self)
+        self:SetBackdropColor(0.12, 0.12, 0.12, 0.95);
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    end);
+    button:SetScript("OnClick", onClick);
+    return button;
+end
+
+--- Create flat square button.
+-- @param container Container of button.
+-- @param text Text of button.
+-- @param onClick Callback function, triggered on button click.
+-- @param size Optional size of button. Default is 20.
+function UiService:CreateFlatSquareButton(container, text, onClick, size)
+    local button = self:CreateFlatButton(container, text, onClick);
+    local buttonSize = size or 20;
+    button:SetWidth(buttonSize);
+    button:SetHeight(buttonSize);
+    return button;
+end
+
+--- Create flat close button.
+-- @param container Container of button.
+-- @param onClick Callback function, triggered on button click.
+function UiService:CreateFlatCloseButton(container, onClick)
+    local button = self:CreateFlatSquareButton(container, "X", onClick, 18);
+    button:SetNormalFontObject("GameFontHighlightSmall");
+    button:SetHighlightFontObject("GameFontHighlight");
+    return button;
+end
+
 --- Create icon button.
 -- @param container Container of button.
 -- @param iconName Icon of button.

@@ -58,13 +58,12 @@ function ProfessionsView:Show()
         self.view = view;
 
         -- add close button
-        local closeButton = CreateFrame("Button", nil, view, "UIPanelCloseButton");
-        closeButton:SetHeight(24);
-        closeButton:SetWidth(24);
-        closeButton:SetPoint("TOPRIGHT", -5, -7);
-        closeButton:SetScript("OnClick", function()
+        local closeButton = uiService:CreateFlatCloseButton(view, function()
             self:Hide();
         end);
+        closeButton:SetHeight(22);
+        closeButton:SetWidth(22);
+        closeButton:SetPoint("TOPRIGHT", -12, -8);
 
         -- get profession ids
         local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
@@ -116,19 +115,13 @@ function ProfessionsView:Show()
         bucketListTitleText:SetText(localeService:Get("ProfessionsViewBucketList"));
 
         -- add bucket list clear button
-        local bucketListClearButton = CreateFrame("Button", nil, bucketListFrame);
-        bucketListClearButton:SetHeight(32);
-        bucketListClearButton:SetWidth(32);
-        bucketListClearButton:SetPoint("TOPRIGHT", -4, -7);
-        bucketListClearButton:SetPushedTexture("Interface\\Buttons\\CancelButton-Down");
-        bucketListClearButton:SetHighlightTexture("Interface\\Buttons\\CancelButton-Highlight");
-        bucketListClearButton:SetNormalTexture("Interface\\Buttons\\CancelButton-Up");
-        bucketListClearButton:SetScript("OnClick", function()
+        local bucketListClearButton = uiService:CreateFlatSquareButton(bucketListFrame, "x", function()
             -- clear and refresh bucket list
             BucketList = {};
             self:CheckBucketList();
             self:GetService("inventory"):CheckMissingReagents();
-        end);
+        end, 20);
+        bucketListClearButton:SetPoint("TOPRIGHT", -8, -10);
 
         -- add item search box
         local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -179,6 +172,16 @@ function ProfessionsView:Show()
             professionSelection:SetPoint("TOPRIGHT", -153, -31);
         end
         UIDropDownMenu_SetWidth(professionSelection, 140);
+        if (professionSelection.Button) then
+            professionSelection.Button:HookScript("OnClick", function()
+                C_Timer.After(0, function()
+                    if (DropDownList1 and DropDownList1:IsShown() and DropDownList1.dropdown == professionSelection) then
+                        DropDownList1:ClearAllPoints();
+                        DropDownList1:SetPoint("TOPRIGHT", professionSelection, "BOTTOMRIGHT", -18, 6);
+                    end
+                end);
+            end);
+        end
         self.professionSelection = professionSelection;
         UIDropDownMenu_Initialize(professionSelection, function()
             -- create item
@@ -214,6 +217,16 @@ function ProfessionsView:Show()
             addonSelection:ClearAllPoints();
             addonSelection:SetPoint("TOPRIGHT", -20, -31);
             UIDropDownMenu_SetWidth(addonSelection, 110);
+            if (addonSelection.Button) then
+                addonSelection.Button:HookScript("OnClick", function()
+                    C_Timer.After(0, function()
+                        if (DropDownList1 and DropDownList1:IsShown() and DropDownList1.dropdown == addonSelection) then
+                            DropDownList1:ClearAllPoints();
+                            DropDownList1:SetPoint("TOPRIGHT", addonSelection, "BOTTOMRIGHT", -18, 6);
+                        end
+                    end);
+                end);
+            end
             self.addonSelection = addonSelection;
             UIDropDownMenu_Initialize(addonSelection, function()
                 -- create item
@@ -319,12 +332,12 @@ function ProfessionsView:Show()
         self:SelectAddon(PMSettings.lastAddon);
 
         -- create ok button
-        local okButton = uiService:CreateButton(view, localeService:Get("ProfessionsViewAnnounce"), function()
+        local okButton = uiService:CreateFlatButton(view, localeService:Get("ProfessionsViewAnnounce"), function()
             SendChatMessage(localeService:Get("GuildAnnouncement"), "GUILD");
         end);
         okButton:SetWidth(200);
-        okButton:SetHeight(20);
-        okButton:SetPoint("BOTTOMRIGHT", -10, 6);
+        okButton:SetHeight(22);
+        okButton:SetPoint("BOTTOMRIGHT", -12, 6);
     end
 
     -- hide skill view
