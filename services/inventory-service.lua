@@ -72,21 +72,31 @@ function InventoryService:GetReagents()
     local skillsService = self:GetService("skills");
     local watchedReagents = ReagentWatchList or {};
 
+    -- scan inventory
+    self:ScanInventory();
+
     -- build initial reagent demand from bucket list
+    -- only count reagents for the MISSING amount of the end product
     local demanded = {};
     for skillId, skillAmount in pairs(BucketList) do
         -- get skill reagents
         local skillInfo = skillsService:GetSkillById(skillId);
         if (skillInfo) then
-            -- iterate skill reagents
-            for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
-                demanded[reagentItemId] = (demanded[reagentItemId] or 0) + skillAmount * reagentAmount;
+            -- subtract stocks of the end product from the demanded amount
+            local missingAmount = skillAmount;
+            if (skillInfo.itemId and skillInfo.itemId > 0) then
+                local productStocks = self.inventory[skillInfo.itemId] or 0;
+                missingAmount = math.max(0, skillAmount - productStocks);
+            end
+
+            -- only demand reagents for the missing crafts
+            if (missingAmount > 0) then
+                for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
+                    demanded[reagentItemId] = (demanded[reagentItemId] or 0) + missingAmount * reagentAmount;
+                end
             end
         end
     end
-
-    -- scan inventory
-    self:ScanInventory();
 
     -- recursively expand watchlisted craftable reagents
     -- (watchlisted items themselves are removed from output)
