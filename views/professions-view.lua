@@ -825,7 +825,7 @@ function ProfessionsView:RefreshBucketListRows()
             -- show missing reagents header below separator
             self.bucketListMissingReagentsHeader:ClearAllPoints();
             self.bucketListMissingReagentsHeader:SetPoint("TOPLEFT", self.bucketListScrollChild, "TOPLEFT", 10, -(treeRow.top + 9));
-            self.bucketListMissingReagentsHeader:SetText(localeService:Get("ProfessionsViewMissingReagents"));
+            self.bucketListMissingReagentsHeader:SetText(localeService:Get("ProfessionsViewCraftSelf"));
             self.bucketListMissingReagentsHeader:Show();
         else
 
@@ -939,6 +939,7 @@ function ProfessionsView:RefreshBucketListRows()
         reagentRow.itemLink = nil;
         reagentRow.craftButton:Hide();
         reagentRow.isIndented = indent > 0;
+        reagentRow.craftItemId = treeRow.itemId;
         reagentRow.craftSkillId = nil;
         if (reagentRow.isIndented and treeRow.itemId and treeRow.itemId > 0) then
             reagentRow.craftSkillId = skillsService:GetSkillIdByItemId(treeRow.itemId);
@@ -1034,11 +1035,21 @@ end
 --- Handle click on craft button in bucket list row.
 -- @param reagentRow Bucket list reagent row.
 function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
-    if (not reagentRow or not reagentRow.craftSkillId) then
+    if (not reagentRow or not reagentRow.craftSkillId or not reagentRow.craftItemId) then
         return;
     end
 
-    -- placeholder for future behavior
+    if (not ReagentWatchList) then
+        ReagentWatchList = {};
+    end
+
+    if (ReagentWatchList[reagentRow.craftItemId]) then
+        ReagentWatchList[reagentRow.craftItemId] = nil;
+    else
+        ReagentWatchList[reagentRow.craftItemId] = true;
+    end
+
+    self:RefreshBucketListRows();
 end
 
 --- Build a flat tree of bucket list nodes and their reagents.
@@ -1051,6 +1062,7 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     local directRows = {};
     local derivedRows = {};
     local visited = {};
+    local watchedReagents = ReagentWatchList or {};
 
     -- collect initial nodes from bucket list
     local currentNodes = {};
@@ -1114,17 +1126,12 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
                     if (reagentMissing > 0) then
                         local reagentSkillId = skillsService:GetSkillIdByItemId(reagentItemId);
                         if (reagentSkillId) then
-                            if (not visited[reagentItemId]) then
+                            if (watchedReagents[reagentItemId] and not visited[reagentItemId]) then
                                 if (not nextReagents[reagentItemId]) then
                                     nextReagents[reagentItemId] = { skillId = reagentSkillId, amount = 0 };
                                 end
                                 nextReagents[reagentItemId].amount = nextReagents[reagentItemId].amount + needed;
                             end
-                        else
-                            if (not leafReagents[reagentItemId]) then
-                                leafReagents[reagentItemId] = 0;
-                            end
-                            leafReagents[reagentItemId] = leafReagents[reagentItemId] + needed;
                         end
                     end
                 end

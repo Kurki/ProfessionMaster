@@ -21,6 +21,7 @@ if (not SyncTimes) then SyncTimes = {}; end
 if (not Logs) then Logs = {}; end
 if (not CharacterSets) then CharacterSets = {}; end
 if (not BucketList) then BucketList = {}; end
+if (not ReagentWatchList) then ReagentWatchList = {}; end
 if (not CharacterSettings) then CharacterSettings = {}; end
 if (not Guildmates) then Guildmates = {}; end
 if (not PlayerFactions) then PlayerFactions = {}; end

@@ -12,7 +12,7 @@
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
 ## Version: 3.1.0
 ## IconTexture: Interface\AddOns\ProfessionMaster\icons\pm.png
-## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, Guildmates, Convert, PlayerFactions
+## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, ReagentWatchList, Guildmates, Convert, PlayerFactions
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
 ## X-Curse-Project-ID: 574050
 
