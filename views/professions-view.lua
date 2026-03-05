@@ -839,12 +839,16 @@ function ProfessionsView:RefreshBucketListRows()
 
             -- bind row mouse events
             reagentRow:SetScript("OnLeave", function()
-                reagentRow:SetBackdropColor(reagentRow.bgColor, reagentRow.bgColor, reagentRow.bgColor, 0.5);
-                GameTooltip:Hide();
+                C_Timer.After(0, function()
+                    self:UpdateBucketListReagentRowHoverState(reagentRow);
+                    if (not reagentRow:IsMouseOver() and not reagentRow.craftButton:IsMouseOver()) then
+                        GameTooltip:Hide();
+                    end
+                end);
             end);
             reagentRow:SetScript("OnEnter", function()
-                reagentRow:SetBackdropColor(0.2, 0.2, 0.2);
-                if (reagentRow.itemLink) then
+                self:UpdateBucketListReagentRowHoverState(reagentRow);
+                if (reagentRow.itemLink and not reagentRow.craftButton:IsMouseOver()) then
                     GameTooltip:SetOwner(reagentRow, "ANCHOR_LEFT");
                     GameTooltip:SetHyperlink(reagentRow.itemLink);
                     GameTooltip:Show();
@@ -861,9 +865,41 @@ function ProfessionsView:RefreshBucketListRows()
             amountText:SetJustifyH("RIGHT");
             reagentRow.amountText = amountText;
 
+            -- add craft button (hammer)
+            local craftButton = CreateFrame("Button", nil, reagentRow);
+            craftButton:SetSize(14, 14);
+            craftButton:SetPoint("RIGHT", amountText, "LEFT", -8, 0);
+            local craftIcon = craftButton:CreateTexture(nil, "ARTWORK");
+            craftIcon:SetAllPoints();
+            craftIcon:SetTexture([[Interface\Icons\INV_Hammer_01]]);
+            craftButton.icon = craftIcon;
+            craftButton:SetScript("OnClick", function()
+                self:OnBucketListCraftButtonClicked(reagentRow);
+            end);
+            craftButton:SetScript("OnEnter", function()
+                self:UpdateBucketListReagentRowHoverState(reagentRow);
+                GameTooltip:SetOwner(craftButton, "ANCHOR_RIGHT");
+                GameTooltip:SetText(self:GetService("locale"):Get("ProfessionsViewCraftSelf"));
+                GameTooltip:Show();
+            end);
+            craftButton:SetScript("OnLeave", function()
+                C_Timer.After(0, function()
+                    self:UpdateBucketListReagentRowHoverState(reagentRow);
+                    if (reagentRow:IsMouseOver() and reagentRow.itemLink) then
+                        GameTooltip:SetOwner(reagentRow, "ANCHOR_LEFT");
+                        GameTooltip:SetHyperlink(reagentRow.itemLink);
+                        GameTooltip:Show();
+                    else
+                        GameTooltip:Hide();
+                    end
+                end);
+            end);
+            craftButton:Hide();
+            reagentRow.craftButton = craftButton;
+
             -- add item text
             local itemText = reagentRow:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            itemText:SetPoint("BOTTOMRIGHT", amountText, "BOTTOMLEFT", -8, 0);
+            itemText:SetPoint("BOTTOMRIGHT", craftButton, "BOTTOMLEFT", -6, 0);
             itemText:SetJustifyH("LEFT");
             itemText:SetJustifyV("TOP");
             reagentRow.itemText = itemText;
@@ -897,10 +933,16 @@ function ProfessionsView:RefreshBucketListRows()
         reagentRow.iconText:SetPoint("TOPLEFT", 3, -3);
         reagentRow.itemText:ClearAllPoints();
         reagentRow.itemText:SetPoint("TOPLEFT", 24, -4);
-        reagentRow.itemText:SetPoint("BOTTOMRIGHT", reagentRow.amountText, "BOTTOMLEFT", -8, 0);
+        reagentRow.itemText:SetPoint("BOTTOMRIGHT", reagentRow.craftButton, "BOTTOMLEFT", -6, 0);
 
         reagentRow:Show();
         reagentRow.itemLink = nil;
+        reagentRow.craftButton:Hide();
+        reagentRow.isIndented = indent > 0;
+        reagentRow.craftSkillId = nil;
+        if (reagentRow.isIndented and treeRow.itemId and treeRow.itemId > 0) then
+            reagentRow.craftSkillId = skillsService:GetSkillIdByItemId(treeRow.itemId);
+        end
 
         -- update amount
         local stocks = treeRow.stocks;
@@ -956,6 +998,47 @@ function ProfessionsView:RefreshBucketListRows()
 
     -- update scroll child height
     self.bucketListScrollChild:SetHeight(currentTop + 5);
+end
+
+--- Show or hide craft button for a hovered bucket list row.
+-- @param reagentRow Bucket list reagent row.
+function ProfessionsView:UpdateBucketListCraftButtonVisibility(reagentRow)
+    if (not reagentRow or not reagentRow.craftButton) then
+        return;
+    end
+
+    if (reagentRow.isIndented and reagentRow.craftSkillId and reagentRow:IsMouseOver()) then
+        reagentRow.craftButton:Show();
+    else
+        reagentRow.craftButton:Hide();
+    end
+end
+
+--- Update hover visuals for bucket list row and craft button.
+-- @param reagentRow Bucket list reagent row.
+function ProfessionsView:UpdateBucketListReagentRowHoverState(reagentRow)
+    if (not reagentRow) then
+        return;
+    end
+
+    local isHovered = reagentRow:IsMouseOver() or (reagentRow.craftButton and reagentRow.craftButton:IsMouseOver());
+    if (isHovered) then
+        reagentRow:SetBackdropColor(0.2, 0.2, 0.2);
+    else
+        reagentRow:SetBackdropColor(reagentRow.bgColor, reagentRow.bgColor, reagentRow.bgColor, 0.5);
+    end
+
+    self:UpdateBucketListCraftButtonVisibility(reagentRow);
+end
+
+--- Handle click on craft button in bucket list row.
+-- @param reagentRow Bucket list reagent row.
+function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
+    if (not reagentRow or not reagentRow.craftSkillId) then
+        return;
+    end
+
+    -- placeholder for future behavior
 end
 
 --- Build a flat tree of bucket list nodes and their reagents.
