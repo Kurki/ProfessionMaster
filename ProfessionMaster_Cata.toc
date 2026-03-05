@@ -10,7 +10,7 @@
 ## Title-deDE: |cffDA8CFFProfession Master |c999999FFCataclysm
 ## Notes: See your professions, those of your guild and those of your friends.
 ## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 3.1.0
+## Version: 3.2.0
 ## IconTexture: Interface\AddOns\ProfessionMaster\icons\pm.png
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, ReagentWatchList, Guildmates, Convert, PlayerFactions
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
