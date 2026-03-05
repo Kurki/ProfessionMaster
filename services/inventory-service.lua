@@ -106,13 +106,19 @@ end
 
 -- Check for missing reagents.
 function InventoryService:CheckMissingReagents()
+    -- get reagents
+    local reagents = self:GetReagents();
+
+    -- refresh bucket list in professions view when visible
+    local professionsView = self.addon.professionsView;
+    if (professionsView and professionsView.visible) then
+        professionsView:RefreshBucketListRows();
+    end
+
     -- check if missing reagents should be hidden
     if (PMSettings.hideMissingReagents) then
         return;
     end
-
-    -- get reagents
-    local reagents = self:GetReagents();
 
     -- get missing reagents
     local hasMissingReagents = false;
