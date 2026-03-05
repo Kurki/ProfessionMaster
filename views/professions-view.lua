@@ -122,6 +122,14 @@ function ProfessionsView:Show()
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         bucketListClearButton:SetPoint("TOPRIGHT", -8, -10);
+        bucketListClearButton:HookScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT");
+            GameTooltip:SetText(localeService:Get("ProfessionsViewClearBucketList"));
+            GameTooltip:Show();
+        end);
+        bucketListClearButton:HookScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
 
         -- add item search box
         local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -873,13 +881,27 @@ function ProfessionsView:RefreshBucketListRows()
             craftIcon:SetAllPoints();
             craftIcon:SetTexture([[Interface\Icons\INV_Hammer_01]]);
             craftButton.icon = craftIcon;
+            local craftText = craftButton:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+            craftText:SetAllPoints();
+            craftText:SetJustifyH("CENTER");
+            craftText:SetJustifyV("MIDDLE");
+            craftText:SetText("x");
+            craftText:SetTextColor(1, 0.4, 0.4);
+            craftText:Hide();
+            craftButton.text = craftText;
             craftButton:SetScript("OnClick", function()
                 self:OnBucketListCraftButtonClicked(reagentRow);
             end);
             craftButton:SetScript("OnEnter", function()
                 self:UpdateBucketListReagentRowHoverState(reagentRow);
                 GameTooltip:SetOwner(craftButton, "ANCHOR_RIGHT");
-                GameTooltip:SetText(self:GetService("locale"):Get("ProfessionsViewCraftSelf"));
+                local tooltipKey = "ProfessionsViewCraftSelf";
+                if (reagentRow.craftButtonMode == "remove-watch") then
+                    tooltipKey = "ProfessionsViewRemoveFromWatchList";
+                elseif (reagentRow.craftButtonMode == "remove-bucket") then
+                    tooltipKey = "ProfessionsViewRemoveFromBucketList";
+                end
+                GameTooltip:SetText(self:GetService("locale"):Get(tooltipKey));
                 GameTooltip:Show();
             end);
             craftButton:SetScript("OnLeave", function()
@@ -940,9 +962,31 @@ function ProfessionsView:RefreshBucketListRows()
         reagentRow.craftButton:Hide();
         reagentRow.isIndented = indent > 0;
         reagentRow.craftItemId = treeRow.itemId;
+        reagentRow.isWatchListRoot = treeRow.isWatchListRoot == true;
+        reagentRow.isBucketListRoot = treeRow.isBucketListRoot == true;
+        reagentRow.bucketSkillId = treeRow.skillId;
         reagentRow.craftSkillId = nil;
         if (reagentRow.isIndented and treeRow.itemId and treeRow.itemId > 0) then
             reagentRow.craftSkillId = skillsService:GetSkillIdByItemId(treeRow.itemId);
+        end
+        reagentRow.craftButtonMode = nil;
+        if (reagentRow.isWatchListRoot) then
+            reagentRow.craftButtonMode = "remove-watch";
+            reagentRow.craftButton.icon:Hide();
+            reagentRow.craftButton.text:Show();
+        elseif (reagentRow.isBucketListRoot and reagentRow.bucketSkillId) then
+            reagentRow.craftButtonMode = "remove-bucket";
+            reagentRow.craftButton.icon:Hide();
+            reagentRow.craftButton.text:Show();
+        elseif (reagentRow.isIndented and reagentRow.craftSkillId) then
+            reagentRow.craftButtonMode = "toggle-watch";
+            reagentRow.craftButton.icon:SetTexture([[Interface\Icons\INV_Hammer_01]]);
+            reagentRow.craftButton.icon:Show();
+            reagentRow.craftButton.text:Hide();
+        else
+            reagentRow.craftButton.icon:SetTexture([[Interface\Icons\INV_Hammer_01]]);
+            reagentRow.craftButton.icon:Show();
+            reagentRow.craftButton.text:Hide();
         end
 
         -- update amount
@@ -1008,7 +1052,8 @@ function ProfessionsView:UpdateBucketListCraftButtonVisibility(reagentRow)
         return;
     end
 
-    if (reagentRow.isIndented and reagentRow.craftSkillId and reagentRow:IsMouseOver()) then
+    local canShowButton = reagentRow.craftButtonMode ~= nil;
+    if (canShowButton and (reagentRow:IsMouseOver() or reagentRow.craftButton:IsMouseOver())) then
         reagentRow.craftButton:Show();
     else
         reagentRow.craftButton:Hide();
@@ -1035,7 +1080,7 @@ end
 --- Handle click on craft button in bucket list row.
 -- @param reagentRow Bucket list reagent row.
 function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
-    if (not reagentRow or not reagentRow.craftSkillId or not reagentRow.craftItemId) then
+    if (not reagentRow or not reagentRow.craftItemId or not reagentRow.craftButtonMode) then
         return;
     end
 
@@ -1043,7 +1088,15 @@ function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
         ReagentWatchList = {};
     end
 
-    if (ReagentWatchList[reagentRow.craftItemId]) then
+    if (reagentRow.craftButtonMode == "remove-watch") then
+        ReagentWatchList[reagentRow.craftItemId] = nil;
+    elseif (reagentRow.craftButtonMode == "remove-bucket") then
+        BucketList[reagentRow.bucketSkillId] = nil;
+        self:AddSkills();
+        self:CheckBucketList();
+        self:GetService("inventory"):CheckMissingReagents();
+        return;
+    elseif (ReagentWatchList[reagentRow.craftItemId]) then
         ReagentWatchList[reagentRow.craftItemId] = nil;
     else
         ReagentWatchList[reagentRow.craftItemId] = true;
@@ -1079,7 +1132,6 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
 
     -- first pass: direct bucket list items and their reagents
     local nextReagents = {};
-    local leafReagents = {};
     for _, node in ipairs(currentNodes) do
         local stocks = 0;
         if (node.itemId and node.itemId > 0) then
@@ -1094,6 +1146,7 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
             stocks = stocks,
             indent = 0,
             isNode = true,
+            isBucketListRoot = true,
         });
 
         -- calculate missing quantity
@@ -1167,6 +1220,7 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
                 stocks = stocks,
                 indent = 0,
                 isNode = true,
+                isWatchListRoot = watchedReagents[node.itemId] == true,
             });
 
             -- calculate missing
@@ -1195,17 +1249,12 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
                         if (reagentMissing > 0) then
                             local reagentSkillId = skillsService:GetSkillIdByItemId(reagentItemId);
                             if (reagentSkillId) then
-                                if (not visited[reagentItemId]) then
+                                if (watchedReagents[reagentItemId] and not visited[reagentItemId]) then
                                     if (not nextLevel[reagentItemId]) then
                                         nextLevel[reagentItemId] = { skillId = reagentSkillId, amount = 0 };
                                     end
                                     nextLevel[reagentItemId].amount = nextLevel[reagentItemId].amount + needed;
                                 end
-                            else
-                                if (not leafReagents[reagentItemId]) then
-                                    leafReagents[reagentItemId] = 0;
-                                end
-                                leafReagents[reagentItemId] = leafReagents[reagentItemId] + needed;
                             end
                         end
                     end
@@ -1222,18 +1271,6 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
                 amount = info.amount,
             });
         end
-    end
-
-    -- add non-craftable leaf reagents as root nodes in derived section
-    for reagentItemId, totalNeeded in pairs(leafReagents) do
-        local stocks = inventoryService:GetItemAmount(reagentItemId);
-        table.insert(derivedRows, {
-            itemId = reagentItemId,
-            amount = totalNeeded,
-            stocks = stocks,
-            indent = 0,
-            isNode = true,
-        });
     end
 
     -- combine: direct rows, separator, derived rows
