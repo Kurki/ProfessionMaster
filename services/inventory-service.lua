@@ -70,30 +70,72 @@ end
 function InventoryService:GetReagents()
     -- get skills service
     local skillsService = self:GetService("skills");
+    local watchedReagents = ReagentWatchList or {};
 
-    -- iterate bucket list
-    local reagents = {};
+    -- build initial reagent demand from bucket list
+    local demanded = {};
     for skillId, skillAmount in pairs(BucketList) do
         -- get skill reagents
         local skillInfo = skillsService:GetSkillById(skillId);
         if (skillInfo) then
             -- iterate skill reagents
             for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
-                -- check reagent
-                if (not reagents[reagentItemId]) then
-                    reagents[reagentItemId] = {
-                        amount = skillAmount * reagentAmount,
-                        stocks = 0;
-                    };
-                else
-                    reagents[reagentItemId].amount = reagents[reagentItemId].amount + skillAmount * reagentAmount;
+                demanded[reagentItemId] = (demanded[reagentItemId] or 0) + skillAmount * reagentAmount;
+            end
+        end
+    end
+
+    -- scan inventory
+    self:ScanInventory();
+
+    -- recursively expand watchlisted craftable reagents
+    -- (watchlisted items themselves are removed from output)
+    local loopGuard = 0;
+    local hasChanges = true;
+    while (hasChanges and loopGuard < 200) do
+        loopGuard = loopGuard + 1;
+        hasChanges = false;
+
+        -- collect watchlisted nodes to expand in this pass
+        local toExpand = {};
+        for reagentItemId, totalNeeded in pairs(demanded) do
+            local skillId = skillsService:GetSkillIdByItemId(reagentItemId);
+            if (totalNeeded > 0 and watchedReagents[reagentItemId] and skillId) then
+                table.insert(toExpand, {
+                    itemId = reagentItemId,
+                    needed = totalNeeded,
+                    skillId = skillId,
+                });
+            end
+        end
+
+        -- expand selected nodes
+        for _, node in ipairs(toExpand) do
+            local skillInfo = skillsService:GetSkillById(node.skillId);
+            demanded[node.itemId] = nil;
+            hasChanges = true;
+
+            if (skillInfo and skillInfo.reagents) then
+                local stocks = self.inventory[node.itemId] or 0;
+                local missing = math.max(0, node.needed - stocks);
+                if (missing > 0) then
+                    for subReagentItemId, subReagentAmount in pairs(skillInfo.reagents) do
+                        local subNeeded = missing * subReagentAmount;
+                        demanded[subReagentItemId] = (demanded[subReagentItemId] or 0) + subNeeded;
+                    end
                 end
             end
         end
     end
 
-    -- acan inventory
-    self:ScanInventory();
+    -- prepare output structure
+    local reagents = {};
+    for reagentItemId, totalNeeded in pairs(demanded) do
+        reagents[reagentItemId] = {
+            amount = totalNeeded,
+            stocks = self.inventory[reagentItemId] or 0;
+        };
+    end
 
     -- get reagent stocks
     for reagentItemId, reagent in pairs(reagents) do

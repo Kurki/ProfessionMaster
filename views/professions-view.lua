@@ -1084,6 +1084,8 @@ function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
         return;
     end
 
+    local inventoryService = self:GetService("inventory");
+
     if (not ReagentWatchList) then
         ReagentWatchList = {};
     end
@@ -1094,7 +1096,7 @@ function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
         BucketList[reagentRow.bucketSkillId] = nil;
         self:AddSkills();
         self:CheckBucketList();
-        self:GetService("inventory"):CheckMissingReagents();
+        inventoryService:CheckMissingReagents();
         return;
     elseif (ReagentWatchList[reagentRow.craftItemId]) then
         ReagentWatchList[reagentRow.craftItemId] = nil;
@@ -1102,7 +1104,7 @@ function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
         ReagentWatchList[reagentRow.craftItemId] = true;
     end
 
-    self:RefreshBucketListRows();
+    inventoryService:CheckMissingReagents();
 end
 
 --- Build a flat tree of bucket list nodes and their reagents.

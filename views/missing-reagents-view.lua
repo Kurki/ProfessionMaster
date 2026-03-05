@@ -59,9 +59,44 @@ function MissingReagentsView:Show(missingReagents)
         row:Hide();
     end
 
+    -- build and sort reagents alphabetically
+    local reagentEntries = {};
+    for itemId, missingAmount in pairs(missingReagents) do
+        local itemName = nil;
+        if (C_Item.DoesItemExistByID(itemId)) then
+            itemName = C_Item.GetItemNameByID(itemId);
+            if (not itemName) then
+                itemName = GetItemInfo(itemId);
+            end
+        end
+
+        table.insert(reagentEntries, {
+            itemId = itemId,
+            missingAmount = missingAmount,
+            sortName = itemName,
+        });
+    end
+    table.sort(reagentEntries, function(a, b)
+        if (a.sortName and b.sortName) then
+            local aName = string.lower(a.sortName);
+            local bName = string.lower(b.sortName);
+            if (aName ~= bName) then
+                return aName < bName;
+            end
+        elseif (a.sortName and not b.sortName) then
+            return true;
+        elseif (not a.sortName and b.sortName) then
+            return false;
+        end
+
+        return a.itemId < b.itemId;
+    end);
+
     -- show reagents
     local reagentRowAmount = 0;
-    for itemId, missingAmount in pairs(missingReagents) do
+    for _, reagentEntry in ipairs(reagentEntries) do
+        local itemId = reagentEntry.itemId;
+        local missingAmount = reagentEntry.missingAmount;
         reagentRowAmount = reagentRowAmount + 1;
         if (#self.reagentRows < reagentRowAmount) then
             -- create row frame
