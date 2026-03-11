@@ -433,7 +433,7 @@ function ProfessionsService:Convert()
     Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
     Convert.Wrath = self:ConvertAddon("WRATH", convertData.WRATH, convertResult);
     Convert.Cata = self:ConvertAddon("CATA", convertData.CATA, convertResult);
-    Convert.Mop = {};
+    Convert.Mop = self:ConvertAddon("MOP", convertData.MOP, convertResult);
 end
 function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
     print("Converting " .. addonNumber);
