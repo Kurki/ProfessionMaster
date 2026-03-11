@@ -1080,7 +1080,7 @@ end
 --- Handle click on craft button in bucket list row.
 -- @param reagentRow Bucket list reagent row.
 function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
-    if (not reagentRow or not reagentRow.craftItemId or not reagentRow.craftButtonMode) then
+    if (not reagentRow or not reagentRow.craftButtonMode) then
         return;
     end
 
