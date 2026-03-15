@@ -576,6 +576,7 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     -- get profession and all skills
     local profession = Professions[professionId];
     local skillsService = self:GetService("skills");
+    local playerService = self:GetService("player");
 
     -- filter skills
     if (profession) then
@@ -585,35 +586,13 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
                 -- get skill info
                 local skillInfo = skillsService:GetSkillById(skillId);
                 if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
-                    -- get bucket list amount
-                    local bucketListAmount = BucketList[skillId];
+                    -- skip skills where no players are visible (wrong faction/realm)
+                    if (skill.players and playerService:HasVisiblePlayers(skill.players)) then
+                        -- get bucket list amount
+                        local bucketListAmount = BucketList[skillId];
 
-                    -- check if has search parts
-                    if (#searchParts == 0) then
-                        -- add to skills
-                        table.insert(self.skills, {
-                            professionId = professionId,
-                            skillId = skillId,
-                            skill = skill,
-                            bucketListAmount = bucketListAmount
-                        });
-
-                        -- increase bucket list skill amount
-                        if (bucketListAmount) then
-                            self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
-                        end
-                    else
-                        -- check if skill valid
-                        local skillValid = true;
-                        for i, part in ipairs(searchParts) do
-                            if (string.len(part) > 0 and string.find(string.lower(skill.name), part) == nil) then
-                                skillValid = false;
-                                break;
-                            end
-                        end
-
-                        -- check if recip valid
-                        if (skillValid) then
+                        -- check if has search parts
+                        if (#searchParts == 0) then
                             -- add to skills
                             table.insert(self.skills, {
                                 professionId = professionId,
@@ -625,6 +604,31 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
                             -- increase bucket list skill amount
                             if (bucketListAmount) then
                                 self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
+                            end
+                        else
+                            -- check if skill valid
+                            local skillValid = true;
+                            for i, part in ipairs(searchParts) do
+                                if (string.len(part) > 0 and string.find(string.lower(skill.name), part) == nil) then
+                                    skillValid = false;
+                                    break;
+                                end
+                            end
+
+                            -- check if recip valid
+                            if (skillValid) then
+                                -- add to skills
+                                table.insert(self.skills, {
+                                    professionId = professionId,
+                                    skillId = skillId,
+                                    skill = skill,
+                                    bucketListAmount = bucketListAmount
+                                });
+
+                                -- increase bucket list skill amount
+                                if (bucketListAmount) then
+                                    self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
+                                end
                             end
                         end
                     end

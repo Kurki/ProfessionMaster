@@ -284,6 +284,16 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
     return result;
 end
 
+--- Check if at least one player would be visible (same realm/guild and same faction).
+function PlayerService:HasVisiblePlayers(playerNames)
+    for _, playerName in ipairs(playerNames) do
+        if ((self:IsSameRealm(playerName) or Guildmates[playerName]) and self:IsSameFaction(playerName)) then
+            return true;
+        end
+    end
+    return false;
+end
+
 --- Cehck if list contains the given value
 function PlayerService:ListContains(list, value)
     for _, entryValue in ipairs(list) do

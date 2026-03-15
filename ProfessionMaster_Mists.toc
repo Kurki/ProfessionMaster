@@ -1,16 +1,30 @@
+## Title: |cffDA8CFFProfession Master |c999999FFMoP
+## Version: 3.3.1
 ## Author: Kurki 
 ## Interface: 50503
 ## X-Min-Interface: 50503
-## Category: Professions
+## Category-enUS: Professions
 ## Category-deDE: Berufe
-## X-Category: Professions
-## X-Category-deDE: Berufe
-## Group: Professions
-## Title: |cffDA8CFFProfession Master |c999999FFMoP
-## Title-deDE: |cffDA8CFFProfession Master |c999999FFMoP
+## Category-esES: Profesiones
+## Category-esMX: Profesiones
+## Category-frFR: Métiers
+## Category-itIT: Professioni
+## Category-koKR: 전문 기술
+## Category-ptBR: Profissões
+## Category-ruRU: Профессии
+## Category-zhCN: 专业技能
+## Category-zhTW: 專業技能
 ## Notes: See your professions, those of your guild and those of your friends.
-## Notes-deDE: Siehe deine Berufe, die deiner Gilde und die deiner Freunde ein.
-## Version: 3.3.0
+## Notes-deDE: Sieh deine Berufe, die deiner Gilde und die deiner Freunde ein.
+## Notes-esES: Consulta tus profesiones, las de tu hermandad y las de tus amigos.
+## Notes-esMX: Consulta tus profesiones, las de tu hermandad y las de tus amigos.
+## Notes-frFR: Consultez vos métiers, ceux de votre guilde et ceux de vos amis.
+## Notes-itIT: Visualizza le tue professioni, quelle della tua gilda e quelle dei tuoi amici.
+## Notes-koKR: 자신의 전문 기술, 길드원의 전문 기술, 친구의 전문 기술을 확인하세요.
+## Notes-ptBR: Veja suas profissões, as da sua guilda e as dos seus amigos.
+## Notes-ruRU: Просматривайте свои профессии, профессии вашей гильдии и ваших друзей.
+## Notes-zhCN: 查看你的专业技能、公会成员的专业技能和好友的专业技能。
+## Notes-zhTW: 查看你的專業技能、公會成員的專業技能和好友的專業技能。
 ## IconTexture: Interface\AddOns\ProfessionMaster\icons\pm.png
 ## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, ReagentWatchList, Guildmates, Convert, PlayerFactions
 ## SavedVariablesPerCharacter: Frames, CharacterSettings
