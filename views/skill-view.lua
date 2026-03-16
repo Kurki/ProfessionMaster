@@ -95,7 +95,7 @@ function SkillView:Show(skillRow, professionsView)
         -- amount plus button
         local amountPlusButton = uiService:CreateFlatSquareButton(bucketListFrame, "+", function()
             -- update amount
-            BucketList[self.skillId] = self.bucketListAmount + 1;
+            PM_BucketList[self.skillId] = self.bucketListAmount + 1;
             self:RefreshBucketListAmount();
             professionsView:CheckBucketList();
 
@@ -109,9 +109,9 @@ function SkillView:Show(skillRow, professionsView)
         local amountMinusButton = uiService:CreateFlatSquareButton(bucketListFrame, "-", function()
             -- update amount
             if (self.bucketListAmount <= 1) then
-                BucketList[self.skillId] = nil;
+                PM_BucketList[self.skillId] = nil;
             else
-                BucketList[self.skillId] = self.bucketListAmount - 1;
+                PM_BucketList[self.skillId] = self.bucketListAmount - 1;
             end
             self:RefreshBucketListAmount();
             professionsView:CheckBucketList();
@@ -125,7 +125,7 @@ function SkillView:Show(skillRow, professionsView)
         -- add clear button
         local clearButton = uiService:CreateFlatSquareButton(bucketListFrame, "x", function()
             -- update amount
-            BucketList[self.skillId] = nil;
+            PM_BucketList[self.skillId] = nil;
             self:RefreshBucketListAmount();
             professionsView:CheckBucketList();
 
@@ -229,7 +229,7 @@ end
 -- Update bucket list amount.
 function SkillView:RefreshBucketListAmount()
     -- get amount and set amount text
-    self.bucketListAmount = BucketList[self.skillId] or 0;
+    self.bucketListAmount = PM_BucketList[self.skillId] or 0;
     self.bucketListAmountText:SetText(self.bucketListAmount);
 
     -- set width

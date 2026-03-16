@@ -70,7 +70,7 @@ end
 function InventoryService:GetReagents()
     -- get skills service
     local skillsService = self:GetService("skills");
-    local watchedReagents = ReagentWatchList or {};
+    local watchedReagents = PM_ReagentWatchList or {};
 
     -- scan inventory
     self:ScanInventory();
@@ -78,7 +78,7 @@ function InventoryService:GetReagents()
     -- build initial reagent demand from bucket list
     -- only count reagents for the MISSING amount of the end product
     local demanded = {};
-    for skillId, skillAmount in pairs(BucketList) do
+    for skillId, skillAmount in pairs(PM_BucketList) do
         -- get skill reagents
         local skillInfo = skillsService:GetSkillById(skillId);
         if (skillInfo) then
@@ -168,7 +168,7 @@ function InventoryService:CheckMissingReagents()
     end
 
     -- check if missing reagents should be hidden
-    if (PMSettings.hideMissingReagents) then
+    if (PM_Settings.hideMissingReagents) then
         return;
     end
 
@@ -198,13 +198,13 @@ function InventoryService:ToggleMissingReagents()
     -- check if visible
     if (self.missingReagentsView.visible) then
         --hide missing reagents
-        PMSettings.hideMissingReagents = true;
+        PM_Settings.hideMissingReagents = true;
         self.missingReagentsView:Hide();
         return;
     end
 
     -- do not hide missing ragents
-    PMSettings.hideMissingReagents = nil;
+    PM_Settings.hideMissingReagents = nil;
     self:CheckMissingReagents();
 end
 

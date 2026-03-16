@@ -26,8 +26,8 @@
 ## Notes-zhCN: 查看你的专业技能、公会成员的专业技能和好友的专业技能。
 ## Notes-zhTW: 查看你的專業技能、公會成員的專業技能和好友的專業技能。
 ## IconTexture: Interface\AddOns\ProfessionMaster\icons\pm.png
-## SavedVariables: Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, ReagentWatchList, Guildmates, Convert, PlayerFactions
-## SavedVariablesPerCharacter: Frames, CharacterSettings
+## SavedVariables: PM_Professions, PM_OwnProfessions, PM_SyncTimes, PM_Settings, PM_Logs, PM_CharacterSets, PM_BucketList, PM_ReagentWatchList, PM_Guildmates, PM_Convert, PM_PlayerFactions, Professions, OwnProfessions, SyncTimes, PMSettings, Logs, CharacterSets, BucketList, ReagentWatchList, Convert, PlayerFactions
+## SavedVariablesPerCharacter: PM_Frames, PM_CharacterSettings, Frames, CharacterSettings
 ## X-Curse-Project-ID: 574050
 
 libs\LibStub.lua

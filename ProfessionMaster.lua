@@ -15,16 +15,16 @@ ProfessionMasterAddon = {};
 ProfessionMasterAddon.__index = ProfessionMasterAddon;
 
 -- prepare storage
-if (not OwnProfessions) then OwnProfessions = {}; end
-if (not Professions) then Professions = {}; end
-if (not SyncTimes) then SyncTimes = {}; end
-if (not Logs) then Logs = {}; end
-if (not CharacterSets) then CharacterSets = {}; end
-if (not BucketList) then BucketList = {}; end
-if (not ReagentWatchList) then ReagentWatchList = {}; end
-if (not CharacterSettings) then CharacterSettings = {}; end
-if (not Guildmates) then Guildmates = {}; end
-if (not PlayerFactions) then PlayerFactions = {}; end
+if (not PM_OwnProfessions) then PM_OwnProfessions = {}; end
+if (not PM_Professions) then PM_Professions = {}; end
+if (not PM_SyncTimes) then PM_SyncTimes = {}; end
+if (not PM_Logs) then PM_Logs = {}; end
+if (not PM_CharacterSets) then PM_CharacterSets = {}; end
+if (not PM_BucketList) then PM_BucketList = {}; end
+if (not PM_ReagentWatchList) then PM_ReagentWatchList = {}; end
+if (not PM_CharacterSettings) then PM_CharacterSettings = {}; end
+if (not PM_Guildmates) then PM_Guildmates = {}; end
+if (not PM_PlayerFactions) then PM_PlayerFactions = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
@@ -80,14 +80,14 @@ end
 --- Check settings.
 function ProfessionMasterAddon:CheckSettings()
     -- check settings
-    if (not PMSettings) then 
-        PMSettings = {}; 
+    if (not PM_Settings) then 
+        PM_Settings = {}; 
     end
-    if (not PMSettings.storageId) then
-        PMSettings.storageId = self:GenerateString(12);
+    if (not PM_Settings.storageId) then
+        PM_Settings.storageId = self:GenerateString(12);
     end
-    if (not PMSettings.minimapButton) then
-        PMSettings.minimapButton = {
+    if (not PM_Settings.minimapButton) then
+        PM_Settings.minimapButton = {
             hide = false
         };
     end
@@ -220,7 +220,7 @@ function ProfessionMasterAddon:LogDebug(class, method, message, ...)
     end
 
     -- add to logs
-    table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Debug] " .. string.format(message, ...));
+    table.insert(PM_Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Debug] " .. string.format(message, ...));
 
     -- print out trace
     print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
@@ -237,7 +237,7 @@ function ProfessionMasterAddon:LogTrace(class, method, message, ...)
     end
 
     -- add to logs
-    table.insert(Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Trace] " .. string.format(message, ...));
+    table.insert(PM_Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Trace] " .. string.format(message, ...));
 
     -- print out trace
     print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
@@ -386,10 +386,38 @@ function ProfessionMasterAddon:GenerateString(length)
     return table.concat(id, "");
 end
 
+-- Migrate saved variable from old unprefixed name to new PM_ prefixed name.
+local function MigrateSavedVariable(oldName, newName)
+    if (_G[oldName] ~= nil) then
+        _G[newName] = _G[oldName];
+    end
+    _G[oldName] = nil;
+end
+
 -- Migrate data.
 function ProfessionMasterAddon:Migrate()
+    -- get store version from new or old settings
+    local storeVersion = PM_Settings.storeVersion or (PMSettings and PMSettings.storeVersion);
+
+    -- migrate from pre-7 saved variable names (only if old version exists)
+    if (storeVersion and storeVersion < 7) then
+        MigrateSavedVariable("Professions", "PM_Professions");
+        MigrateSavedVariable("OwnProfessions", "PM_OwnProfessions");
+        MigrateSavedVariable("SyncTimes", "PM_SyncTimes");
+        MigrateSavedVariable("PMSettings", "PM_Settings");
+        MigrateSavedVariable("Logs", "PM_Logs");
+        MigrateSavedVariable("CharacterSets", "PM_CharacterSets");
+        MigrateSavedVariable("BucketList", "PM_BucketList");
+        MigrateSavedVariable("ReagentWatchList", "PM_ReagentWatchList");
+        MigrateSavedVariable("CharacterSettings", "PM_CharacterSettings");
+        MigrateSavedVariable("Guildmates", "PM_Guildmates");
+        MigrateSavedVariable("Convert", "PM_Convert");
+        MigrateSavedVariable("PlayerFactions", "PM_PlayerFactions");
+        MigrateSavedVariable("Frames", "PM_Frames");
+    end
+
     -- set store version
-    PMSettings.storeVersion = 6;
+    PM_Settings.storeVersion = 7;
 end
 
 -- create addon

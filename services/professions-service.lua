@@ -17,10 +17,10 @@ end
 -- Call once at init or after data migration.
 function ProfessionsService:RebuildItemIndex()
     self.itemIndex = {};
-    if (not Professions) then
+    if (not PM_Professions) then
         return;
     end
-    for professionId, profession in pairs(Professions) do
+    for professionId, profession in pairs(PM_Professions) do
         for skillId, skill in pairs(profession) do
             if (skill.itemId and skill.itemId ~= 0) then
                 self.itemIndex[skill.itemId] = {
@@ -71,7 +71,7 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
         self:StorePlayerSkills(ppMessage.playerName, ppMessage.professionId, ppMessage.skills);
 
         -- add sync time
-        SyncTimes[ppMessage.storageId] = time();
+        PM_SyncTimes[ppMessage.storageId] = time();
         return;
     end
 end
@@ -79,7 +79,7 @@ end
 --- Say hello to guild.
 function ProfessionsService:SayHelloToGuild()
     -- send hello message to guild
-    self:GetService("message"):SendToGuild(self:GetModel("hello-message"):Create(PMSettings.storageId));
+    self:GetService("message"):SendToGuild(self:GetModel("hello-message"):Create(PM_Settings.storageId));
 end
 
 --- Request profession from other player.
@@ -88,7 +88,7 @@ function ProfessionsService:RequestProfessionsFromPlayer(playerName, playerStora
     local lastSyncDate = self:GetLastSyncDate(playerStorageId);
 
     -- send request professions message to player
-    self:GetService("message"):SendToPlayer(playerName, self:GetModel("request-professions-message"):Create(PMSettings.storageId, lastSyncDate, sendBack));
+    self:GetService("message"):SendToPlayer(playerName, self:GetModel("request-professions-message"):Create(PM_Settings.storageId, lastSyncDate, sendBack));
 end
 
 --- Get last sync date of storage.
@@ -96,7 +96,7 @@ end
 -- @return Date of last sync or 0 if not synced yet.
 function ProfessionsService:GetLastSyncDate(storageId)
     -- get sync time
-    local syncTime = SyncTimes[storageId];
+    local syncTime = PM_SyncTimes[storageId];
     if (not syncTime) then
         return 0;
     end
@@ -116,8 +116,8 @@ function ProfessionsService:StoreCharacterSet(characterNames)
     local playerService = self:GetService('player');
     for i = 1, #characterNames do
         characterNames[i] = playerService:GetLongName(characterNames[i]);
-        if (not PlayerFactions[characterNames[i]]) then
-            PlayerFactions[characterNames[i]] = playerService.faction;
+        if (not PM_PlayerFactions[characterNames[i]]) then
+            PM_PlayerFactions[characterNames[i]] = playerService.faction;
         end
     end
 
@@ -150,24 +150,24 @@ function ProfessionsService:StoreCharacterSet(characterNames)
     end
 
     -- create new character set
-    table.insert(CharacterSets, characterNames);
+    table.insert(PM_CharacterSets, characterNames);
 end
 
 --- Store player skills.
 function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
     -- tag player faction if not already known
-    if (not PlayerFactions[playerName]) then
+    if (not PM_PlayerFactions[playerName]) then
         local playerService = self:GetService("player");
-        PlayerFactions[playerName] = playerService.faction;
+        PM_PlayerFactions[playerName] = playerService.faction;
     end
 
     -- check profession id
-    if (not Professions[professionId]) then
-        Professions[professionId] = {};
+    if (not PM_Professions[professionId]) then
+        PM_Professions[professionId] = {};
     end
 
     -- get profession
-    local profession = Professions[professionId];
+    local profession = PM_Professions[professionId];
     local professionNamesService = self:GetService("profession-names");
     local professionName = professionNamesService:GetProfessionName(professionId);
     local itemsToLoad = {};
@@ -292,7 +292,7 @@ end
 --- Find skill by item link.
 function ProfessionsService:FindSkillByItemLink(itemLink)
     -- check profession storage
-    if ((not Professions) or (not itemLink)) then
+    if ((not PM_Professions) or (not itemLink)) then
         return nil;
     end
 
@@ -306,7 +306,7 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
     if (self.itemIndex) then
         local entry = self.itemIndex[itemId];
         if (entry) then
-            local profession = Professions[entry.professionId];
+            local profession = PM_Professions[entry.professionId];
             if (profession and profession[entry.skillId]) then
                 return entry.skillId, profession[entry.skillId], entry.professionId;
             end
@@ -321,7 +321,7 @@ end
 -- @return skillId, skillData, professionId or nil if not found
 function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
     -- check values
-    if ((not Professions) or ((not targetSkillId) and (not targetItemId))) then
+    if ((not PM_Professions) or ((not targetSkillId) and (not targetItemId))) then
         return nil;
     end
 
@@ -329,7 +329,7 @@ function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
     if (targetItemId and self.itemIndex) then
         local entry = self.itemIndex[targetItemId];
         if (entry) then
-            local profession = Professions[entry.professionId];
+            local profession = PM_Professions[entry.professionId];
             if (profession and profession[entry.skillId]) then
                 return entry.skillId, profession[entry.skillId], entry.professionId;
             end
@@ -338,7 +338,7 @@ function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
 
     -- try direct skill id lookup across professions (O(P) instead of O(P*S))
     if (targetSkillId) then
-        for professionId, profession in pairs(Professions) do
+        for professionId, profession in pairs(PM_Professions) do
             if (profession[targetSkillId]) then
                 return targetSkillId, profession[targetSkillId], professionId;
             end
@@ -364,14 +364,14 @@ function ProfessionsService:FindCrafterForSkill(targetSkillId, targetItemId)
     local eligiblePlayers = {};
     for _, playerName in ipairs(skill.players) do
         -- check if is same realm and guild mate
-        if (playerService:IsSameRealm(playerName) and Guildmates[playerName]) then
+        if (playerService:IsSameRealm(playerName) and PM_Guildmates[playerName]) then
             -- cheeck if is online
-            if (Guildmates[playerName].online) then
+            if (PM_Guildmates[playerName].online) then
                 guildMateOnline = true;
             end
 
             -- check if is own character
-            if (OwnProfessions[playerName]) then
+            if (PM_OwnProfessions[playerName]) then
                 return playerName, true;
             end
             -- add player to player list
@@ -409,7 +409,7 @@ function ProfessionsService:FindSkillByName(skillName)
     end
 
     -- check profession id
-    if (not Professions[professionId]) then
+    if (not PM_Professions[professionId]) then
         return nil;
     end
 
@@ -417,7 +417,7 @@ function ProfessionsService:FindSkillByName(skillName)
     local skillName = string.trim(skillName);
 
     -- check skills professions
-    for skillId, skill in pairs(Professions[professionId]) do     
+    for skillId, skill in pairs(PM_Professions[professionId]) do     
         -- check item id
         if (skill.name and skill.name == skillName) then
             return skillId, skill, professionId;
@@ -428,12 +428,12 @@ end
 --- Convert data.
 function ProfessionsService:Convert()
     local convertData = self:GetModel('convert-data');
-    Convert = {};
+    PM_Convert = {};
     --self:ConvertAddon(1, convertData.CLASSIC);
-    Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
-    Convert.Wrath = self:ConvertAddon("WRATH", convertData.WRATH, convertResult);
-    Convert.Cata = self:ConvertAddon("CATA", convertData.CATA, convertResult);
-    Convert.Mop = self:ConvertAddon("MOP", convertData.MOP, convertResult);
+    PM_Convert.Bcc = self:ConvertAddon("BCC", convertData.BCC, convertResult);
+    PM_Convert.Wrath = self:ConvertAddon("WRATH", convertData.WRATH, convertResult);
+    PM_Convert.Cata = self:ConvertAddon("CATA", convertData.CATA, convertResult);
+    PM_Convert.Mop = self:ConvertAddon("MOP", convertData.MOP, convertResult);
 end
 function ProfessionsService:ConvertAddon(addonNumber, data, convertResult)
     print("Converting " .. addonNumber);

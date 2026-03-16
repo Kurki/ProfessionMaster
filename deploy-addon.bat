@@ -29,7 +29,7 @@ mkdir "!TARGET!"
 echo Copying to !TARGET! ...
 set "ROBO_SRC=!SRC!"
 if "!ROBO_SRC:~-1!"=="\" set "ROBO_SRC=!ROBO_SRC:~0,-1!"
-robocopy !ROBO_SRC! "!TARGET!" /MIR /XD .git /XF deploy-addon.bat
+robocopy !ROBO_SRC! "!TARGET!" /MIR /XD .git .github /XF deploy-addon.bat
 endlocal
 exit /b
 

@@ -33,7 +33,7 @@ function WelcomeView:Show()
 
         -- create ok button
         local okButton = uiService:CreateButton(view, localeService:Get("SkillViewOk"), function()
-            CharacterSettings.welcomeRead = true;
+            PM_CharacterSettings.welcomeRead = true;
             self:Hide();
         end);
         okButton:SetWidth(100);
