@@ -13,8 +13,8 @@ local currentZIndex = 1000;
 --- Initialize service.
 function UiService:Initialize()
     -- init database
-    if (Frames == nil) then
-        Frames = {}
+    if (PM_Frames == nil) then
+        PM_Frames = {}
     end
 end
 
@@ -283,7 +283,7 @@ end
 function UiService:StorePosition(frame)
     -- store position
     local from, _, to, x, y = frame:GetPoint();
-    Frames[frame.positionName] = {
+    PM_Frames[frame.positionName] = {
         from = from,
         to = to,
         x = x,
@@ -297,7 +297,7 @@ function UiService:RestorePosition(frame)
     frame:ClearAllPoints();
 
     -- get position
-    local position = Frames[frame.positionName];
+    local position = PM_Frames[frame.positionName];
 
     -- check position
     if (position == nil) then
@@ -327,7 +327,7 @@ function UiService:CreateMinimapIcon()
             elseif (button == "RightButton") then
                 if (IsShiftKeyDown()) then
                     libDbIcon:Hide("ProfessionMaster");
-                    PMSettings.minimapButton.hide = true;
+                    PM_Settings.minimapButton.hide = true;
                 else
                     service:GetService("inventory"):ToggleMissingReagents();
                 end
@@ -344,6 +344,6 @@ function UiService:CreateMinimapIcon()
 	})
 
     -- show minimap button
-	libDbIcon:Register("ProfessionMaster", dataObj, PMSettings.minimapButton);
+	libDbIcon:Register("ProfessionMaster", dataObj, PM_Settings.minimapButton);
 end
 

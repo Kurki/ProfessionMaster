@@ -20,15 +20,15 @@ function PurgeService:Purge(context)
     -- check if all data should be purged
     if (context == 'all') then
         -- purge all data
-        Professions = {};
-        OwnProfessions = {};
-        SyncTimes = {};
-        PMSettings = {};
-        Logs = {};
-        CharacterSets = {};
-        BucketList = {};
-        Frames = {};
-        CharacterSettings = {}; 
+        PM_Professions = {};
+        PM_OwnProfessions = {};
+        PM_SyncTimes = {};
+        PM_Settings = {};
+        PM_Logs = {};
+        PM_CharacterSets = {};
+        PM_BucketList = {};
+        PM_Frames = {};
+        PM_CharacterSettings = {}; 
         self.addon:CheckSettings();
 
         -- rebuild reverse index after purge
@@ -43,8 +43,8 @@ function PurgeService:Purge(context)
     local playerService = self:GetService('player');
     if (context == 'own') then
         self:PurgeCharacter(playerService.current);
-        Frames = {};
-        CharacterSettings = {}; 
+        PM_Frames = {};
+        PM_CharacterSettings = {}; 
         return;
     end
 
@@ -58,15 +58,15 @@ function PurgeService:PurgeCharacter(characterName)
     local lowerCharacterName = string.lower(characterName);
 
     -- remove from own professions
-    for ownProfessionCharacter, _ in pairs(OwnProfessions) do   
+    for ownProfessionCharacter, _ in pairs(PM_OwnProfessions) do   
         if (string.lower(ownProfessionCharacter) == lowerCharacterName) then
-            OwnProfessions[ownProfessionCharacter] = nil;
+            PM_OwnProfessions[ownProfessionCharacter] = nil;
             break;
         end
     end
 
     -- check all professions
-    for _, profession in pairs(Professions) do     
+    for _, profession in pairs(PM_Professions) do     
         -- check all skills
         for _, skill in pairs(profession) do     
             -- check all players
@@ -80,10 +80,10 @@ function PurgeService:PurgeCharacter(characterName)
     end  
 
     -- reset all sync times
-    SyncTimes = {};
+    PM_SyncTimes = {};
 
     -- reset storage id to recieve data again
-    PMSettings.storageId = nil;
+    PM_Settings.storageId = nil;
 
     -- check settings
     self.addon:CheckSettings();

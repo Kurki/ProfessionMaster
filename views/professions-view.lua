@@ -117,7 +117,7 @@ function ProfessionsView:Show()
         -- add bucket list clear button
         local bucketListClearButton = uiService:CreateFlatSquareButton(bucketListFrame, "x", function()
             -- clear and refresh bucket list
-            BucketList = {};
+            PM_BucketList = {};
             self:CheckBucketList();
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
@@ -336,8 +336,8 @@ function ProfessionsView:Show()
         self.skillViewBackground = skillViewBackground;
 
         -- select first profession
-        self:SelectProfession(PMSettings.lastProfession or 0);
-        self:SelectAddon(PMSettings.lastAddon);
+        self:SelectProfession(PM_Settings.lastProfession or 0);
+        self:SelectAddon(PM_Settings.lastAddon);
 
         -- create ok button
         local okButton = uiService:CreateFlatButton(view, localeService:Get("ProfessionsViewAnnounce"), function()
@@ -369,7 +369,7 @@ function ProfessionsView:CheckBucketList()
     
     -- check bucket list has values
     local hasBucketList = false;
-    for _ in pairs(BucketList) do
+    for _ in pairs(PM_BucketList) do
         hasBucketList = true;
         break;
     end
@@ -447,7 +447,7 @@ end
 function ProfessionsView:SelectProfession(professionId)
     -- set profession id
     self.professionId = professionId;
-    PMSettings.lastProfession = professionId;
+    PM_Settings.lastProfession = professionId;
 
     -- select dropdown
     UIDropDownMenu_SetText(self.professionSelection, self:GetProfessionText(professionId));
@@ -494,7 +494,7 @@ function ProfessionsView:SelectAddon(addonId)
 
     -- set addon id
     self.addonId = addonId;
-    PMSettings.lastAddon = addonId;
+    PM_Settings.lastAddon = addonId;
 
     -- select dropdown
     if (self.addonSelection) then
@@ -574,7 +574,7 @@ end
 --- Add filtered skills.
 function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     -- get profession and all skills
-    local profession = Professions[professionId];
+    local profession = PM_Professions[professionId];
     local skillsService = self:GetService("skills");
     local playerService = self:GetService("player");
 
@@ -589,7 +589,7 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
                     -- skip skills where no players are visible (wrong faction/realm)
                     if (skill.players and playerService:HasVisiblePlayers(skill.players)) then
                         -- get bucket list amount
-                        local bucketListAmount = BucketList[skillId];
+                        local bucketListAmount = PM_BucketList[skillId];
 
                         -- check if has search parts
                         if (#searchParts == 0) then
@@ -1090,22 +1090,22 @@ function ProfessionsView:OnBucketListCraftButtonClicked(reagentRow)
 
     local inventoryService = self:GetService("inventory");
 
-    if (not ReagentWatchList) then
-        ReagentWatchList = {};
+    if (not PM_ReagentWatchList) then
+        PM_ReagentWatchList = {};
     end
 
     if (reagentRow.craftButtonMode == "remove-watch") then
-        ReagentWatchList[reagentRow.craftItemId] = nil;
+        PM_ReagentWatchList[reagentRow.craftItemId] = nil;
     elseif (reagentRow.craftButtonMode == "remove-bucket") then
-        BucketList[reagentRow.bucketSkillId] = nil;
+        PM_BucketList[reagentRow.bucketSkillId] = nil;
         self:AddSkills();
         self:CheckBucketList();
         inventoryService:CheckMissingReagents();
         return;
-    elseif (ReagentWatchList[reagentRow.craftItemId]) then
-        ReagentWatchList[reagentRow.craftItemId] = nil;
+    elseif (PM_ReagentWatchList[reagentRow.craftItemId]) then
+        PM_ReagentWatchList[reagentRow.craftItemId] = nil;
     else
-        ReagentWatchList[reagentRow.craftItemId] = true;
+        PM_ReagentWatchList[reagentRow.craftItemId] = true;
     end
 
     inventoryService:CheckMissingReagents();
@@ -1121,11 +1121,11 @@ function ProfessionsView:BuildBucketListTree(skillsService, inventoryService)
     local directRows = {};
     local derivedRows = {};
     local visited = {};
-    local watchedReagents = ReagentWatchList or {};
+    local watchedReagents = PM_ReagentWatchList or {};
 
     -- collect initial nodes from bucket list
     local currentNodes = {};
-    for skillId, skillAmount in pairs(BucketList) do
+    for skillId, skillAmount in pairs(PM_BucketList) do
         local skillInfo = skillsService:GetSkillById(skillId);
         if (skillInfo) then
             table.insert(currentNodes, {

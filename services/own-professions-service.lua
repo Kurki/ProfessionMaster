@@ -26,7 +26,7 @@ function OwnProfessionsService:GetProfessionData()
         professionPlayerName = self:GetService("player"):GetLongName(professionPlayerName);
 
         -- check if is guild mate
-        if (not Guildmates or not Guildmates[professionPlayerName]) then
+        if (not PM_Guildmates or not PM_Guildmates[professionPlayerName]) then
             return;
         end
     end
@@ -167,13 +167,13 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
 
     -- check player
     local playerName = self:GetService("player").current;
-    if (not OwnProfessions[playerName]) then
+    if (not PM_OwnProfessions[playerName]) then
         -- add player name
-        OwnProfessions[playerName] = {};
+        PM_OwnProfessions[playerName] = {};
     end
 
     -- get player professions
-    local playerProfessions = OwnProfessions[playerName];
+    local playerProfessions = PM_OwnProfessions[playerName];
 
     -- check profession
     if (not playerProfessions[professionId]) then
@@ -227,7 +227,7 @@ end
 function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStorageId, lastSyncDate, sendBack)
     -- iterate all players
     local playerService = self:GetService("player");
-    for characterName, professions in pairs(OwnProfessions) do
+    for characterName, professions in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
              -- iterate all professions
@@ -259,7 +259,7 @@ function OwnProfessionsService:SendMyCharacters(playerName)
     local MyCharactersMessage = self:GetModel("my-characters-message");
 
     -- iterate all characters
-    for characterName, _ in pairs(OwnProfessions) do
+    for characterName, _ in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- add short name to result
@@ -301,7 +301,7 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
             -- check if 8 skills added
             if (#messageSkills == 8) then
                 -- send message
-                messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PMSettings.storageId, ownPlayerName, messageSkills));
+                messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, ownPlayerName, messageSkills));
                 messageSkills = {};
             end
         end
@@ -310,20 +310,20 @@ function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionI
     -- check if skills to send
     if (#messageSkills > 0) then
         -- send message
-        messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PMSettings.storageId, ownPlayerName, messageSkills)); 
+        messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, ownPlayerName, messageSkills)); 
     end
 end
 
 --- Check welcome.
 function OwnProfessionsService:CheckWelcome()
     -- check if welcome read
-    if (CharacterSettings.welcomeRead) then
+    if (PM_CharacterSettings.welcomeRead) then
         return;
     end
 
     -- check if player professions read
     local playerName = self:GetService("player").current;
-    if (OwnProfessions[playerName]) then
+    if (PM_OwnProfessions[playerName]) then
         return;
     end
 
