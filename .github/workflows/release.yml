@@ -1,0 +1,78 @@
+name: Build & Release Addon
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine full version
+        id: version
+        run: |
+          BASE_VERSION=$(cat version.txt | tr -d '[:space:]')
+          echo "Base version (Major.Minor): $BASE_VERSION"
+
+          LATEST_TAG=$(git tag --list "${BASE_VERSION}.*" --sort=-version:refname | head -n1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            RELEASE_NUM=0
+            echo "No existing release for ${BASE_VERSION}. Starting at 0."
+          else
+            CURRENT_RELEASE=$(echo "$LATEST_TAG" | awk -F. '{print $3}')
+            RELEASE_NUM=$((CURRENT_RELEASE + 1))
+            echo "Latest release: ${LATEST_TAG} → new release: ${RELEASE_NUM}"
+          fi
+
+          FULL_VERSION="${BASE_VERSION}.${RELEASE_NUM}"
+          echo "full_version=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "Full version: $FULL_VERSION"
+
+      - name: Update TOC files with full version
+        run: |
+          VERSION="${{ steps.version.outputs.full_version }}"
+          shopt -s nullglob
+          for toc in *.toc; do
+            sed -i "s/^## Version: .*/## Version: ${VERSION}/" "$toc"
+            echo "Updated $toc → Version: $VERSION"
+          done
+
+      - name: Create ZIP archive
+        id: zip
+        run: |
+          ZIPNAME="ProfessionMaster-v${{ steps.version.outputs.full_version }}.zip"
+          zip -r "$ZIPNAME" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "deploy-addon.bat" \
+            -x "version.txt"
+          echo "zipfile=$ZIPNAME" >> $GITHUB_OUTPUT
+          echo "ZIP created: $ZIPNAME"
+
+      - name: Create Git Tag
+        run: |
+          VERSION="${{ steps.version.outputs.full_version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
+      - name: Create Release and upload ZIP
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.full_version }}
+          name: ${{ steps.version.outputs.full_version }}
+          files: ${{ steps.zip.outputs.zipfile }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
