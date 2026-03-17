@@ -56,6 +56,7 @@ jobs:
           mkdir "$STAGING"
           rsync -a --exclude='.git' --exclude='.github' --exclude='.vscode' \
             --exclude='deploy-addon.bat' --exclude='watch-addon.ps1' --exclude='version.txt' \
+            --exclude='ProfessionMaster' \
             . "$STAGING/"
           zip -r "$ZIPNAME" "$STAGING"
           echo "zipfile=$ZIPNAME" >> $GITHUB_OUTPUT
