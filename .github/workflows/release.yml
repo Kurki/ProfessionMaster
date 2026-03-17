@@ -55,7 +55,9 @@ jobs:
           zip -r "$ZIPNAME" . \
             -x ".git/*" \
             -x ".github/*" \
+            -x ".vscode/*" \
             -x "deploy-addon.bat" \
+            -x "watch-addon.ps1" \
             -x "version.txt"
           echo "zipfile=$ZIPNAME" >> $GITHUB_OUTPUT
           echo "ZIP created: $ZIPNAME"
