@@ -52,13 +52,12 @@ jobs:
         id: zip
         run: |
           ZIPNAME="ProfessionMaster-v${{ steps.version.outputs.full_version }}.zip"
-          zip -r "$ZIPNAME" . \
-            -x ".git/*" \
-            -x ".github/*" \
-            -x ".vscode/*" \
-            -x "deploy-addon.bat" \
-            -x "watch-addon.ps1" \
-            -x "version.txt"
+          STAGING="ProfessionMaster"
+          mkdir "$STAGING"
+          rsync -a --exclude='.git' --exclude='.github' --exclude='.vscode' \
+            --exclude='deploy-addon.bat' --exclude='watch-addon.ps1' --exclude='version.txt' \
+            . "$STAGING/"
+          zip -r "$ZIPNAME" "$STAGING"
           echo "zipfile=$ZIPNAME" >> $GITHUB_OUTPUT
           echo "ZIP created: $ZIPNAME"
 
