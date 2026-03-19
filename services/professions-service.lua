@@ -74,6 +74,15 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
         PM_SyncTimes[ppMessage.storageId] = time();
         return;
     end
+
+    -- check if is player specializations message
+    local PlayerSpecializationsMessage = self:GetModel("player-specializations-message");
+    if (prefix == PlayerSpecializationsMessage.prefix) then
+        -- parse and store specializations
+        local psMessage = PlayerSpecializationsMessage:Parse(message);
+        PM_Specializations[psMessage.playerName] = psMessage.specializations;
+        return;
+    end
 end
 
 --- Say hello to guild.

@@ -12,6 +12,44 @@ local OwnProfessionsService = _G.professionMaster:CreateService("own-professions
 function OwnProfessionsService:Initialize()
 end
 
+--- Detect own specializations for the current player.
+-- Checks IsSpellKnown for all known specialization spells (TBC+).
+function OwnProfessionsService:DetectSpecializations()
+    -- only available from TBC onwards
+    if (self.addon.isVanilla) then
+        return;
+    end
+
+    -- get player name
+    local playerName = self:GetService("player").current;
+
+    -- get specialization spells model
+    local specializationSpells = self:GetModel("specialization-spells");
+
+    -- prepare specializations for this player
+    local specializations = {};
+
+    -- iterate all professions that have specializations
+    for professionId, specs in pairs(specializationSpells) do
+        for _, spec in ipairs(specs) do
+            if (IsSpellKnown(spec.spellId)) then
+                specializations[professionId] = spec.spellId;
+                break;
+            end
+        end
+    end
+
+    -- store in saved variable
+    PM_Specializations[playerName] = specializations;
+end
+
+--- Get own specializations for a character.
+-- @param playerName Name of the character.
+-- @return Table mapping professionId to spellId, or empty table.
+function OwnProfessionsService:GetSpecializations(playerName)
+    return PM_Specializations[playerName] or {};
+end
+
 --- Get own profession data.
 function OwnProfessionsService:GetProfessionData()
     -- check if is in combat
@@ -240,6 +278,9 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
     -- send my characters
     self:SendMyCharacters(playerName);
 
+    -- send specializations for all own characters
+    self:SendSpecializations(playerName);
+
     -- check if should send back
     if (sendBack) then
         -- request professions from other player
@@ -271,6 +312,42 @@ function OwnProfessionsService:SendMyCharacters(playerName)
     if (#messageCharacters > 0) then
         -- send message
         messageService:SendToPlayer(playerName, MyCharactersMessage:Create(messageCharacters)); 
+    end
+end
+
+--- Send specializations of all own characters to a player.
+-- @param playerName Name of player to send specializations to.
+function OwnProfessionsService:SendSpecializations(playerName)
+    -- only available from TBC onwards
+    if (self.addon.isVanilla) then
+        return;
+    end
+
+    -- get services and model
+    local messageService = self:GetService("message");
+    local playerService = self:GetService("player");
+    local PlayerSpecializationsMessage = self:GetModel("player-specializations-message");
+
+    -- only iterate own characters (from PM_OwnProfessions)
+    for characterName, _ in pairs(PM_OwnProfessions) do
+        -- check if is same realm and same faction
+        if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
+            -- get specializations for this character
+            local specializations = PM_Specializations[characterName];
+            if (specializations) then
+                -- check if has any specializations
+                local hasSpecializations = false;
+                for _ in pairs(specializations) do
+                    hasSpecializations = true;
+                    break;
+                end
+
+                -- send if has specializations
+                if (hasSpecializations) then
+                    messageService:SendToPlayer(playerName, PlayerSpecializationsMessage:Create(characterName, specializations));
+                end
+            end
+        end
     end
 end
 
