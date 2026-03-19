@@ -2,5 +2,6 @@
     <Script file="missing-reagents-view.lua" />
     <Script file="professions-view.lua" />
     <Script file="skill-view.lua" />
+    <Script file="spec-view.lua" />
     <Script file="welcome-view.lua" />
 </Ui>
