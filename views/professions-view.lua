@@ -25,7 +25,7 @@ function ProfessionsView:Show()
         self.scrollTop = 0;
 
         -- create view
-        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"), false);
+        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"), false, true);
         view:EnableKeyboard();
         view:SetScript("OnKeyDown", function(_, key)
             -- check escape
@@ -40,22 +40,18 @@ function ProfessionsView:Show()
             end
         end)
 
-        -- set sizeable
-        view:SetResizable(true);
+        self.view = view;
 
-        -- create resize handlers
-        view:SetScript("OnMouseDown", function(self, button)
-            if button == "LeftButton" and IsShiftKeyDown() then
-                self:StartSizing("BOTTOMRIGHT");
-                self:SetUserPlaced(true);
-                self:SetBackdropBorderColor(1, 1, 1, 1);
+        -- handle resize: update scroll child width and refresh rows
+        view:HookScript("OnSizeChanged", function()
+            if (self.scrollChild and self.scrollFrame) then
+                self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
+                self:RefreshRows();
+            end
+            if (self.bucketListScrollChild and self.bucketListScrollElement) then
+                self.bucketListScrollChild:SetWidth(self.bucketListScrollElement:GetWidth());
             end
         end);
-        view:SetScript("OnMouseUp", function(self, button)
-            self:StopMovingOrSizing();
-            self:SetBackdropBorderColor(0, 0, 0, 1);
-        end);
-        self.view = view;
 
         -- add close button
         local closeButton = uiService:CreateFlatCloseButton(view, function()
@@ -640,9 +636,10 @@ end
 
 --- Refresh rows.
 function ProfessionsView:RefreshRows()
-    -- get visible range
+    -- get visible range based on actual scroll frame height
+    local visibleRowCount = math.ceil((self.scrollFrame:GetHeight() or 400) / 20) + 6;
     local startIndex = math.max(math.floor(self.scrollTop / 20) - 3, 1);
-    local endIndex = math.min(startIndex + 28, #self.skills);
+    local endIndex = math.min(startIndex + visibleRowCount, #self.skills);
     local visibleCount = endIndex - startIndex + 1;
 
     -- get player service
