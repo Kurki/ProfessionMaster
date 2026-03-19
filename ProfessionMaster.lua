@@ -25,6 +25,7 @@ if (not PM_ReagentWatchList) then PM_ReagentWatchList = {}; end
 if (not PM_CharacterSettings) then PM_CharacterSettings = {}; end
 if (not PM_Guildmates) then PM_Guildmates = {}; end
 if (not PM_PlayerFactions) then PM_PlayerFactions = {}; end
+if (not PM_Specializations) then PM_Specializations = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()
@@ -311,6 +312,9 @@ function ProfessionMasterAddon:RegisterEvents()
 
             -- check welcome
             self:GetService("own-professions"):CheckWelcome();
+
+            -- detect own specializations (TBC+)
+            self:GetService("own-professions"):DetectSpecializations();
 
             -- say hello to guild
             self:GetService("professions"):SayHelloToGuild();
