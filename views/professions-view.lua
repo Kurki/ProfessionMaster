@@ -51,6 +51,7 @@ function ProfessionsView:Show()
             if (self.bucketListScrollChild and self.bucketListScrollElement) then
                 self.bucketListScrollChild:SetWidth(self.bucketListScrollElement:GetWidth());
             end
+            self:UpdateResponsiveLayout();
         end);
 
         -- add close button
@@ -131,6 +132,7 @@ function ProfessionsView:Show()
         local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         itemSearchLabel:SetPoint("TOPLEFT", 18, -15);
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
+        self.itemSearchLabel = itemSearchLabel;
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
         if (self.addon.isVanilla) then
@@ -166,6 +168,7 @@ function ProfessionsView:Show()
         -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
+        self.professionLabel = professionLabel;
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
         if (self.addon.isVanilla) then
@@ -215,8 +218,9 @@ function ProfessionsView:Show()
         if (not self.addon.isVanilla) then
             -- add addon selection
             local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            addonLabel:SetPoint("TOPRIGHT", -120, -15);
+            addonLabel:SetPoint("TOPRIGHT", -125, -15);
             addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
+            self.addonLabel = addonLabel;
             local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
             addonSelection:ClearAllPoints();
             addonSelection:SetPoint("TOPRIGHT", -20, -31);
@@ -284,6 +288,7 @@ function ProfessionsView:Show()
         bucketListIcon:SetSize(16, 16);
         bucketListIcon:SetTexture("Interface\\Buttons\\UI-GuildButton-PublicNote-Up"); 
         bucketListIcon:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -56, -67);
+        self.bucketListIcon = bucketListIcon;
 
         -- add skill text
         local skillText = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -292,8 +297,9 @@ function ProfessionsView:Show()
 
         -- add player text
         local playerText = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        playerText:SetPoint("TOPLEFT", 332, -69);
+        playerText:SetPoint("TOPLEFT", 292, -69);
         playerText:SetText(localeService:Get("ProfessionsViewPlayers"));
+        self.playerHeaderText = playerText;
 
         -- create scroll frame 
         local scrollFrame, scrollChild, scrollElement = uiService:CreateScrollFrame(skillsFrame);
@@ -356,6 +362,35 @@ function ProfessionsView:Show()
     self.visible = true;
 end
 
+--- Update responsive layout based on skillsFrame width.
+function ProfessionsView:UpdateResponsiveLayout()
+    if (not self.skillsFrame or not self.itemSearch) then return; end
+    local skillsWidth = self.skillsFrame:GetWidth();
+    if (skillsWidth < 500) then
+        self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -10, -56);
+        if (self.professionLabel) then self.professionLabel:Hide(); end
+        if (self.professionSelection) then self.professionSelection:Hide(); end
+        if (self.addonLabel) then self.addonLabel:Hide(); end
+        if (self.addonSelection) then self.addonSelection:Hide(); end
+        if (self.playerHeaderText) then self.playerHeaderText:Hide(); end
+        if (self.bucketListIcon) then self.bucketListIcon:Hide(); end
+        self.hidePlayerColumn = true;
+    else
+        if (self.addon.isVanilla) then
+            self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -199, -56);
+        else
+            self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -332, -56);
+        end
+        if (self.professionLabel) then self.professionLabel:Show(); end
+        if (self.professionSelection) then self.professionSelection:Show(); end
+        if (self.addonLabel) then self.addonLabel:Show(); end
+        if (self.addonSelection) then self.addonSelection:Show(); end
+        if (self.playerHeaderText) then self.playerHeaderText:Show(); end
+        if (self.bucketListIcon) then self.bucketListIcon:Show(); end
+        self.hidePlayerColumn = false;
+    end
+end
+
 --- Check bucket list.
 function ProfessionsView:CheckBucketList()
     -- check view
@@ -379,6 +414,7 @@ function ProfessionsView:CheckBucketList()
         self.bucketListFrame:Hide();
     end
     self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
+    self:UpdateResponsiveLayout();
 
     -- Refresh bucket list rows
     self:RefreshBucketListRows();
@@ -663,7 +699,7 @@ function ProfessionsView:RefreshRows()
 
         -- add player text
         local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        playerText:SetPoint("TOPLEFT", 316, -4);
+        playerText:SetPoint("TOPLEFT", 276, -4);
         playerText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -26, -4);
         playerText:SetJustifyH("LEFT");
         playerText:SetJustifyV("TOP");
@@ -755,7 +791,12 @@ function ProfessionsView:RefreshRows()
         row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
 
         -- set player text
-        row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+        if (self.hidePlayerColumn) then
+            row.playerText:Hide();
+        else
+            row.playerText:Show();
+            row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+        end
 
         -- set bucket list text
         row.bucketListText:SetText(bucketListAmount);
