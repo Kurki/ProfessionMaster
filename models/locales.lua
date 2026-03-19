@@ -59,7 +59,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Remove from shopping list",
             ["ProfessionsViewClearBucketList"] = "Clear shopping list",
             ["ProfessionsViewNotOnBucketList"] = "Other",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
             ["ProfessionsViewAnnounce"] = "Promote in Guild Chat",
 
             -- skill view
@@ -77,7 +77,27 @@ function LocalesModel:Create()
             -- who
             ["WhoCraftResponse"] = "I can craft that for you!",
             ["WhoCannotCraftResponse"] = "Unfortunately, I don't know anyone who can craft that.",
-            ['WhoOtherCanCraftResponse'] = "can craft that for you!"
+            ['WhoOtherCanCraftResponse'] = "can craft that for you!",
+
+            -- specializations
+            ["Specialization"] = "Specialization",
+            ["AllSpecializations"] = "All Specializations",
+            ["Spec28675"] = "Potion Master",
+            ["Spec28677"] = "Elixir Master",
+            ["Spec28672"] = "Transmutation Master",
+            ["Spec9788"] = "Armorsmith",
+            ["Spec9787"] = "Weaponsmith",
+            ["Spec17039"] = "Master Swordsmith",
+            ["Spec17040"] = "Master Hammersmith",
+            ["Spec17041"] = "Master Axesmith",
+            ["Spec10656"] = "Dragonscale Leatherworking",
+            ["Spec10658"] = "Elemental Leatherworking",
+            ["Spec10660"] = "Tribal Leatherworking",
+            ["Spec26797"] = "Spellfire Tailoring",
+            ["Spec26801"] = "Shadoweave Tailoring",
+            ["Spec26798"] = "Mooncloth Tailoring",
+            ["Spec20219"] = "Gnomish Engineering",
+            ["Spec20222"] = "Goblin Engineering"
         },
         -- define de locale
         ["de"] = {
@@ -128,7 +148,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Von Einkaufliste entfernen",
             ["ProfessionsViewClearBucketList"] = "Einkaufsliste leeren",
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufliste setzen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
             ["ProfessionsViewAnnounce"] = "Im Gildenchat ankündigen",
 
             -- skill view
@@ -146,7 +166,27 @@ function LocalesModel:Create()
             -- who
             ["WhoCraftResponse"] = "Ich kann dir das herstellen!",
             ["WhoCannotCraftResponse"] = "Ich kenne leider niemanden der das herstellen kann.",
-            ['WhoOtherCanCraftResponse'] = "kann dir das herstellen!"
+            ['WhoOtherCanCraftResponse'] = "kann dir das herstellen!",
+
+            -- specializations
+            ["Specialization"] = "Spezialisierung",
+            ["AllSpecializations"] = "Alle Spezialisierungen",
+            ["Spec28675"] = "Trankmeister",
+            ["Spec28677"] = "Elixiermeister",
+            ["Spec28672"] = "Transmutationsmeister",
+            ["Spec9788"] = "Rüstungsschmied",
+            ["Spec9787"] = "Waffenschmied",
+            ["Spec17039"] = "Schwertschmiedemeister",
+            ["Spec17040"] = "Hammerschmiedemeister",
+            ["Spec17041"] = "Axtschmiedemeister",
+            ["Spec10656"] = "Drachenschuppenlederverarbeitung",
+            ["Spec10658"] = "Elementarlederverarbeitung",
+            ["Spec10660"] = "Stammeslederverarbeitung",
+            ["Spec26797"] = "Zauberfeuerschneiderei",
+            ["Spec26801"] = "Schattenweberschneiderei",
+            ["Spec26798"] = "Urmondstoffschneiderei",
+            ["Spec20219"] = "Gnomeningenieur",
+            ["Spec20222"] = "Gobliningenieur"
         },
         -- define ru locale
         ["ru"] = {
@@ -197,7 +237,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Удалить из списка покупок",
             ["ProfessionsViewClearBucketList"] = "Очистить список покупок",
             ["ProfessionsViewNotOnBucketList"] = "Прочее",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали / Добавить в список покупок.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
             ["ProfessionsViewAnnounce"] = "Объявить в чате гильдии",
 
             -- skill view
@@ -215,7 +255,27 @@ function LocalesModel:Create()
             -- who
             ["WhoCraftResponse"] = "Я могу это для тебя сделать!",
             ["WhoCannotCraftResponse"] = "К сожалению, я не знаю никого, кто может это сделать.",
-            ["WhoOtherCanCraftResponse"] = "может это для тебя сделать!"
+            ["WhoOtherCanCraftResponse"] = "может это для тебя сделать!",
+
+            -- specializations
+            ["Specialization"] = "Специализация",
+            ["AllSpecializations"] = "Все специализации",
+            ["Spec28675"] = "Мастер зелий",
+            ["Spec28677"] = "Мастер эликсиров",
+            ["Spec28672"] = "Мастер трансмутации",
+            ["Spec9788"] = "Бронник",
+            ["Spec9787"] = "Оружейник",
+            ["Spec17039"] = "Мастер мечей",
+            ["Spec17040"] = "Мастер молотов",
+            ["Spec17041"] = "Мастер топоров",
+            ["Spec10656"] = "Драконья кожа",
+            ["Spec10658"] = "Стихии",
+            ["Spec10660"] = "Племенное",
+            ["Spec26797"] = "Чародейский огонь",
+            ["Spec26801"] = "Тень",
+            ["Spec26798"] = "Лунная ткань",
+            ["Spec20219"] = "Гномская инженерия",
+            ["Spec20222"] = "Гоблинская инженерия"
         },
         -- define es locale
         ["es"] = {
@@ -266,7 +326,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Quitar de la lista de compras",
             ["ProfessionsViewClearBucketList"] = "Vaciar lista de compras",
             ["ProfessionsViewNotOnBucketList"] = "Otros",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles / Añadir a la lista de compras.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
             ["ProfessionsViewAnnounce"] = "Anunciar en el chat del gremio",
 
             -- skill view
@@ -284,7 +344,27 @@ function LocalesModel:Create()
             -- who
             ["WhoCraftResponse"] = "¡Puedo fabricarte eso!",
             ["WhoCannotCraftResponse"] = "Lamentablemente, no conozco a nadie que pueda fabricar eso.",
-            ["WhoOtherCanCraftResponse"] = "puede fabricarte eso!"
+            ["WhoOtherCanCraftResponse"] = "puede fabricarte eso!",
+
+            -- specializations
+            ["Specialization"] = "Especialización",
+            ["AllSpecializations"] = "Todas las especializaciones",
+            ["Spec28675"] = "Maestro en pociones",
+            ["Spec28677"] = "Maestro en elixires",
+            ["Spec28672"] = "Maestro en transmutación",
+            ["Spec9788"] = "Forjador de armaduras",
+            ["Spec9787"] = "Forjador de armas",
+            ["Spec17039"] = "Maestro espadero",
+            ["Spec17040"] = "Maestro martillero",
+            ["Spec17041"] = "Maestro hachas",
+            ["Spec10656"] = "Peletería de escamas de dragón",
+            ["Spec10658"] = "Peletería elemental",
+            ["Spec10660"] = "Peletería tribal",
+            ["Spec26797"] = "Sastrería de fuego mágico",
+            ["Spec26801"] = "Sastrería de tejido de sombras",
+            ["Spec26798"] = "Sastrería de tela lunar",
+            ["Spec20219"] = "Ingeniería gnómica",
+            ["Spec20222"] = "Ingeniería goblin"
         }
     };
 end

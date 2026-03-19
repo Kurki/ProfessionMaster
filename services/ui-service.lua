@@ -19,13 +19,15 @@ function UiService:Initialize()
 end
 
 -- create frame
-function UiService:CreateView(name, width, height, title, showShortcut)
+function UiService:CreateView(name, width, height, title, showShortcut, resizable)
     -- create view
     local view = CreateFrame("Frame", nil, nil, BackdropTemplateMixin and "BackdropTemplate");
     view:SetFrameStrata("HIGH");
     view:SetWidth(width);
     view:SetHeight(height);
     view.positionName = name;
+    view.defaultWidth = width;
+    view.defaultHeight = height;
     view:SetFrameLevel(currentZIndex);
     view:SetBackdrop({
         bgFile = [[Interface/Buttons/WHITE8X8]],
@@ -58,14 +60,165 @@ function UiService:CreateView(name, width, height, title, showShortcut)
     view:EnableMouse(true);
     view:SetClampedToScreen(true);
     view:RegisterForDrag("LeftButton");
-    view:SetScript("OnDragStart", view.StartMoving);
-    view:SetScript("OnDragStop", function()
-        -- stop moving and store position
-        view:StopMovingOrSizing();
-        self:StorePosition(view);
-    end);
+
+    -- restore position and size
     self:RestorePosition(view);
+    self:RestoreSize(view, width, height);
+
+    -- validate that view is visible on screen
+    self:ValidateOnScreen(view);
+
+    -- set up resizable behavior
+    if (resizable) then
+        self:SetupResizable(view);
+    end
+
+    -- set drag handlers (only start drag if not on edge)
+    local service = self;
+    view:SetScript("OnDragStart", function()
+        if (not view.amResizing) then
+            view:StartMoving();
+        end
+    end);
+    view:SetScript("OnDragStop", function()
+        view:StopMovingOrSizing();
+        service:StorePosition(view);
+    end);
+
     return view;
+end
+
+--- Set up resizable behavior on a view frame.
+-- @param view The frame to make resizable.
+function UiService:SetupResizable(view)
+    local service = self;
+    view:SetResizable(true);
+    view:SetResizeBounds(view.defaultWidth * 0.6, view.defaultHeight * 0.6);
+
+    local edgeSize = 6;
+    local resizeDirection = nil;
+    view.amResizing = false;
+
+    -- create edge overlay textures for per-side coloring
+    local edgeThickness = 1;
+    local edgeTop = view:CreateTexture(nil, "OVERLAY");
+    edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeTop:SetPoint("TOPLEFT", 0, 0);
+    edgeTop:SetPoint("TOPRIGHT", 0, 0);
+    edgeTop:SetHeight(edgeThickness);
+
+    local edgeBottom = view:CreateTexture(nil, "OVERLAY");
+    edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeBottom:SetPoint("BOTTOMLEFT", 0, 0);
+    edgeBottom:SetPoint("BOTTOMRIGHT", 0, 0);
+    edgeBottom:SetHeight(edgeThickness);
+
+    local edgeLeft = view:CreateTexture(nil, "OVERLAY");
+    edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeLeft:SetPoint("TOPLEFT", 0, 0);
+    edgeLeft:SetPoint("BOTTOMLEFT", 0, 0);
+    edgeLeft:SetWidth(edgeThickness);
+
+    local edgeRight = view:CreateTexture(nil, "OVERLAY");
+    edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeRight:SetPoint("TOPRIGHT", 0, 0);
+    edgeRight:SetPoint("BOTTOMRIGHT", 0, 0);
+    edgeRight:SetWidth(edgeThickness);
+
+    -- map resize directions to active edges
+    local directionEdges = {
+        TOP         = { top = true },
+        BOTTOM      = { bottom = true },
+        LEFT        = { left = true },
+        RIGHT       = { right = true },
+        TOPLEFT     = { top = true, left = true },
+        TOPRIGHT    = { top = true, right = true },
+        BOTTOMLEFT  = { bottom = true, left = true },
+        BOTTOMRIGHT = { bottom = true, right = true },
+    };
+
+    local function UpdateEdgeColors(direction)
+        if (not direction) then
+            -- default: all gray
+            edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            return;
+        end
+        local active = directionEdges[direction] or {};
+        -- active edges golden, others white
+        if (active.top) then edgeTop:SetColorTexture(1, 0.82, 0, 1); else edgeTop:SetColorTexture(1, 1, 1, 1); end
+        if (active.bottom) then edgeBottom:SetColorTexture(1, 0.82, 0, 1); else edgeBottom:SetColorTexture(1, 1, 1, 1); end
+        if (active.left) then edgeLeft:SetColorTexture(1, 0.82, 0, 1); else edgeLeft:SetColorTexture(1, 1, 1, 1); end
+        if (active.right) then edgeRight:SetColorTexture(1, 0.82, 0, 1); else edgeRight:SetColorTexture(1, 1, 1, 1); end
+    end
+
+    local function GetResizeDirection()
+        -- only detect edges when mouse is over the frame
+        if (not view:IsMouseOver()) then return nil; end
+
+        local x, y = GetCursorPosition();
+        local scale = view:GetEffectiveScale();
+        x, y = x / scale, y / scale;
+        local left = view:GetLeft();
+        local right = view:GetRight();
+        local top = view:GetTop();
+        local bottom = view:GetBottom();
+        if (not left) then return nil; end
+
+        local atLeft = (x - left) < edgeSize;
+        local atRight = (right - x) < edgeSize;
+        local atTop = (top - y) < edgeSize;
+        local atBottom = (y - bottom) < edgeSize;
+
+        if (atTop and atLeft) then return "TOPLEFT"; end
+        if (atTop and atRight) then return "TOPRIGHT"; end
+        if (atBottom and atLeft) then return "BOTTOMLEFT"; end
+        if (atBottom and atRight) then return "BOTTOMRIGHT"; end
+        if (atTop) then return "TOP"; end
+        if (atBottom) then return "BOTTOM"; end
+        if (atLeft) then return "LEFT"; end
+        if (atRight) then return "RIGHT"; end
+        return nil;
+    end
+
+    view:HookScript("OnUpdate", function()
+        if (resizeDirection) then return; end
+        local dir = GetResizeDirection();
+        UpdateEdgeColors(dir);
+    end);
+
+    view:HookScript("OnMouseDown", function(_, button)
+        if (button == "LeftButton") then
+            local dir = GetResizeDirection();
+            if (dir) then
+                resizeDirection = dir;
+                view.amResizing = true;
+                view:StopMovingOrSizing();
+                view:StartSizing(dir);
+                UpdateEdgeColors(dir);
+            end
+        end
+    end);
+
+    view:HookScript("OnMouseUp", function(_, button)
+        if (resizeDirection) then
+            view:StopMovingOrSizing();
+            resizeDirection = nil;
+            view.amResizing = false;
+            local dir = GetResizeDirection();
+            UpdateEdgeColors(dir);
+            service:StorePosition(view);
+            service:StoreSize(view);
+        end
+    end);
+
+    view:HookScript("OnLeave", function()
+        if (not resizeDirection) then
+            UpdateEdgeColors(nil);
+        end
+    end);
 end
 
 --- Create normal button.
@@ -281,32 +434,74 @@ end
 
 -- store frame position
 function UiService:StorePosition(frame)
-    -- store position
     local from, _, to, x, y = frame:GetPoint();
-    PM_Frames[frame.positionName] = {
-        from = from,
-        to = to,
-        x = x,
-        y = y
-    };
+    if (not PM_Frames[frame.positionName]) then
+        PM_Frames[frame.positionName] = {};
+    end
+    PM_Frames[frame.positionName].from = from;
+    PM_Frames[frame.positionName].to = to;
+    PM_Frames[frame.positionName].x = x;
+    PM_Frames[frame.positionName].y = y;
 end
 
 -- restore frame position
 function UiService:RestorePosition(frame)
-    -- clear all points
     frame:ClearAllPoints();
-
-    -- get position
-    local position = PM_Frames[frame.positionName];
-
-    -- check position
-    if (position == nil) then
+    local data = PM_Frames[frame.positionName];
+    if (not data or not data.from) then
         frame:SetPoint("CENTER", 0, 0);
         return;
     end
+    frame:SetPoint(data.from, nil, data.to, data.x, data.y);
+end
 
-    -- set stored point
-    frame:SetPoint(position.from, nil, position.to, position.x, position.y);
+-- store frame size
+function UiService:StoreSize(frame)
+    if (not PM_Frames[frame.positionName]) then
+        PM_Frames[frame.positionName] = {};
+    end
+    PM_Frames[frame.positionName].width = frame:GetWidth();
+    PM_Frames[frame.positionName].height = frame:GetHeight();
+end
+
+-- restore frame size
+function UiService:RestoreSize(frame, defaultWidth, defaultHeight)
+    local data = PM_Frames[frame.positionName];
+    if (data and data.width and data.height) then
+        -- enforce minimum size
+        local minWidth = defaultWidth * 0.5;
+        local minHeight = defaultHeight * 0.5;
+        frame:SetWidth(math.max(data.width, minWidth));
+        frame:SetHeight(math.max(data.height, minHeight));
+    else
+        frame:SetWidth(defaultWidth);
+        frame:SetHeight(defaultHeight);
+    end
+end
+
+-- validate that frame is visible on screen, reset to center if not
+function UiService:ValidateOnScreen(frame)
+    -- defer to next frame so layout is resolved
+    C_Timer.After(0, function()
+        local left = frame:GetLeft();
+        local bottom = frame:GetBottom();
+        local right = frame:GetRight();
+        local top = frame:GetTop();
+        if (not left or not bottom) then
+            return;
+        end
+
+        local scale = frame:GetEffectiveScale();
+        local screenWidth = GetScreenWidth();
+        local screenHeight = GetScreenHeight();
+
+        -- check if at least part of the frame is visible
+        local visible = (right * scale > 0) and (left * scale < screenWidth) and (top * scale > 0) and (bottom * scale < screenHeight);
+        if (not visible) then
+            frame:ClearAllPoints();
+            frame:SetPoint("CENTER", 0, 0);
+        end
+    end);
 end
 
 -- Create minimap icon.

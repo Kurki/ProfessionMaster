@@ -22,16 +22,19 @@ function ProfessionsView:Show()
         self.skills = {};
         self.professionId = nil;
         self.skillView = self.addon:NewView("skill-view");
+        self.specView = self.addon:NewView("spec-view");
         self.scrollTop = 0;
 
         -- create view
-        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"), false);
+        local view = uiService:CreateView("PmProfessions", 1000, 540, localeService:Get("ProfessionsViewTitle"), false, true);
         view:EnableKeyboard();
         view:SetScript("OnKeyDown", function(_, key)
             -- check escape
             if (key == "ESCAPE") then
                 if (self.skillViewVisible) then
                     self:HideSkillView();
+                elseif (self.specViewVisible) then
+                    self:HideSpecView();
                 else
                     self:Hide();
                 end
@@ -40,22 +43,19 @@ function ProfessionsView:Show()
             end
         end)
 
-        -- set sizeable
-        view:SetResizable(true);
-
-        -- create resize handlers
-        view:SetScript("OnMouseDown", function(self, button)
-            if button == "LeftButton" and IsShiftKeyDown() then
-                self:StartSizing("BOTTOMRIGHT");
-                self:SetUserPlaced(true);
-                self:SetBackdropBorderColor(1, 1, 1, 1);
-            end
-        end);
-        view:SetScript("OnMouseUp", function(self, button)
-            self:StopMovingOrSizing();
-            self:SetBackdropBorderColor(0, 0, 0, 1);
-        end);
         self.view = view;
+
+        -- handle resize: update scroll child width and refresh rows
+        view:HookScript("OnSizeChanged", function()
+            if (self.scrollChild and self.scrollFrame) then
+                self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
+                self:RefreshRows();
+            end
+            if (self.bucketListScrollChild and self.bucketListScrollElement) then
+                self.bucketListScrollChild:SetWidth(self.bucketListScrollElement:GetWidth());
+            end
+            self:UpdateResponsiveLayout();
+        end);
 
         -- add close button
         local closeButton = uiService:CreateFlatCloseButton(view, function()
@@ -135,6 +135,7 @@ function ProfessionsView:Show()
         local itemSearchLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         itemSearchLabel:SetPoint("TOPLEFT", 18, -15);
         itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
+        self.itemSearchLabel = itemSearchLabel;
         local itemSearch = CreateFrame("EditBox", nil, skillsFrame, "InputBoxTemplate");
         itemSearch:SetPoint("TOPLEFT", 22, -33);
         if (self.addon.isVanilla) then
@@ -170,6 +171,7 @@ function ProfessionsView:Show()
         -- add profession selection
         local professionLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
+        self.professionLabel = professionLabel;
         local professionSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
         professionSelection:ClearAllPoints();
         if (self.addon.isVanilla) then
@@ -213,14 +215,29 @@ function ProfessionsView:Show()
                 item.text, item.arg1 = self:GetProfessionText(professionId), professionId;
                 UIDropDownMenu_AddButton(item);
             end
+
+            -- add all specializations entry (non-vanilla only)
+            if (not self.addon.isVanilla) then
+                -- add separator
+                local separator = UIDropDownMenu_CreateInfo();
+                separator.notCheckable = true;
+                separator.isTitle = true;
+                separator.disabled = true;
+                separator.text = "";
+                UIDropDownMenu_AddButton(separator);
+
+                item.text, item.arg1 = self:GetProfessionText(-1), -1;
+                UIDropDownMenu_AddButton(item);
+            end
         end);
 
         -- check if is not vanilla
         if (not self.addon.isVanilla) then
             -- add addon selection
             local addonLabel = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-            addonLabel:SetPoint("TOPRIGHT", -120, -15);
+            addonLabel:SetPoint("TOPRIGHT", -130, -15);
             addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
+            self.addonLabel = addonLabel;
             local addonSelection = CreateFrame("Frame", nil, skillsFrame, "UIDropDownMenuTemplate");
             addonSelection:ClearAllPoints();
             addonSelection:SetPoint("TOPRIGHT", -20, -31);
@@ -288,21 +305,49 @@ function ProfessionsView:Show()
         bucketListIcon:SetSize(16, 16);
         bucketListIcon:SetTexture("Interface\\Buttons\\UI-GuildButton-PublicNote-Up"); 
         bucketListIcon:SetPoint("TOPLEFT", skillsFrame, "TOPRIGHT", -56, -67);
+        self.bucketListIcon = bucketListIcon;
 
-        -- add skill text
+        -- add specialization area (between search and item list)
+        local specArea = CreateFrame("Frame", nil, skillsFrame);
+        specArea:SetPoint("TOPLEFT", 10, -62);
+        specArea:SetPoint("RIGHT", skillsFrame, "RIGHT", -12, 0);
+        specArea:SetHeight(1);
+        specArea:Hide();
+        self.specArea = specArea;
+
+        -- add specialization header
+        local specHeaderLabel = specArea:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        specHeaderLabel:SetPoint("TOPLEFT", 8, 0);
+        specHeaderLabel:SetText(localeService:Get("Specialization"));
+        self.specHeaderLabel = specHeaderLabel;
+
+        -- add specialization players header
+        local specPlayersHeader = specArea:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        specPlayersHeader:SetPoint("TOPLEFT", 282, 0);
+        specPlayersHeader:SetText(localeService:Get("ProfessionsViewPlayers"));
+        self.specPlayersHeader = specPlayersHeader;
+
+        -- specialization row pool
+        self.specRowPool = {};
+
+        -- add skill text (anchored below spec area)
         local skillText = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        skillText:SetPoint("TOPLEFT", 22, -69);
+        skillText:SetPoint("TOPLEFT", 18, -69);
         self.skillText = skillText;
+        self.skillTextDefaultTop = -69;
 
         -- add player text
         local playerText = skillsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        playerText:SetPoint("TOPLEFT", 332, -69);
+        playerText:SetPoint("TOPLEFT", 292, -69);
         playerText:SetText(localeService:Get("ProfessionsViewPlayers"));
+        self.playerHeaderText = playerText;
+        self.playerHeaderDefaultTop = -69;
 
         -- create scroll frame 
         local scrollFrame, scrollChild, scrollElement = uiService:CreateScrollFrame(skillsFrame);
         scrollFrame:SetPoint("TOPLEFT", 10, -82);
         scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+        self.scrollFrameDefaultTop = -82;
         scrollElement:SetScript("OnVerticalScroll", function(_, top)
             self.scrollTop = top;
             self:RefreshRows();
@@ -350,6 +395,7 @@ function ProfessionsView:Show()
 
     -- hide skill view
     self:HideSkillView(true);
+    self:HideSpecView();
     self:CheckBucketList();
 
     -- select first profession
@@ -358,6 +404,200 @@ function ProfessionsView:Show()
     -- show view
     self.view:Show();
     self.visible = true;
+end
+
+--- Update responsive layout based on skillsFrame width.
+function ProfessionsView:UpdateResponsiveLayout()
+    if (not self.skillsFrame or not self.itemSearch) then return; end
+    local skillsWidth = self.skillsFrame:GetWidth();
+    if (skillsWidth < 500) then
+        self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -10, -56);
+        if (self.professionLabel) then self.professionLabel:Hide(); end
+        if (self.professionSelection) then self.professionSelection:Hide(); end
+        if (self.addonLabel) then self.addonLabel:Hide(); end
+        if (self.addonSelection) then self.addonSelection:Hide(); end
+        if (self.playerHeaderText) then self.playerHeaderText:Hide(); end
+        if (self.specPlayersHeader) then self.specPlayersHeader:Hide(); end
+        if (self.bucketListIcon) then self.bucketListIcon:Hide(); end
+        self.hidePlayerColumn = true;
+    else
+        if (self.addon.isVanilla) then
+            self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -199, -56);
+        else
+            self.itemSearch:SetPoint("BOTTOMRIGHT", self.skillsFrame, "TOPRIGHT", -332, -56);
+        end
+        if (self.professionLabel) then self.professionLabel:Show(); end
+        if (self.professionSelection) then self.professionSelection:Show(); end
+        if (self.addonLabel) then self.addonLabel:Show(); end
+        if (self.addonSelection) then self.addonSelection:Show(); end
+        if (self.playerHeaderText) then self.playerHeaderText:Show(); end
+        if (self.specPlayersHeader) then self.specPlayersHeader:Show(); end
+        if (self.bucketListIcon) then self.bucketListIcon:Show(); end
+        self.hidePlayerColumn = false;
+    end
+end
+
+--- Refresh specialization rows above the item list.
+function ProfessionsView:RefreshSpecializationRows()
+    if (not self.specArea or self.addon.isVanilla) then return; end
+
+    -- hide all existing spec rows
+    for _, row in ipairs(self.specRowPool) do
+        row:Hide();
+    end
+
+    -- determine which professions to show specializations for
+    local professionId = self.professionId;
+
+    -- hide specs for "all professions" (0) and "all specializations" (-1)
+    if (not professionId or professionId == 0 or professionId == -1) then
+        self.specArea:Hide();
+        self:UpdateItemAreaPosition(0);
+        return;
+    end
+
+    -- get specialization spells for this profession
+    local specializationSpells = self:GetModel("specialization-spells");
+    local specs = specializationSpells[professionId];
+    if (not specs or #specs == 0) then
+        self.specArea:Hide();
+        self:UpdateItemAreaPosition(0);
+        return;
+    end
+
+    -- build specialization display data: for each spec, collect players who have it
+    local localeService = self:GetService("locale");
+    local playerService = self:GetService("player");
+    local specRows = {};
+
+    for _, spec in ipairs(specs) do
+        local players = {};
+        for characterName, characterSpecs in pairs(PM_Specializations) do
+            if (characterSpecs[professionId] == spec.spellId) then
+                if ((playerService:IsSameRealm(characterName) or PM_Guildmates[characterName]) and playerService:IsSameFaction(characterName)) then
+                    table.insert(players, characterName);
+                end
+            end
+        end
+        local specName = localeService:Get("Spec" .. spec.spellId);
+        table.insert(specRows, {
+            name = specName,
+            players = players,
+            spellId = spec.spellId,
+            icon = spec.icon or 136240,
+        });
+    end
+
+    -- show spec area
+    local rowHeight = 20;
+    local headerHeight = 16;
+    local totalHeight = headerHeight + (#specRows * rowHeight) + 4;
+    self.specArea:SetHeight(totalHeight);
+    self.specArea:Show();
+
+    -- ensure enough row frames
+    while (#self.specRowPool < #specRows) do
+        local poolIndex = #self.specRowPool + 1;
+        local row = CreateFrame("Button", nil, self.specArea, BackdropTemplateMixin and "BackdropTemplate");
+        row:SetBackdrop({
+            bgFile = [[Interface\Buttons\WHITE8x8]]
+        });
+
+        local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        itemText:SetPoint("TOPLEFT", 6, -3);
+        row.itemText = itemText;
+
+        local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        playerText:SetPoint("TOPLEFT", 276, -4);
+        playerText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 0, -4);
+        playerText:SetJustifyH("LEFT");
+        playerText:SetJustifyV("TOP");
+        playerText:SetTextColor(1, 1, 1);
+        row.playerText = playerText;
+
+        -- hover effects
+        row:SetScript("OnEnter", function()
+            row:SetBackdropColor(0.2, 0.2, 0.2);
+            GameTooltip:SetOwner(row, "ANCHOR_LEFT");
+            GameTooltip:ClearLines();
+            if (row.specData) then
+                GameTooltip:SetText(row.specData.name);
+                local playerNames = self:GetService("player"):CombinePlayerNames(row.specData.players, 5);
+                GameTooltip:AddLine("|cffffffff" .. self:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
+            end
+            GameTooltip:Show();
+        end);
+        row:SetScript("OnLeave", function()
+            if (row.bgColor) then
+                row:SetBackdropColor(row.bgColor, row.bgColor, row.bgColor, 0.5);
+            end
+            GameTooltip:Hide();
+        end);
+
+        -- click to open spec view
+        row:SetScript("OnMouseDown", function(_, button)
+            if (button == "LeftButton" and row.specData) then
+                self:ShowSpecView(row.specData);
+            end
+        end);
+
+        self.specRowPool[poolIndex] = row;
+    end
+
+    -- populate rows
+    for i, specData in ipairs(specRows) do
+        local row = self.specRowPool[i];
+        local top = headerHeight + (i - 1) * rowHeight;
+        row:ClearAllPoints();
+        row:SetPoint("TOPLEFT", self.specArea, "TOPLEFT", 5, -top);
+        row:SetPoint("RIGHT", self.specArea, "RIGHT", -28, 0);
+        row:SetHeight(rowHeight);
+
+        local backgroundColor = (i % 2 == 0) and 0.12 or 0.06;
+        row.bgColor = backgroundColor;
+        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+
+        row.specData = specData;
+        row.itemText:SetText("|T" .. specData.icon .. ":16|t " .. specData.name);
+
+        if (self.hidePlayerColumn) then
+            row.playerText:Hide();
+        else
+            row.playerText:Show();
+            row.playerText:SetText(table.concat(playerService:CombinePlayerNames(specData.players, 12), ", "));
+        end
+
+        row:Show();
+    end
+
+    -- update item area position
+    self:UpdateItemAreaPosition(totalHeight);
+end
+
+--- Update the item area position based on specialization area height.
+function ProfessionsView:UpdateItemAreaPosition(specHeight)
+    if (not self.skillText) then return; end
+    local offset = specHeight > 0 and (specHeight + 4) or 0;
+    local skillTextTop = self.skillTextDefaultTop - offset;
+    local playerHeaderTop = self.playerHeaderDefaultTop - offset;
+    local scrollFrameTop = self.scrollFrameDefaultTop - offset;
+
+    self.skillText:ClearAllPoints();
+    self.skillText:SetPoint("TOPLEFT", 18, skillTextTop);
+
+    self.playerHeaderText:ClearAllPoints();
+    self.playerHeaderText:SetPoint("TOPLEFT", 292, playerHeaderTop);
+
+    self.bucketListIcon:ClearAllPoints();
+    self.bucketListIcon:SetPoint("TOPLEFT", self.skillsFrame, "TOPRIGHT", -56, skillTextTop - 2 + 4);
+
+    self.scrollFrame:ClearAllPoints();
+    self.scrollFrame:SetPoint("TOPLEFT", 10, scrollFrameTop);
+    self.scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+
+    if (self.scrollChild and self.scrollFrame) then
+        self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
+    end
 end
 
 --- Check bucket list.
@@ -383,6 +623,7 @@ function ProfessionsView:CheckBucketList()
         self.bucketListFrame:Hide();
     end
     self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
+    self:UpdateResponsiveLayout();
 
     -- Refresh bucket list rows
     self:RefreshBucketListRows();
@@ -407,6 +648,22 @@ function ProfessionsView:HideSkillView(supressLoading)
     if (not supressLoading) then
         self:AddSkills();
     end
+end
+
+--- Show spec view.
+function ProfessionsView:ShowSpecView(specData)
+    self.skillViewBackground:Show();
+    self.skillViewBackground:SetFrameLevel(2000);
+    self.specView:Show(specData, self);
+    self.specView.view:SetFrameLevel(2001);
+    self.specViewVisible = true;
+end
+
+--- Hide spec view.
+function ProfessionsView:HideSpecView()
+    self.skillViewBackground:Hide();
+    self.specView:Hide();
+    self.specViewVisible = false;
 end
 
 --- Hide professions view.
@@ -436,6 +693,11 @@ function ProfessionsView:GetProfessionText(professionId)
     -- check if all selected
     if (professionId == 0) then
         return "|T133745:16|t " .. self:GetService("locale"):Get("ProfessionsViewAllProfessions");
+    end
+
+    -- check if all specializations selected
+    if (professionId == -1) then
+        return "|T133739:16|t " .. self:GetService("locale"):Get("AllSpecializations");
     end
 
     -- get icon and name of profession
@@ -509,7 +771,9 @@ function ProfessionsView:AddSkills()
     local localeService = self:GetService("locale");
 
     -- set skill text
-    if (self.professionId == 333) then
+    if (self.professionId == -1) then
+        self.skillText:SetText(localeService:Get("Specialization"));
+    elseif (self.professionId == 333) then
         self.skillText:SetText(localeService:Get("ProfessionsViewEnchantment"));
     else
         self.skillText:SetText(localeService:Get("ProfessionsViewItem"));
@@ -522,12 +786,18 @@ function ProfessionsView:AddSkills()
         searchParts[i] = messageService:TrimString(searchParts[i]);
     end
 
+    -- refresh specialization rows
+    self:RefreshSpecializationRows();
+
     -- check professions
     self.skills = {};
     
     -- check if all should be shown
     self.bucketListSkillAmount = 0;
-    if (self.professionId == 0) then
+    if (self.professionId == -1) then
+        -- "All Specializations" mode: show specializations as items
+        self:AddSpecializationSkills(searchParts);
+    elseif (self.professionId == 0) then
         -- get profession ids
         local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
         for i, professionId in ipairs(professionIds) do
@@ -537,18 +807,20 @@ function ProfessionsView:AddSkills()
         self:AddFilteredSkills(self.professionId, self.addonId, searchParts);
     end
 
-    -- sort skills
-    table.sort(self.skills, function(a, b)
-        if (a.bucketListAmount and not b.bucketListAmount) then
-            return true;
-        end
+    -- sort skills (skip for All Specializations mode which is pre-ordered)
+    if (self.professionId ~= -1) then
+        table.sort(self.skills, function(a, b)
+            if (a.bucketListAmount and not b.bucketListAmount) then
+                return true;
+            end
 
-        if (not a.bucketListAmount and b.bucketListAmount) then
-            return false;
-        end
+            if (not a.bucketListAmount and b.bucketListAmount) then
+                return false;
+            end
 
-        return a.skill.name < b.skill.name;
-    end);
+            return a.skill.name < b.skill.name;
+        end);
+    end
 
     -- set bucket list group text visibility
     if (self.bucketListSkillAmount > 0) then
@@ -638,11 +910,80 @@ function ProfessionsView:AddFilteredSkills(professionId, addonId, searchParts)
     end
 end
 
+--- Add specialization entries as skill rows (for "All Specializations" mode).
+function ProfessionsView:AddSpecializationSkills(searchParts)
+    local localeService = self:GetService("locale");
+    local playerService = self:GetService("player");
+    local professionNamesService = self:GetService("profession-names");
+    local specializationSpells = self:GetModel("specialization-spells");
+
+    -- use dropdown order for profession grouping
+    local professionOrder = professionNamesService:GetProfessionIdsToShow();
+
+    for _, professionId in ipairs(professionOrder) do
+        local specs = specializationSpells[professionId];
+        if (specs) then
+            local professionSpecs = {};
+            for _, spec in ipairs(specs) do
+                local specName = localeService:Get("Spec" .. spec.spellId);
+
+                -- collect players who have this specialization
+                local players = {};
+                for characterName, characterSpecs in pairs(PM_Specializations) do
+                    if (characterSpecs[professionId] == spec.spellId) then
+                        if ((playerService:IsSameRealm(characterName) or PM_Guildmates[characterName]) and playerService:IsSameFaction(characterName)) then
+                            table.insert(players, characterName);
+                        end
+                    end
+                end
+
+                -- check search filter
+                local matchesSearch = true;
+                if (#searchParts > 0) then
+                    for _, part in ipairs(searchParts) do
+                        if (string.len(part) > 0 and string.find(string.lower(specName), part) == nil) then
+                            matchesSearch = false;
+                            break;
+                        end
+                    end
+                end
+
+                if (matchesSearch) then
+                    table.insert(professionSpecs, {
+                        professionId = professionId,
+                        skillId = "spec_" .. spec.spellId,
+                        skill = {
+                            name = specName,
+                            icon = spec.icon or 136240,
+                            players = players,
+                        },
+                        isSpecialization = true,
+                    });
+                end
+            end
+
+            -- add profession group header + specs if any matched
+            if (#professionSpecs > 0) then
+                -- insert group header marker
+                table.insert(self.skills, {
+                    professionId = professionId,
+                    isGroupHeader = true,
+                    groupName = professionNamesService:GetProfessionName(professionId),
+                });
+                for _, specEntry in ipairs(professionSpecs) do
+                    table.insert(self.skills, specEntry);
+                end
+            end
+        end
+    end
+end
+
 --- Refresh rows.
 function ProfessionsView:RefreshRows()
-    -- get visible range
+    -- get visible range based on actual scroll frame height
+    local visibleRowCount = math.ceil((self.scrollFrame:GetHeight() or 400) / 20) + 6;
     local startIndex = math.max(math.floor(self.scrollTop / 20) - 3, 1);
-    local endIndex = math.min(startIndex + 28, #self.skills);
+    local endIndex = math.min(startIndex + visibleRowCount, #self.skills);
     local visibleCount = endIndex - startIndex + 1;
 
     -- get player service
@@ -666,7 +1007,7 @@ function ProfessionsView:RefreshRows()
 
         -- add player text
         local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        playerText:SetPoint("TOPLEFT", 316, -4);
+        playerText:SetPoint("TOPLEFT", 276, -4);
         playerText:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", -26, -4);
         playerText:SetJustifyH("LEFT");
         playerText:SetJustifyV("TOP");
@@ -710,7 +1051,16 @@ function ProfessionsView:RefreshRows()
                     end
                 end
             elseif (button == "LeftButton") then
-                self:ShowSkillView(row);
+                if (row.isSpecialization) then
+                    self:ShowSpecView({
+                        name = row.skill.name,
+                        players = row.skill.players,
+                        icon = row.skill.icon,
+                        professionId = row.professionId,
+                    });
+                else
+                    self:ShowSkillView(row);
+                end
             end
         end);
 
@@ -722,54 +1072,90 @@ function ProfessionsView:RefreshRows()
         row:Hide();
     end
 
+    -- hide all group header labels
+    if (not self.groupHeaderPool) then
+        self.groupHeaderPool = {};
+    end
+    for _, label in ipairs(self.groupHeaderPool) do
+        label:Hide();
+    end
+    local groupHeaderIndex = 0;
+
     -- bind pool frames to visible data
+    local poolUsed = 0;
     for i = 0, visibleCount - 1 do
         local rowIndex = startIndex + i;
-        local row = self.rowPool[i + 1];
         local skillData = self.skills[rowIndex];
-        local professionId = skillData.professionId;
-        local skillId = skillData.skillId;
-        local skill = skillData.skill;
-        local bucketListAmount = skillData.bucketListAmount;
-
-        -- set background color by data index
-        local backgroundColor;
-        if (rowIndex % 2 == 0) then
-            backgroundColor = 0.1;
-        else
-            backgroundColor = 0.15;
-        end
-        row.bgColor = backgroundColor;
-        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
 
         -- calculate top position
         local top = (rowIndex - 1) * 20;
-        if (self.bucketListSkillAmount > 0 and bucketListAmount) then
+        if (self.bucketListSkillAmount > 0 and skillData.bucketListAmount) then
             top = top + 20;
-        elseif(self.bucketListSkillAmount > 0 and not bucketListAmount) then
+        elseif(self.bucketListSkillAmount > 0 and not skillData.bucketListAmount) then
             top = top + 40;
         end
-        row:ClearAllPoints();
-        row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 0, -top);
-        row:SetPoint("BOTTOMRIGHT", self.scrollChild, "TOPRIGHT", -28, -(top + 20));
 
-        -- set item text
-        local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
-        row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
+        -- check if this is a group header
+        if (skillData.isGroupHeader) then
+            groupHeaderIndex = groupHeaderIndex + 1;
+            if (not self.groupHeaderPool[groupHeaderIndex]) then
+                local label = self.scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+                label:SetFont("Fonts\\FRIZQT__.TTF", 10);
+                self.groupHeaderPool[groupHeaderIndex] = label;
+            end
+            local label = self.groupHeaderPool[groupHeaderIndex];
+            label:ClearAllPoints();
+            label:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 4, -(top + 6));
+            label:SetText(skillData.groupName);
+            label:Show();
+        else
+            poolUsed = poolUsed + 1;
+            local row = self.rowPool[poolUsed];
+            if (not row) then break; end
 
-        -- set player text
-        row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+            local professionId = skillData.professionId;
+            local skillId = skillData.skillId;
+            local skill = skillData.skill;
+            local bucketListAmount = skillData.bucketListAmount;
 
-        -- set bucket list text
-        row.bucketListText:SetText(bucketListAmount);
+            -- set background color by data index
+            local backgroundColor;
+            if (rowIndex % 2 == 0) then
+                backgroundColor = 0.1;
+            else
+                backgroundColor = 0.15;
+            end
+            row.bgColor = backgroundColor;
+            row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
 
-        -- store data on row
-        row.professionId = professionId;
-        row.skill = skill;
-        row.skillId = skillId;
+            row:ClearAllPoints();
+            row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 0, -top);
+            row:SetPoint("BOTTOMRIGHT", self.scrollChild, "TOPRIGHT", -28, -(top + 20));
 
-        -- show
-        row:Show();
+            -- set item text
+            local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
+            row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
+
+            -- set player text
+            if (self.hidePlayerColumn) then
+                row.playerText:Hide();
+            else
+                row.playerText:Show();
+                row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+            end
+
+            -- set bucket list text
+            row.bucketListText:SetText(bucketListAmount);
+
+            -- store data on row
+            row.professionId = professionId;
+            row.skill = skill;
+            row.skillId = skillId;
+            row.isSpecialization = skillData.isSpecialization;
+
+            -- show
+            row:Show();
+        end
     end
 end
 
