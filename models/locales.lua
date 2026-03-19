@@ -81,6 +81,7 @@ function LocalesModel:Create()
 
             -- specializations
             ["Specialization"] = "Specialization",
+            ["AllSpecializations"] = "All Specializations",
             ["Spec28675"] = "Potion Master",
             ["Spec28677"] = "Elixir Master",
             ["Spec28672"] = "Transmutation Master",
@@ -169,6 +170,7 @@ function LocalesModel:Create()
 
             -- specializations
             ["Specialization"] = "Spezialisierung",
+            ["AllSpecializations"] = "Alle Spezialisierungen",
             ["Spec28675"] = "Trankmeister",
             ["Spec28677"] = "Elixiermeister",
             ["Spec28672"] = "Transmutationsmeister",
@@ -257,6 +259,7 @@ function LocalesModel:Create()
 
             -- specializations
             ["Specialization"] = "Специализация",
+            ["AllSpecializations"] = "Все специализации",
             ["Spec28675"] = "Мастер зелий",
             ["Spec28677"] = "Мастер эликсиров",
             ["Spec28672"] = "Мастер трансмутации",
@@ -345,6 +348,7 @@ function LocalesModel:Create()
 
             -- specializations
             ["Specialization"] = "Especialización",
+            ["AllSpecializations"] = "Todas las especializaciones",
             ["Spec28675"] = "Maestro en pociones",
             ["Spec28677"] = "Maestro en elixires",
             ["Spec28672"] = "Maestro en transmutación",
