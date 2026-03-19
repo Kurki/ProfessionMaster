@@ -93,11 +93,66 @@ end
 function UiService:SetupResizable(view)
     local service = self;
     view:SetResizable(true);
-    view:SetResizeBounds(view.defaultWidth * 0.8, view.defaultHeight * 0.6);
+    view:SetResizeBounds(view.defaultWidth * 0.6, view.defaultHeight * 0.6);
 
     local edgeSize = 6;
     local resizeDirection = nil;
     view.amResizing = false;
+
+    -- create edge overlay textures for per-side coloring
+    local edgeThickness = 1;
+    local edgeTop = view:CreateTexture(nil, "OVERLAY");
+    edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeTop:SetPoint("TOPLEFT", 0, 0);
+    edgeTop:SetPoint("TOPRIGHT", 0, 0);
+    edgeTop:SetHeight(edgeThickness);
+
+    local edgeBottom = view:CreateTexture(nil, "OVERLAY");
+    edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeBottom:SetPoint("BOTTOMLEFT", 0, 0);
+    edgeBottom:SetPoint("BOTTOMRIGHT", 0, 0);
+    edgeBottom:SetHeight(edgeThickness);
+
+    local edgeLeft = view:CreateTexture(nil, "OVERLAY");
+    edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeLeft:SetPoint("TOPLEFT", 0, 0);
+    edgeLeft:SetPoint("BOTTOMLEFT", 0, 0);
+    edgeLeft:SetWidth(edgeThickness);
+
+    local edgeRight = view:CreateTexture(nil, "OVERLAY");
+    edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+    edgeRight:SetPoint("TOPRIGHT", 0, 0);
+    edgeRight:SetPoint("BOTTOMRIGHT", 0, 0);
+    edgeRight:SetWidth(edgeThickness);
+
+    -- map resize directions to active edges
+    local directionEdges = {
+        TOP         = { top = true },
+        BOTTOM      = { bottom = true },
+        LEFT        = { left = true },
+        RIGHT       = { right = true },
+        TOPLEFT     = { top = true, left = true },
+        TOPRIGHT    = { top = true, right = true },
+        BOTTOMLEFT  = { bottom = true, left = true },
+        BOTTOMRIGHT = { bottom = true, right = true },
+    };
+
+    local function UpdateEdgeColors(direction)
+        if (not direction) then
+            -- default: all gray
+            edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
+            return;
+        end
+        local active = directionEdges[direction] or {};
+        -- active edges golden, others white
+        if (active.top) then edgeTop:SetColorTexture(1, 0.82, 0, 1); else edgeTop:SetColorTexture(1, 1, 1, 1); end
+        if (active.bottom) then edgeBottom:SetColorTexture(1, 0.82, 0, 1); else edgeBottom:SetColorTexture(1, 1, 1, 1); end
+        if (active.left) then edgeLeft:SetColorTexture(1, 0.82, 0, 1); else edgeLeft:SetColorTexture(1, 1, 1, 1); end
+        if (active.right) then edgeRight:SetColorTexture(1, 0.82, 0, 1); else edgeRight:SetColorTexture(1, 1, 1, 1); end
+    end
 
     local function GetResizeDirection()
         -- only detect edges when mouse is over the frame
@@ -131,11 +186,7 @@ function UiService:SetupResizable(view)
     view:HookScript("OnUpdate", function()
         if (resizeDirection) then return; end
         local dir = GetResizeDirection();
-        if (dir) then
-            view:SetBackdropBorderColor(1, 1, 1, 1);
-        else
-            view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
-        end
+        UpdateEdgeColors(dir);
     end);
 
     view:HookScript("OnMouseDown", function(_, button)
@@ -146,7 +197,7 @@ function UiService:SetupResizable(view)
                 view.amResizing = true;
                 view:StopMovingOrSizing();
                 view:StartSizing(dir);
-                view:SetBackdropBorderColor(1, 1, 1, 1);
+                UpdateEdgeColors(dir);
             end
         end
     end);
@@ -157,9 +208,7 @@ function UiService:SetupResizable(view)
             resizeDirection = nil;
             view.amResizing = false;
             local dir = GetResizeDirection();
-            if (not dir) then
-                view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
-            end
+            UpdateEdgeColors(dir);
             service:StorePosition(view);
             service:StoreSize(view);
         end
@@ -167,7 +216,7 @@ function UiService:SetupResizable(view)
 
     view:HookScript("OnLeave", function()
         if (not resizeDirection) then
-            view:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
+            UpdateEdgeColors(nil);
         end
     end);
 end

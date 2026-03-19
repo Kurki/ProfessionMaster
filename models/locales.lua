@@ -59,7 +59,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Remove from shopping list",
             ["ProfessionsViewClearBucketList"] = "Clear shopping list",
             ["ProfessionsViewNotOnBucketList"] = "Other",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details / Add to Shopping List.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
             ["ProfessionsViewAnnounce"] = "Promote in Guild Chat",
 
             -- skill view
@@ -147,7 +147,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Von Einkaufliste entfernen",
             ["ProfessionsViewClearBucketList"] = "Einkaufsliste leeren",
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen / Auf Einkaufliste setzen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
             ["ProfessionsViewAnnounce"] = "Im Gildenchat ankündigen",
 
             -- skill view
@@ -235,7 +235,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Удалить из списка покупок",
             ["ProfessionsViewClearBucketList"] = "Очистить список покупок",
             ["ProfessionsViewNotOnBucketList"] = "Прочее",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали / Добавить в список покупок.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
             ["ProfessionsViewAnnounce"] = "Объявить в чате гильдии",
 
             -- skill view
@@ -323,7 +323,7 @@ function LocalesModel:Create()
             ["ProfessionsViewRemoveFromBucketList"] = "Quitar de la lista de compras",
             ["ProfessionsViewClearBucketList"] = "Vaciar lista de compras",
             ["ProfessionsViewNotOnBucketList"] = "Otros",
-            ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles / Añadir a la lista de compras.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
             ["ProfessionsViewAnnounce"] = "Anunciar en el chat del gremio",
 
             -- skill view
