@@ -45,16 +45,22 @@ function ProfessionsView:Show()
 
         self.view = view;
 
-        -- handle resize: update scroll child width and refresh rows
+        -- handle resize: update scroll child width and debounce expensive refresh
         view:HookScript("OnSizeChanged", function()
             if (self.scrollChild and self.scrollFrame) then
                 self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
-                self:RefreshRows();
             end
             if (self.bucketListScrollChild and self.bucketListScrollElement) then
                 self.bucketListScrollChild:SetWidth(self.bucketListScrollElement:GetWidth());
             end
-            self:UpdateResponsiveLayout();
+            if (self.resizePending) then
+                self.resizePending:Cancel();
+            end
+            self.resizePending = C_Timer.NewTimer(0.05, function()
+                self.resizePending = nil;
+                self:RefreshRows();
+                self:UpdateResponsiveLayout();
+            end);
         end);
 
         -- add close button
@@ -836,6 +842,14 @@ function ProfessionsView:AddSkills()
         self.otherGroupText:Hide();
     end
 
+    -- pre-compute player name strings for all skills (so RefreshRows doesn't recalculate on every scroll/resize)
+    local playerService = self:GetService("player");
+    for _, skillData in ipairs(self.skills) do
+        if (skillData.skill and skillData.skill.players) then
+            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(skillData.skill.players, 12), ", ");
+        end
+    end
+
     -- set scroll height
     self.scrollChild:SetHeight(#self.skills * 20 + (self.bucketListSkillAmount > 0 and 40 or 0));
 
@@ -986,9 +1000,6 @@ function ProfessionsView:RefreshRows()
     local endIndex = math.min(startIndex + visibleRowCount, #self.skills);
     local visibleCount = endIndex - startIndex + 1;
 
-    -- get player service
-    local playerService = self:GetService("player");
-
     -- ensure pool has enough frames
     if (not self.rowPool) then
         self.rowPool = {};
@@ -1136,12 +1147,12 @@ function ProfessionsView:RefreshRows()
             local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
             row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
 
-            -- set player text
+            -- set player text (use pre-computed cache from AddSkills)
             if (self.hidePlayerColumn) then
                 row.playerText:Hide();
             else
                 row.playerText:Show();
-                row.playerText:SetText(table.concat(playerService:CombinePlayerNames(skill.players, 12), ", "));
+                row.playerText:SetText(skillData.playerNamesText or "");
             end
 
             -- set bucket list text
