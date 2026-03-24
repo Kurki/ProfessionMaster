@@ -70,6 +70,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Missing Reagents",
 
+            -- help view
+            ["HelpViewTitle"] = "Help",
+            ["HelpTooltip"] = "Show Help",
+            ["CloseTooltip"] = "Close",
+
             -- purge
             ["AllDataPurged"] = "All data was deleted",
             ["CharacterPurged"] = "Data of %s was deleted",
@@ -158,6 +163,11 @@ function LocalesModel:Create()
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Fehlende Materialien",
+
+            -- help view
+            ["HelpViewTitle"] = "Hilfe",
+            ["HelpTooltip"] = "Hilfe anzeigen",
+            ["CloseTooltip"] = "Schließen",
 
             -- purge
             ["AllDataPurged"] = "Alle Daten wurden gelöscht",
@@ -248,6 +258,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Недостающие реагенты",
 
+            -- help view
+            ["HelpViewTitle"] = "Помощь",
+            ["HelpTooltip"] = "Показать помощь",
+            ["CloseTooltip"] = "Закрыть",
+
             -- purge
             ["AllDataPurged"] = "Все данные были удалены",
             ["CharacterPurged"] = "Данные %s были удалены",
@@ -336,6 +351,11 @@ function LocalesModel:Create()
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Materiales faltantes",
+
+            -- help view
+            ["HelpViewTitle"] = "Ayuda",
+            ["HelpTooltip"] = "Mostrar ayuda",
+            ["CloseTooltip"] = "Cerrar",
 
             -- purge
             ["AllDataPurged"] = "Todos los datos fueron eliminados",
@@ -426,6 +446,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Composants manquants",
 
+            -- help view
+            ["HelpViewTitle"] = "Aide",
+            ["HelpTooltip"] = "Afficher l'aide",
+            ["CloseTooltip"] = "Fermer",
+
             -- purge
             ["AllDataPurged"] = "Toutes les données ont été supprimées",
             ["CharacterPurged"] = "Les données de %s ont été supprimées",
@@ -514,6 +539,11 @@ function LocalesModel:Create()
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagenti mancanti",
+
+            -- help view
+            ["HelpViewTitle"] = "Aiuto",
+            ["HelpTooltip"] = "Mostra aiuto",
+            ["CloseTooltip"] = "Chiudi",
 
             -- purge
             ["AllDataPurged"] = "Tutti i dati sono stati eliminati",
@@ -604,6 +634,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "부족한 재료",
 
+            -- help view
+            ["HelpViewTitle"] = "도움말",
+            ["HelpTooltip"] = "도움말 표시",
+            ["CloseTooltip"] = "닫기",
+
             -- purge
             ["AllDataPurged"] = "모든 데이터가 삭제되었습니다",
             ["CharacterPurged"] = "%s의 데이터가 삭제되었습니다",
@@ -693,6 +728,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagentes faltantes",
 
+            -- help view
+            ["HelpViewTitle"] = "Ajuda",
+            ["HelpTooltip"] = "Mostrar ajuda",
+            ["CloseTooltip"] = "Fechar",
+
             -- purge
             ["AllDataPurged"] = "Todos os dados foram apagados",
             ["CharacterPurged"] = "Os dados de %s foram apagados",
@@ -727,7 +767,7 @@ function LocalesModel:Create()
             -- general
             ["AddonLoaded"] = "v" .. self.addon.version .. " 作者 Kurki。使用 |cffDA8CFF/pm help|r 获取更多信息。",
             ["VersionOutdated"] = "你的版本已过期。最新版本可在 https://www.curseforge.com/wow/addons/profession-master 下载。",
-            ["GuildAnnouncement"] = "我正在通过 Profession Master 分享我的专业技能。输入"!who [物品]"，我也许能告诉你谁可以为你制作。",
+            ["GuildAnnouncement"] = "我正在通过 Profession Master 分享我的专业技能。输入\"/who [物品]\"，我也许能告诉你谁可以为你制作。",
             ["LanguageNotSupported"] = "很遗憾，ProfessionMaster 不支持你客户端的语言。",
             ["You"] = "你",
 
@@ -782,6 +822,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
 
+            -- help view
+            ["HelpViewTitle"] = "帮助",
+            ["HelpTooltip"] = "显示帮助",
+            ["CloseTooltip"] = "关闭",
+
             -- purge
             ["AllDataPurged"] = "所有数据已删除",
             ["CharacterPurged"] = "%s 的数据已删除",
@@ -816,7 +861,7 @@ function LocalesModel:Create()
             -- general
             ["AddonLoaded"] = "v" .. self.addon.version .. " 作者 Kurki。使用 |cffDA8CFF/pm help|r 獲取更多資訊。",
             ["VersionOutdated"] = "你的版本已過期。最新版本可在 https://www.curseforge.com/wow/addons/profession-master 下載。",
-            ["GuildAnnouncement"] = "我正在透過 Profession Master 分享我的專業技能。輸入「!who [物品]」，我也許能告訴你誰可以為你製作。",
+            ["GuildAnnouncement"] = "我正在透過 Profession Master 分享我的專業技能。輸入\"!who [物品]\"，我也許能告訴你誰可以為你製作。",
             ["LanguageNotSupported"] = "很遺憾，ProfessionMaster 不支援你客戶端的語言。",
             ["You"] = "你",
 
@@ -870,6 +915,11 @@ function LocalesModel:Create()
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
+
+            -- help view
+            ["HelpViewTitle"] = "說明",
+            ["HelpTooltip"] = "顯示說明",
+            ["CloseTooltip"] = "關閉",
 
             -- purge
             ["AllDataPurged"] = "所有資料已刪除",

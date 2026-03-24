@@ -70,6 +70,31 @@ function ProfessionsView:Show()
         closeButton:SetHeight(22);
         closeButton:SetWidth(22);
         closeButton:SetPoint("TOPRIGHT", -12, -8);
+        closeButton:SetScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("CloseTooltip"));
+            GameTooltip:Show();
+        end);
+        closeButton:SetScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
+
+        -- add help button (question mark text left of close button)
+        self.helpView = self.addon:NewView("help");
+        local helpButton = uiService:CreateFlatSquareButton(view, "?", function()
+            self.helpView:ToggleVisibility();
+        end, 16);
+        helpButton:SetPoint("RIGHT", closeButton, "LEFT", -8, 0);
+        helpButton:SetNormalFontObject("GameFontHighlightSmall");
+        helpButton:SetHighlightFontObject("GameFontHighlight");
+        helpButton:HookScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("HelpTooltip"));
+            GameTooltip:Show();
+        end);
+        helpButton:HookScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
 
         -- get profession ids
         local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
