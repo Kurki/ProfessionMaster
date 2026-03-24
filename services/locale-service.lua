@@ -11,16 +11,19 @@ local LocaleService = _G.professionMaster:CreateService("locale");
 --- Initialize service.
 function LocaleService:Initialize()
     -- get current locale name and all locales
-    local localeName = string.sub(GetLocale(), 1, 2);
+    local fullLocaleName = GetLocale();
+    local shortLocaleName = string.sub(fullLocaleName, 1, 2);
     local locales = self:GetModel("locales"):Create();
 
-    -- fund locale
-    for k, v in pairs(locales) do
-        if (k == localeName) then
-            -- store current locale
-            self.current = v;
-            return;
-        end
+    -- try full locale first (e.g. zhCN, zhTW), then short (e.g. en, de)
+    if (locales[fullLocaleName]) then
+        self.current = locales[fullLocaleName];
+        return;
+    end
+
+    if (locales[shortLocaleName]) then
+        self.current = locales[shortLocaleName];
+        return;
     end
 
     -- use enUS locale

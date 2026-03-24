@@ -70,6 +70,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Missing Reagents",
 
+            -- help view
+            ["HelpViewTitle"] = "Help",
+            ["HelpTooltip"] = "Show Help",
+            ["CloseTooltip"] = "Close",
+
             -- purge
             ["AllDataPurged"] = "All data was deleted",
             ["CharacterPurged"] = "Data of %s was deleted",
@@ -158,6 +163,11 @@ function LocalesModel:Create()
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Fehlende Materialien",
+
+            -- help view
+            ["HelpViewTitle"] = "Hilfe",
+            ["HelpTooltip"] = "Hilfe anzeigen",
+            ["CloseTooltip"] = "Schließen",
 
             -- purge
             ["AllDataPurged"] = "Alle Daten wurden gelöscht",
@@ -248,6 +258,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Недостающие реагенты",
 
+            -- help view
+            ["HelpViewTitle"] = "Помощь",
+            ["HelpTooltip"] = "Показать помощь",
+            ["CloseTooltip"] = "Закрыть",
+
             -- purge
             ["AllDataPurged"] = "Все данные были удалены",
             ["CharacterPurged"] = "Данные %s были удалены",
@@ -337,6 +352,11 @@ function LocalesModel:Create()
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Materiales faltantes",
 
+            -- help view
+            ["HelpViewTitle"] = "Ayuda",
+            ["HelpTooltip"] = "Mostrar ayuda",
+            ["CloseTooltip"] = "Cerrar",
+
             -- purge
             ["AllDataPurged"] = "Todos los datos fueron eliminados",
             ["CharacterPurged"] = "Los datos de %s fueron eliminados",
@@ -365,6 +385,570 @@ function LocalesModel:Create()
             ["Spec26798"] = "Sastrería de tela lunar",
             ["Spec20219"] = "Ingeniería gnómica",
             ["Spec20222"] = "Ingeniería goblin"
+        },
+        -- define fr locale
+        ["fr"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " par Kurki. Utilisez |cffDA8CFF/pm help|r pour plus d'informations.",
+            ["VersionOutdated"] = "Votre version est obsolète. La dernière version peut être téléchargée sur https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Je partage maintenant mes métiers avec Profession Master. Tapez « !who [objet] » et je pourrai peut-être vous dire qui peut le fabriquer pour vous.",
+            ["LanguageNotSupported"] = "Malheureusement, la langue de votre client n'est pas prise en charge par ProfessionMaster.",
+            ["You"] = "Vous",
+
+            -- commands
+            ["CommandsTitle"] = "Commandes disponibles :",
+            ["CommandsOverview"] = "/pm - Afficher/Masquer l'aperçu des métiers",
+            ["CommandsMinimap"] = "/pm minimap - Afficher l'icône de la minicarte",
+            ["CommandsReagents"] = "/pm reagents - Afficher/Masquer les composants manquants",
+            ["CommandsPurge"] = "/pm purge [all | own | <nom du joueur>] - Supprimer toutes les données, vos données ou celles d'un joueur spécifique",
+            ["CommandsPurgeRow1"] = "Commandes de suppression disponibles :",
+            ["CommandsPurgeRow2"] = "/pm purge all - Supprimer toutes les données",
+            ["CommandsPurgeRow3"] = "/pm purge own - Supprimer vos données",
+            ["CommandsPurgeRow4"] = "/pm purge <nom du joueur> - Supprimer les données d'un joueur spécifique",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - Bienvenue",
+            ["WelcomeDescription"] = self.addon.name .. " vous montre vos métiers et ceux de tous les membres de votre guilde qui utilisent également " .. self.addon.name .. " dans un seul aperçu.\n\n" ..
+                "Utilisez le bouton sur votre minicarte ou la commande de chat /pm pour afficher ou masquer les fenêtres correspondantes.\n\n" ..
+                "|cffd4af37Ouvrez maintenant vos fenêtres de métiers pour partager vos métiers.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Clic gauche :|cffffffff Afficher l'aperçu|r",
+            ["MinimapButtonRightClick"] = "|cff999999Clic droit :|cffffffff Afficher/Masquer les composants manquants|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic droit :|cffffffff Masquer le bouton de la minicarte|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Aperçu - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "Métier",
+            ["ProfessionsViewAllProfessions"] = "Tous les métiers",
+            ["ProfessionsViewAddon"] = "Addon",
+            ["ProfessionsViewAllAddons"] = "Tous les addons",
+            ["ProfessionsViewSearch"] = "Rechercher",
+            ["ProfessionsViewItem"] = "Objet",
+            ["ProfessionsViewEnchantment"] = "Enchantement",
+            ["ProfessionsViewPlayers"] = "Joueurs",
+            ["ProfessionsViewBucketList"] = "Liste de courses",
+            ["ProfessionsViewMissingReagents"] = "Composants manquants",
+            ["ProfessionsViewCraftSelf"] = "Fabriquer soi-même",
+            ["ProfessionsViewRemoveFromWatchList"] = "Retirer de la liste de suivi",
+            ["ProfessionsViewRemoveFromBucketList"] = "Retirer de la liste de courses",
+            ["ProfessionsViewClearBucketList"] = "Vider la liste de courses",
+            ["ProfessionsViewNotOnBucketList"] = "Autres",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClic gauche : |cffffffffAfficher les détails.   |cffDA8CFFShift + Clic gauche : |cffffffffLien de l'objet dans le chat.   |cffDA8CFFCtrl + Shift + Clic gauche : |cffffffffLien de compétence dans le chat.",
+            ["ProfessionsViewAnnounce"] = "Annoncer dans le chat de guilde",
+
+            -- skill view
+            ["SkillViewPlayers"] = "Joueurs",
+            ["SkillViewOnBucketList"] = "Sur la liste de courses",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Composants manquants",
+
+            -- help view
+            ["HelpViewTitle"] = "Aide",
+            ["HelpTooltip"] = "Afficher l'aide",
+            ["CloseTooltip"] = "Fermer",
+
+            -- purge
+            ["AllDataPurged"] = "Toutes les données ont été supprimées",
+            ["CharacterPurged"] = "Les données de %s ont été supprimées",
+
+            -- who
+            ["WhoCraftResponse"] = "Je peux fabriquer ça pour vous !",
+            ["WhoCannotCraftResponse"] = "Malheureusement, je ne connais personne qui puisse fabriquer cela.",
+            ["WhoOtherCanCraftResponse"] = "peut fabriquer ça pour vous !",
+
+            -- specializations
+            ["Specialization"] = "Spécialisation",
+            ["AllSpecializations"] = "Toutes les spécialisations",
+            ["Spec28675"] = "Maître des potions",
+            ["Spec28677"] = "Maître des élixirs",
+            ["Spec28672"] = "Maître de la transmutation",
+            ["Spec9788"] = "Forgeron d'armures",
+            ["Spec9787"] = "Forgeron d'armes",
+            ["Spec17039"] = "Maître épéiste",
+            ["Spec17040"] = "Maître marteleur",
+            ["Spec17041"] = "Maître des haches",
+            ["Spec10656"] = "Travail du cuir d'écailles de dragon",
+            ["Spec10658"] = "Travail du cuir élémentaire",
+            ["Spec10660"] = "Travail du cuir tribal",
+            ["Spec26797"] = "Couture de feu magique",
+            ["Spec26801"] = "Couture de tisse-ombre",
+            ["Spec26798"] = "Couture de tissu lunaire",
+            ["Spec20219"] = "Ingénierie gnome",
+            ["Spec20222"] = "Ingénierie gobeline"
+        },
+        -- define it locale
+        ["it"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " di Kurki. Usa |cffDA8CFF/pm help|r per maggiori informazioni.",
+            ["VersionOutdated"] = "La tua versione è obsoleta. L'ultima versione può essere scaricata su https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Ora condivido le mie professioni con Profession Master. Scrivi \"!who [oggetto]\" e forse potrò dirti chi può fabbricarlo per te.",
+            ["LanguageNotSupported"] = "Purtroppo la lingua del tuo client non è supportata da ProfessionMaster.",
+            ["You"] = "Tu",
+
+            -- commands
+            ["CommandsTitle"] = "Comandi disponibili:",
+            ["CommandsOverview"] = "/pm - Mostra/Nascondi panoramica delle professioni",
+            ["CommandsMinimap"] = "/pm minimap - Mostra icona della minimappa",
+            ["CommandsReagents"] = "/pm reagents - Mostra/Nascondi reagenti mancanti",
+            ["CommandsPurge"] = "/pm purge [all | own | <nome giocatore>] - Elimina tutti i dati, i tuoi dati o quelli di un giocatore specifico",
+            ["CommandsPurgeRow1"] = "Comandi di eliminazione disponibili:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Elimina tutti i dati",
+            ["CommandsPurgeRow3"] = "/pm purge own - Elimina i tuoi dati",
+            ["CommandsPurgeRow4"] = "/pm purge <nome giocatore> - Elimina i dati di un giocatore specifico",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - Benvenuto",
+            ["WelcomeDescription"] = self.addon.name .. " ti mostra le tue professioni e quelle di tutti i membri della tua gilda che usano anche " .. self.addon.name .. " in un'unica panoramica.\n\n" ..
+                "Usa il pulsante sulla minimappa o il comando chat /pm per mostrare o nascondere le finestre corrispondenti.\n\n" ..
+                "|cffd4af37Apri ora le finestre delle tue professioni per condividerle.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Clic sinistro:|cffffffff Mostra panoramica|r",
+            ["MinimapButtonRightClick"] = "|cff999999Clic destro:|cffffffff Mostra/Nascondi reagenti mancanti|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic destro:|cffffffff Nascondi pulsante della minimappa|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Panoramica - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "Professione",
+            ["ProfessionsViewAllProfessions"] = "Tutte le professioni",
+            ["ProfessionsViewAddon"] = "Addon",
+            ["ProfessionsViewAllAddons"] = "Tutti gli addon",
+            ["ProfessionsViewSearch"] = "Cerca",
+            ["ProfessionsViewItem"] = "Oggetto",
+            ["ProfessionsViewEnchantment"] = "Incantamento",
+            ["ProfessionsViewPlayers"] = "Giocatori",
+            ["ProfessionsViewBucketList"] = "Lista della spesa",
+            ["ProfessionsViewMissingReagents"] = "Reagenti mancanti",
+            ["ProfessionsViewCraftSelf"] = "Fabbrica tu stesso",
+            ["ProfessionsViewRemoveFromWatchList"] = "Rimuovi dalla lista di osservazione",
+            ["ProfessionsViewRemoveFromBucketList"] = "Rimuovi dalla lista della spesa",
+            ["ProfessionsViewClearBucketList"] = "Svuota lista della spesa",
+            ["ProfessionsViewNotOnBucketList"] = "Altro",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClic sinistro: |cffffffffMostra dettagli.   |cffDA8CFFShift + Clic sinistro: |cffffffffLink oggetto nella chat.   |cffDA8CFFCtrl + Shift + Clic sinistro: |cffffffffLink abilità nella chat.",
+            ["ProfessionsViewAnnounce"] = "Annuncia nella chat della gilda",
+
+            -- skill view
+            ["SkillViewPlayers"] = "Giocatori",
+            ["SkillViewOnBucketList"] = "Nella lista della spesa",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Reagenti mancanti",
+
+            -- help view
+            ["HelpViewTitle"] = "Aiuto",
+            ["HelpTooltip"] = "Mostra aiuto",
+            ["CloseTooltip"] = "Chiudi",
+
+            -- purge
+            ["AllDataPurged"] = "Tutti i dati sono stati eliminati",
+            ["CharacterPurged"] = "I dati di %s sono stati eliminati",
+
+            -- who
+            ["WhoCraftResponse"] = "Posso fabbricarlo per te!",
+            ["WhoCannotCraftResponse"] = "Purtroppo non conosco nessuno che possa fabbricarlo.",
+            ["WhoOtherCanCraftResponse"] = "può fabbricarlo per te!",
+
+            -- specializations
+            ["Specialization"] = "Specializzazione",
+            ["AllSpecializations"] = "Tutte le specializzazioni",
+            ["Spec28675"] = "Maestro delle pozioni",
+            ["Spec28677"] = "Maestro degli elisir",
+            ["Spec28672"] = "Maestro della trasmutazione",
+            ["Spec9788"] = "Forgiatore di armature",
+            ["Spec9787"] = "Forgiatore di armi",
+            ["Spec17039"] = "Maestro spadaio",
+            ["Spec17040"] = "Maestro del martello",
+            ["Spec17041"] = "Maestro dell'ascia",
+            ["Spec10656"] = "Lavorazione pelle di drago",
+            ["Spec10658"] = "Lavorazione pelle elementale",
+            ["Spec10660"] = "Lavorazione pelle tribale",
+            ["Spec26797"] = "Sartoria del fuoco magico",
+            ["Spec26801"] = "Sartoria dell'ombra",
+            ["Spec26798"] = "Sartoria della stoffa lunare",
+            ["Spec20219"] = "Ingegneria gnomesca",
+            ["Spec20222"] = "Ingegneria goblin"
+        },
+        -- define ko locale
+        ["ko"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " 제작: Kurki. |cffDA8CFF/pm help|r 명령어로 자세한 정보를 확인하세요.",
+            ["VersionOutdated"] = "버전이 오래되었습니다. 최신 버전은 https://www.curseforge.com/wow/addons/profession-master 에서 다운로드할 수 있습니다.",
+            ["GuildAnnouncement"] = "Profession Master로 전문 기술을 공유합니다. \"!who [아이템]\"을 입력하면 누가 제작할 수 있는지 알려드릴 수 있습니다.",
+            ["LanguageNotSupported"] = "죄송합니다. 클라이언트 언어가 ProfessionMaster에서 지원되지 않습니다.",
+            ["You"] = "나",
+
+            -- commands
+            ["CommandsTitle"] = "사용 가능한 명령어:",
+            ["CommandsOverview"] = "/pm - 전문 기술 개요 표시/숨기기",
+            ["CommandsMinimap"] = "/pm minimap - 미니맵 아이콘 표시",
+            ["CommandsReagents"] = "/pm reagents - 부족한 재료 표시/숨기기",
+            ["CommandsPurge"] = "/pm purge [all | own | <플레이어 이름>] - 모든 데이터, 내 데이터 또는 특정 플레이어의 데이터 삭제",
+            ["CommandsPurgeRow1"] = "사용 가능한 삭제 명령어:",
+            ["CommandsPurgeRow2"] = "/pm purge all - 모든 데이터 삭제",
+            ["CommandsPurgeRow3"] = "/pm purge own - 내 데이터 삭제",
+            ["CommandsPurgeRow4"] = "/pm purge <플레이어 이름> - 특정 플레이어의 데이터 삭제",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - 환영합니다",
+            ["WelcomeDescription"] = self.addon.name .. "은(는) " .. self.addon.name .. "을(를) 사용하는 모든 길드원의 전문 기술을 한눈에 보여줍니다.\n\n" ..
+                "미니맵 버튼이나 채팅 명령어 /pm을 사용하여 해당 창을 표시하거나 숨길 수 있습니다.\n\n" ..
+                "|cffd4af37지금 전문 기술 창을 열어 전문 기술을 공유하세요.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999좌클릭:|cffffffff 개요 표시|r",
+            ["MinimapButtonRightClick"] = "|cff999999우클릭:|cffffffff 부족한 재료 표시/숨기기|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 우클릭:|cffffffff 미니맵 버튼 숨기기|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - 개요 - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "전문 기술",
+            ["ProfessionsViewAllProfessions"] = "모든 전문 기술",
+            ["ProfessionsViewAddon"] = "애드온",
+            ["ProfessionsViewAllAddons"] = "모든 애드온",
+            ["ProfessionsViewSearch"] = "검색",
+            ["ProfessionsViewItem"] = "아이템",
+            ["ProfessionsViewEnchantment"] = "마법부여",
+            ["ProfessionsViewPlayers"] = "플레이어",
+            ["ProfessionsViewBucketList"] = "구매 목록",
+            ["ProfessionsViewMissingReagents"] = "부족한 재료",
+            ["ProfessionsViewCraftSelf"] = "직접 제작",
+            ["ProfessionsViewRemoveFromWatchList"] = "관심 목록에서 제거",
+            ["ProfessionsViewRemoveFromBucketList"] = "구매 목록에서 제거",
+            ["ProfessionsViewClearBucketList"] = "구매 목록 비우기",
+            ["ProfessionsViewNotOnBucketList"] = "기타",
+            ["ProfessionsViewFooter"] = "|cffDA8CFF좌클릭: |cffffffff상세 보기.   |cffDA8CFFShift + 좌클릭: |cffffffff채팅에 아이템 링크.   |cffDA8CFFCtrl + Shift + 좌클릭: |cffffffff채팅에 기술 링크.",
+            ["ProfessionsViewAnnounce"] = "길드 채팅에 홍보",
+
+            -- skill view
+            ["SkillViewPlayers"] = "플레이어",
+            ["SkillViewOnBucketList"] = "구매 목록에 있음",
+            ["SkillViewOk"] = "확인",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "부족한 재료",
+
+            -- help view
+            ["HelpViewTitle"] = "도움말",
+            ["HelpTooltip"] = "도움말 표시",
+            ["CloseTooltip"] = "닫기",
+
+            -- purge
+            ["AllDataPurged"] = "모든 데이터가 삭제되었습니다",
+            ["CharacterPurged"] = "%s의 데이터가 삭제되었습니다",
+
+            -- who
+            ["WhoCraftResponse"] = "제가 제작해 드릴 수 있습니다!",
+            ["WhoCannotCraftResponse"] = "죄송합니다, 제작할 수 있는 사람을 모릅니다.",
+            ["WhoOtherCanCraftResponse"] = "님이 제작해 드릴 수 있습니다!",
+
+            -- specializations
+            ["Specialization"] = "전문화",
+            ["AllSpecializations"] = "모든 전문화",
+            ["Spec28675"] = "물약의 대가",
+            ["Spec28677"] = "비약의 대가",
+            ["Spec28672"] = "변환의 대가",
+            ["Spec9788"] = "방어구 대장장이",
+            ["Spec9787"] = "무기 대장장이",
+            ["Spec17039"] = "검 제작의 대가",
+            ["Spec17040"] = "망치 제작의 대가",
+            ["Spec17041"] = "도끼 제작의 대가",
+            ["Spec10656"] = "용비늘 가죽세공",
+            ["Spec10658"] = "원소 가죽세공",
+            ["Spec10660"] = "부족 가죽세공",
+            ["Spec26797"] = "마법불꽃 재봉술",
+            ["Spec26801"] = "그림자매듭 재봉술",
+            ["Spec26798"] = "달빛매듭 재봉술",
+            ["Spec20219"] = "노움 공학",
+            ["Spec20222"] = "고블린 공학"
+        },
+        -- define pt locale
+        ["pt"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " por Kurki. Use |cffDA8CFF/pm help|r para mais informações.",
+            ["VersionOutdated"] = "Sua versão está desatualizada. A versão mais recente pode ser baixada em https://www.curseforge.com/wow/addons/profession-master.",
+            ["GuildAnnouncement"] = "Agora estou compartilhando minhas profissões com o Profession Master. Digite \"!who [item]\" e talvez eu possa dizer quem pode fabricar isso para você.",
+            ["LanguageNotSupported"] = "Infelizmente, o idioma do seu cliente não é suportado pelo ProfessionMaster.",
+            ["You"] = "Você",
+
+            -- commands
+            ["CommandsTitle"] = "Comandos disponíveis:",
+            ["CommandsOverview"] = "/pm - Mostrar/Ocultar visão geral das profissões",
+            ["CommandsMinimap"] = "/pm minimap - Mostrar ícone do minimapa",
+            ["CommandsReagents"] = "/pm reagents - Mostrar/Ocultar reagentes faltantes",
+            ["CommandsPurge"] = "/pm purge [all | own | <nome do jogador>] - Apagar todos os dados, seus dados ou de um jogador específico",
+            ["CommandsPurgeRow1"] = "Comandos de exclusão disponíveis:",
+            ["CommandsPurgeRow2"] = "/pm purge all - Apagar todos os dados",
+            ["CommandsPurgeRow3"] = "/pm purge own - Apagar seus dados",
+            ["CommandsPurgeRow4"] = "/pm purge <nome do jogador> - Apagar dados de um jogador específico",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - Bem-vindo",
+            ["WelcomeDescription"] = self.addon.name .. " mostra suas profissões e as de todos os membros da sua guilda que também usam " .. self.addon.name .. " em uma única visão geral.\n\n" ..
+                "Use o botão no minimapa ou o comando de chat /pm para mostrar ou ocultar as janelas correspondentes.\n\n" ..
+                "|cffd4af37Abra agora as janelas de profissões para compartilhar suas profissões.",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999Clique esquerdo:|cffffffff Mostrar visão geral|r",
+            ["MinimapButtonRightClick"] = "|cff999999Clique direito:|cffffffff Mostrar/Ocultar reagentes faltantes|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clique direito:|cffffffff Ocultar botão do minimapa|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - Visão geral - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "Profissão",
+            ["ProfessionsViewAllProfessions"] = "Todas as profissões",
+            ["ProfessionsViewAddon"] = "Addon",
+            ["ProfessionsViewAllAddons"] = "Todos os addons",
+            ["ProfessionsViewSearch"] = "Pesquisar",
+            ["ProfessionsViewItem"] = "Item",
+            ["ProfessionsViewEnchantment"] = "Encantamento",
+            ["ProfessionsViewPlayers"] = "Jogadores",
+            ["ProfessionsViewBucketList"] = "Lista de compras",
+            ["ProfessionsViewMissingReagents"] = "Reagentes faltantes",
+            ["ProfessionsViewCraftSelf"] = "Fabricar você mesmo",
+            ["ProfessionsViewRemoveFromWatchList"] = "Remover da lista de observação",
+            ["ProfessionsViewRemoveFromBucketList"] = "Remover da lista de compras",
+            ["ProfessionsViewClearBucketList"] = "Limpar lista de compras",
+            ["ProfessionsViewNotOnBucketList"] = "Outros",
+            ["ProfessionsViewFooter"] = "|cffDA8CFFClique esquerdo: |cffffffffMostrar detalhes.   |cffDA8CFFShift + Clique esquerdo: |cffffffffLink do item no chat.   |cffDA8CFFCtrl + Shift + Clique esquerdo: |cffffffffLink da habilidade no chat.",
+            ["ProfessionsViewAnnounce"] = "Anunciar no chat da guilda",
+
+            -- skill view
+            ["SkillViewPlayers"] = "Jogadores",
+            ["SkillViewOnBucketList"] = "Na lista de compras",
+            ["SkillViewOk"] = "OK",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "Reagentes faltantes",
+
+            -- help view
+            ["HelpViewTitle"] = "Ajuda",
+            ["HelpTooltip"] = "Mostrar ajuda",
+            ["CloseTooltip"] = "Fechar",
+
+            -- purge
+            ["AllDataPurged"] = "Todos os dados foram apagados",
+            ["CharacterPurged"] = "Os dados de %s foram apagados",
+
+            -- who
+            ["WhoCraftResponse"] = "Posso fabricar isso para você!",
+            ["WhoCannotCraftResponse"] = "Infelizmente, não conheço ninguém que possa fabricar isso.",
+            ["WhoOtherCanCraftResponse"] = "pode fabricar isso para você!",
+
+            -- specializations
+            ["Specialization"] = "Especialização",
+            ["AllSpecializations"] = "Todas as especializações",
+            ["Spec28675"] = "Mestre em poções",
+            ["Spec28677"] = "Mestre em elixires",
+            ["Spec28672"] = "Mestre em transmutação",
+            ["Spec9788"] = "Ferreiro de armaduras",
+            ["Spec9787"] = "Ferreiro de armas",
+            ["Spec17039"] = "Mestre espadachim",
+            ["Spec17040"] = "Mestre dos martelos",
+            ["Spec17041"] = "Mestre dos machados",
+            ["Spec10656"] = "Couraria de escamas de dragão",
+            ["Spec10658"] = "Couraria elemental",
+            ["Spec10660"] = "Couraria tribal",
+            ["Spec26797"] = "Alfaiataria de fogo arcano",
+            ["Spec26801"] = "Alfaiataria de teia de sombras",
+            ["Spec26798"] = "Alfaiataria de tecido lunar",
+            ["Spec20219"] = "Engenharia gnômica",
+            ["Spec20222"] = "Engenharia goblin"
+        },
+        -- define zhCN locale (Simplified Chinese)
+        ["zhCN"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " 作者 Kurki。使用 |cffDA8CFF/pm help|r 获取更多信息。",
+            ["VersionOutdated"] = "你的版本已过期。最新版本可在 https://www.curseforge.com/wow/addons/profession-master 下载。",
+            ["GuildAnnouncement"] = "我正在通过 Profession Master 分享我的专业技能。输入\"/who [物品]\"，我也许能告诉你谁可以为你制作。",
+            ["LanguageNotSupported"] = "很遗憾，ProfessionMaster 不支持你客户端的语言。",
+            ["You"] = "你",
+
+            -- commands
+            ["CommandsTitle"] = "可用命令：",
+            ["CommandsOverview"] = "/pm - 显示/隐藏专业技能概览",
+            ["CommandsMinimap"] = "/pm minimap - 显示小地图图标",
+            ["CommandsReagents"] = "/pm reagents - 显示/隐藏缺少的材料",
+            ["CommandsPurge"] = "/pm purge [all | own | <玩家名称>] - 删除所有数据、你的数据或特定玩家的数据",
+            ["CommandsPurgeRow1"] = "可用的删除命令：",
+            ["CommandsPurgeRow2"] = "/pm purge all - 删除所有数据",
+            ["CommandsPurgeRow3"] = "/pm purge own - 删除你的数据",
+            ["CommandsPurgeRow4"] = "/pm purge <玩家名称> - 删除特定玩家的数据",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - 欢迎",
+            ["WelcomeDescription"] = self.addon.name .. " 在一个界面中显示你的专业技能以及所有同样使用 " .. self.addon.name .. " 的公会成员的专业技能。\n\n" ..
+                "使用小地图按钮或聊天命令 /pm 来显示或隐藏相应窗口。\n\n" ..
+                "|cffd4af37现在打开你的专业技能窗口以分享你的专业技能。",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999左键点击：|cffffffff 显示概览|r",
+            ["MinimapButtonRightClick"] = "|cff999999右键点击：|cffffffff 显示/隐藏缺少的材料|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 右键点击：|cffffffff 隐藏小地图按钮|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - 概览 - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "专业技能",
+            ["ProfessionsViewAllProfessions"] = "所有专业技能",
+            ["ProfessionsViewAddon"] = "插件",
+            ["ProfessionsViewAllAddons"] = "所有插件",
+            ["ProfessionsViewSearch"] = "搜索",
+            ["ProfessionsViewItem"] = "物品",
+            ["ProfessionsViewEnchantment"] = "附魔",
+            ["ProfessionsViewPlayers"] = "玩家",
+            ["ProfessionsViewBucketList"] = "购物清单",
+            ["ProfessionsViewMissingReagents"] = "缺少的材料",
+            ["ProfessionsViewCraftSelf"] = "自己制作",
+            ["ProfessionsViewRemoveFromWatchList"] = "从关注列表中移除",
+            ["ProfessionsViewRemoveFromBucketList"] = "从购物清单中移除",
+            ["ProfessionsViewClearBucketList"] = "清空购物清单",
+            ["ProfessionsViewNotOnBucketList"] = "其他",
+            ["ProfessionsViewFooter"] = "|cffDA8CFF左键点击：|cffffffff显示详情。   |cffDA8CFFShift + 左键点击：|cffffffff在聊天中发送物品链接。   |cffDA8CFFCtrl + Shift + 左键点击：|cffffffff在聊天中发送技能链接。",
+            ["ProfessionsViewAnnounce"] = "在公会聊天中宣传",
+
+            -- skill view
+            ["SkillViewPlayers"] = "玩家",
+            ["SkillViewOnBucketList"] = "已在购物清单中",
+            ["SkillViewOk"] = "确定",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "缺少的材料",
+
+            -- help view
+            ["HelpViewTitle"] = "帮助",
+            ["HelpTooltip"] = "显示帮助",
+            ["CloseTooltip"] = "关闭",
+
+            -- purge
+            ["AllDataPurged"] = "所有数据已删除",
+            ["CharacterPurged"] = "%s 的数据已删除",
+
+            -- who
+            ["WhoCraftResponse"] = "我可以为你制作！",
+            ["WhoCannotCraftResponse"] = "很遗憾，我不知道谁能制作这个。",
+            ["WhoOtherCanCraftResponse"] = "可以为你制作！",
+
+            -- specializations
+            ["Specialization"] = "专精",
+            ["AllSpecializations"] = "所有专精",
+            ["Spec28675"] = "药水大师",
+            ["Spec28677"] = "药剂大师",
+            ["Spec28672"] = "转化大师",
+            ["Spec9788"] = "护甲锻造师",
+            ["Spec9787"] = "武器锻造师",
+            ["Spec17039"] = "铸剑大师",
+            ["Spec17040"] = "铸锤大师",
+            ["Spec17041"] = "铸斧大师",
+            ["Spec10656"] = "龙鳞制皮",
+            ["Spec10658"] = "元素制皮",
+            ["Spec10660"] = "部族制皮",
+            ["Spec26797"] = "魔焰裁缝",
+            ["Spec26801"] = "暗影裁缝",
+            ["Spec26798"] = "月布裁缝",
+            ["Spec20219"] = "侏儒工程学",
+            ["Spec20222"] = "地精工程学"
+        },
+        -- define zhTW locale (Traditional Chinese)
+        ["zhTW"] = {
+            -- general
+            ["AddonLoaded"] = "v" .. self.addon.version .. " 作者 Kurki。使用 |cffDA8CFF/pm help|r 獲取更多資訊。",
+            ["VersionOutdated"] = "你的版本已過期。最新版本可在 https://www.curseforge.com/wow/addons/profession-master 下載。",
+            ["GuildAnnouncement"] = "我正在透過 Profession Master 分享我的專業技能。輸入\"!who [物品]\"，我也許能告訴你誰可以為你製作。",
+            ["LanguageNotSupported"] = "很遺憾，ProfessionMaster 不支援你客戶端的語言。",
+            ["You"] = "你",
+
+            -- commands
+            ["CommandsTitle"] = "可用指令：",
+            ["CommandsOverview"] = "/pm - 顯示/隱藏專業技能概覽",
+            ["CommandsMinimap"] = "/pm minimap - 顯示小地圖圖示",
+            ["CommandsReagents"] = "/pm reagents - 顯示/隱藏缺少的材料",
+            ["CommandsPurge"] = "/pm purge [all | own | <玩家名稱>] - 刪除所有資料、你的資料或特定玩家的資料",
+            ["CommandsPurgeRow1"] = "可用的刪除指令：",
+            ["CommandsPurgeRow2"] = "/pm purge all - 刪除所有資料",
+            ["CommandsPurgeRow3"] = "/pm purge own - 刪除你的資料",
+            ["CommandsPurgeRow4"] = "/pm purge <玩家名稱> - 刪除特定玩家的資料",
+
+            -- welcome
+            ["WelcomeTitle"] = self.addon.name .. " - 歡迎",
+            ["WelcomeDescription"] = self.addon.name .. " 在一個介面中顯示你的專業技能以及所有同樣使用 " .. self.addon.name .. " 的公會成員的專業技能。\n\n" ..
+                "使用小地圖按鈕或聊天指令 /pm 來顯示或隱藏對應的視窗。\n\n" ..
+                "|cffd4af37現在打開你的專業技能視窗以分享你的專業技能。",
+
+            -- minimap button
+            ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
+            ["MinimapButtonLeftClick"] = "|cff999999左鍵點擊：|cffffffff 顯示概覽|r",
+            ["MinimapButtonRightClick"] = "|cff999999右鍵點擊：|cffffffff 顯示/隱藏缺少的材料|r",
+            ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 右鍵點擊：|cffffffff 隱藏小地圖按鈕|r",
+
+            -- profession view
+            ["ProfessionsViewTitle"] = "|cffDA8CFFProfession Master|cffffffff - 概覽 - v" .. self.addon.version,
+            ["ProfessionsViewProfession"] = "專業技能",
+            ["ProfessionsViewAllProfessions"] = "所有專業技能",
+            ["ProfessionsViewAddon"] = "插件",
+            ["ProfessionsViewAllAddons"] = "所有插件",
+            ["ProfessionsViewSearch"] = "搜尋",
+            ["ProfessionsViewItem"] = "物品",
+            ["ProfessionsViewEnchantment"] = "附魔",
+            ["ProfessionsViewPlayers"] = "玩家",
+            ["ProfessionsViewBucketList"] = "購物清單",
+            ["ProfessionsViewMissingReagents"] = "缺少的材料",
+            ["ProfessionsViewCraftSelf"] = "自己製作",
+            ["ProfessionsViewRemoveFromWatchList"] = "從關注列表中移除",
+            ["ProfessionsViewRemoveFromBucketList"] = "從購物清單中移除",
+            ["ProfessionsViewClearBucketList"] = "清空購物清單",
+            ["ProfessionsViewNotOnBucketList"] = "其他",
+            ["ProfessionsViewFooter"] = "|cffDA8CFF左鍵點擊：|cffffffff顯示詳情。   |cffDA8CFFShift + 左鍵點擊：|cffffffff在聊天中發送物品連結。   |cffDA8CFFCtrl + Shift + 左鍵點擊：|cffffffff在聊天中發送技能連結。",
+            ["ProfessionsViewAnnounce"] = "在公會聊天中宣傳",
+
+            -- skill view
+            ["SkillViewPlayers"] = "玩家",
+            ["SkillViewOnBucketList"] = "已在購物清單中",
+            ["SkillViewOk"] = "確定",
+
+            -- missing reagents view
+            ["MissingReagentsViewTitle"] = "缺少的材料",
+
+            -- help view
+            ["HelpViewTitle"] = "說明",
+            ["HelpTooltip"] = "顯示說明",
+            ["CloseTooltip"] = "關閉",
+
+            -- purge
+            ["AllDataPurged"] = "所有資料已刪除",
+            ["CharacterPurged"] = "%s 的資料已刪除",
+
+            -- who
+            ["WhoCraftResponse"] = "我可以為你製作！",
+            ["WhoCannotCraftResponse"] = "很遺憾，我不知道誰能製作這個。",
+            ["WhoOtherCanCraftResponse"] = "可以為你製作！",
+
+            -- specializations
+            ["Specialization"] = "專精",
+            ["AllSpecializations"] = "所有專精",
+            ["Spec28675"] = "藥水大師",
+            ["Spec28677"] = "藥劑大師",
+            ["Spec28672"] = "轉化大師",
+            ["Spec9788"] = "護甲鍛造師",
+            ["Spec9787"] = "武器鍛造師",
+            ["Spec17039"] = "鑄劍大師",
+            ["Spec17040"] = "鑄錘大師",
+            ["Spec17041"] = "鑄斧大師",
+            ["Spec10656"] = "龍鱗製皮",
+            ["Spec10658"] = "元素製皮",
+            ["Spec10660"] = "部族製皮",
+            ["Spec26797"] = "魔焰裁縫",
+            ["Spec26801"] = "暗影裁縫",
+            ["Spec26798"] = "月布裁縫",
+            ["Spec20219"] = "乘儒工程學",
+            ["Spec20222"] = "乘精工程學"
         }
     };
 end

@@ -35,16 +35,12 @@ function CommandsService:HandleCommand(parameters)
     end
 
     -- check if help should be shown
-    if (string.lower(parameters) == "help") then
-        -- write help
-        local chatService = self:GetService("chat");
-        chatService:Write("CommandsTitle");
-        chatService:Write("CommandsOverview");
-        chatService:Write("CommandsReagents");
-        if (PM_Settings.minimapButton.hide) then
-            chatService:Write("CommandsMinimap");
+    if (string.lower(parameters) == "help" and not self.addon.inCombat) then
+        -- show help view
+        if (not self.helpView) then
+            self.helpView = self.addon:NewView("help");
         end
-        chatService:Write("CommandsPurge");
+        self.helpView:Show();
         return;
     end
 
