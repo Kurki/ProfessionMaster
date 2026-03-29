@@ -37,6 +37,14 @@ function SkillView:Show(skillRow, professionsView)
         closeButton:SetHeight(22);
         closeButton:SetWidth(22);
         closeButton:SetPoint("TOPRIGHT", -12, -8);
+        closeButton:SetScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("CloseTooltip"));
+            GameTooltip:Show();
+        end);
+        closeButton:SetScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
 
         -- add players frame
         local playersFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
@@ -103,6 +111,14 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         amountPlusButton:SetPoint("LEFT", bucketListAmountText, "RIGHT", 10, 0);
+        amountPlusButton:HookScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("SkillViewAddToBucketList"));
+            GameTooltip:Show();
+        end);
+        amountPlusButton:HookScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
         self.amountPlusButton = amountPlusButton;
 
         -- amount minus button
@@ -120,6 +136,14 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         amountMinusButton:SetPoint("LEFT", amountPlusButton, "RIGHT", 3, 0);
+        amountMinusButton:HookScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("SkillViewRemoveOneFromBucketList"));
+            GameTooltip:Show();
+        end);
+        amountMinusButton:HookScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
         self.amountMinusButton = amountMinusButton;
 
         -- add clear button
@@ -133,6 +157,14 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", 3, 0);
+        clearButton:HookScript("OnEnter", function(button)
+            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
+            GameTooltip:SetText(localeService:Get("SkillViewRemoveFromBucketList"));
+            GameTooltip:Show();
+        end);
+        clearButton:HookScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
         self.clearButton = clearButton;
 
         -- create ok button
