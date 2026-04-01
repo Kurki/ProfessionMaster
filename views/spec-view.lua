@@ -34,14 +34,7 @@ function SpecView:Show(specData, professionsView)
         closeButton:SetPoint("TOPRIGHT", -12, -8);
 
         -- add players frame
-        local playersFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
-        playersFrame:SetBackdrop({
-            bgFile = [[Interface\Buttons\WHITE8x8]],
-            edgeFile = [[Interface/Buttons/WHITE8X8]],
-            edgeSize = 1
-        });
-        playersFrame:SetBackdropColor(0, 0, 0, 0.5);
-        playersFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
+        local playersFrame = uiService:CreatePanel(view);
         playersFrame:SetPoint("TOPLEFT", 12, -36);
         playersFrame:SetPoint("BOTTOMRIGHT", -12, 42);
         self.playersFrame = playersFrame;
@@ -129,13 +122,8 @@ function SpecView:RefreshPlayerRows()
         local row = self.playerRowPool[i + 1];
 
         -- set background color by data index
-        local backgroundColor;
-        if (rowIndex % 2 == 0) then
-            backgroundColor = 0.1;
-        else
-            backgroundColor = 0.15;
-        end
-        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+        local uiService = self:GetService("ui");
+        uiService:SetRowColor(row, rowIndex);
 
         -- position
         local top = (rowIndex - 1) * 20;

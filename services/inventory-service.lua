@@ -163,8 +163,8 @@ function InventoryService:CheckMissingReagents()
 
     -- refresh bucket list in professions view when visible
     local professionsView = self.addon.professionsView;
-    if (professionsView and professionsView.visible) then
-        professionsView:RefreshBucketListRows();
+    if (professionsView and professionsView.visible and professionsView.bucketListPanel) then
+        professionsView.bucketListPanel:Refresh();
     end
 
     -- check if missing reagents should be hidden
