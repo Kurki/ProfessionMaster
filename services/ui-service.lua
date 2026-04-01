@@ -221,6 +221,47 @@ function UiService:SetupResizable(view)
     end);
 end
 
+--- Bind a simple tooltip to a frame.
+-- Shows tooltip on enter, hides on leave. Uses HookScript so existing handlers are preserved.
+-- @param frame The frame to bind the tooltip to.
+-- @param text Tooltip text string.
+-- @param anchorPoint Optional anchor point (default "ANCHOR_BOTTOM").
+function UiService:BindTooltip(frame, text, anchorPoint)
+    local anchor = anchorPoint or "ANCHOR_BOTTOM";
+    frame:HookScript("OnEnter", function(button)
+        GameTooltip:SetOwner(button, anchor);
+        GameTooltip:SetText(text);
+        GameTooltip:Show();
+    end);
+    frame:HookScript("OnLeave", function()
+        GameTooltip:Hide();
+    end);
+end
+
+--- Create a frame with standard panel backdrop (dark background with gray border).
+-- @param parent Parent frame.
+-- @return Frame with backdrop configured.
+function UiService:CreatePanel(parent)
+    local frame = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate");
+    frame:SetBackdrop({
+        bgFile = [[Interface\Buttons\WHITE8x8]],
+        edgeFile = [[Interface/Buttons/WHITE8X8]],
+        edgeSize = 1
+    });
+    frame:SetBackdropColor(0, 0, 0, 0.5);
+    frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
+    return frame;
+end
+
+--- Apply alternating row background color.
+-- @param row Row frame with backdrop.
+-- @param rowIndex 1-based row index for alternation.
+function UiService:SetRowColor(row, rowIndex)
+    local backgroundColor = (rowIndex % 2 == 0) and 0.1 or 0.15;
+    row.bgColor = backgroundColor;
+    row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+end
+
 --- Create normal button.
 -- @param container  Container of button.
 -- @param text Text of button.

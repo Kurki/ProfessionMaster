@@ -37,24 +37,10 @@ function SkillView:Show(skillRow, professionsView)
         closeButton:SetHeight(22);
         closeButton:SetWidth(22);
         closeButton:SetPoint("TOPRIGHT", -12, -8);
-        closeButton:SetScript("OnEnter", function(button)
-            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
-            GameTooltip:SetText(localeService:Get("CloseTooltip"));
-            GameTooltip:Show();
-        end);
-        closeButton:SetScript("OnLeave", function()
-            GameTooltip:Hide();
-        end);
+        uiService:BindTooltip(closeButton, localeService:Get("CloseTooltip"));
 
         -- add players frame
-        local playersFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
-        playersFrame:SetBackdrop({
-            bgFile = [[Interface\Buttons\WHITE8x8]],
-            edgeFile = [[Interface/Buttons/WHITE8X8]],
-            edgeSize = 1
-        });
-        playersFrame:SetBackdropColor(0, 0, 0, 0.5);
-        playersFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
+        local playersFrame = uiService:CreatePanel(view);
         playersFrame:SetPoint("TOPLEFT", 12, -36);
         playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 42);
         self.playersFrame = playersFrame;
@@ -78,14 +64,7 @@ function SkillView:Show(skillRow, professionsView)
         self.playerScrollElement = playerScrollElement;
 
         -- add bucket list frame
-        local bucketListFrame = CreateFrame("Frame", nil, view, BackdropTemplateMixin and "BackdropTemplate");
-        bucketListFrame:SetBackdrop({
-            bgFile = [[Interface\Buttons\WHITE8x8]],
-            edgeFile = [[Interface/Buttons/WHITE8X8]],
-            edgeSize = 1
-        });
-        bucketListFrame:SetBackdropColor(0, 0, 0, 0.5);
-        bucketListFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.5);
+        local bucketListFrame = uiService:CreatePanel(view);
         bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
         bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 42);
         self.bucketListFrame = bucketListFrame;
@@ -111,14 +90,7 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         amountPlusButton:SetPoint("LEFT", bucketListAmountText, "RIGHT", 10, 0);
-        amountPlusButton:HookScript("OnEnter", function(button)
-            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
-            GameTooltip:SetText(localeService:Get("SkillViewAddToBucketList"));
-            GameTooltip:Show();
-        end);
-        amountPlusButton:HookScript("OnLeave", function()
-            GameTooltip:Hide();
-        end);
+        uiService:BindTooltip(amountPlusButton, localeService:Get("SkillViewAddToBucketList"));
         self.amountPlusButton = amountPlusButton;
 
         -- amount minus button
@@ -136,14 +108,7 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         amountMinusButton:SetPoint("LEFT", amountPlusButton, "RIGHT", 3, 0);
-        amountMinusButton:HookScript("OnEnter", function(button)
-            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
-            GameTooltip:SetText(localeService:Get("SkillViewRemoveOneFromBucketList"));
-            GameTooltip:Show();
-        end);
-        amountMinusButton:HookScript("OnLeave", function()
-            GameTooltip:Hide();
-        end);
+        uiService:BindTooltip(amountMinusButton, localeService:Get("SkillViewRemoveOneFromBucketList"));
         self.amountMinusButton = amountMinusButton;
 
         -- add clear button
@@ -157,14 +122,7 @@ function SkillView:Show(skillRow, professionsView)
             self:GetService("inventory"):CheckMissingReagents();
         end, 20);
         clearButton:SetPoint("LEFT", amountMinusButton, "RIGHT", 3, 0);
-        clearButton:HookScript("OnEnter", function(button)
-            GameTooltip:SetOwner(button, "ANCHOR_BOTTOM");
-            GameTooltip:SetText(localeService:Get("SkillViewRemoveFromBucketList"));
-            GameTooltip:Show();
-        end);
-        clearButton:HookScript("OnLeave", function()
-            GameTooltip:Hide();
-        end);
+        uiService:BindTooltip(clearButton, localeService:Get("SkillViewRemoveFromBucketList"));
         self.clearButton = clearButton;
 
         -- create ok button
@@ -199,7 +157,10 @@ function SkillView:Show(skillRow, professionsView)
 end
 
 --- Refresh player rows (pooled).
-function SkillView:RefreshPlayerRows() 
+function SkillView:RefreshPlayerRows()
+    -- get services
+    local uiService = self:GetService("ui");
+
     -- get visible range
     local startIndex = math.max(math.floor(self.playerScrollTop / 20) - 1, 1);
     local endIndex = math.min(startIndex + 25, #self.playerNames);
@@ -238,13 +199,7 @@ function SkillView:RefreshPlayerRows()
         local row = self.playerRowPool[i + 1];
 
         -- set background color by data index
-        local backgroundColor;
-        if (rowIndex % 2 == 0) then
-            backgroundColor = 0.1;
-        else
-            backgroundColor = 0.15;
-        end
-        row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
+        uiService:SetRowColor(row, rowIndex);
 
         -- position
         local top = (rowIndex - 1) * 20;
