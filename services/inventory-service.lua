@@ -91,8 +91,9 @@ function InventoryService:GetReagents()
 
             -- only demand reagents for the missing crafts
             if (missingAmount > 0) then
+                local craftsNeeded = math.ceil(missingAmount / (skillInfo.itemAmount or 1));
                 for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
-                    demanded[reagentItemId] = (demanded[reagentItemId] or 0) + missingAmount * reagentAmount;
+                    demanded[reagentItemId] = (demanded[reagentItemId] or 0) + craftsNeeded * reagentAmount;
                 end
             end
         end
@@ -129,8 +130,9 @@ function InventoryService:GetReagents()
                 local stocks = self.inventory[node.itemId] or 0;
                 local missing = math.max(0, node.needed - stocks);
                 if (missing > 0) then
+                    local craftsNeeded = math.ceil(missing / (skillInfo.itemAmount or 1));
                     for subReagentItemId, subReagentAmount in pairs(skillInfo.reagents) do
-                        local subNeeded = missing * subReagentAmount;
+                        local subNeeded = craftsNeeded * subReagentAmount;
                         demanded[subReagentItemId] = (demanded[subReagentItemId] or 0) + subNeeded;
                     end
                 end

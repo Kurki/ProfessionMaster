@@ -470,8 +470,9 @@ function BucketListPanel:BuildTree(skillsService, inventoryService)
         if (missing > 0) then
             local skillInfo = skillsService:GetSkillById(node.skillId);
             if (skillInfo and skillInfo.reagents) then
+                local craftsNeeded = math.ceil(missing / (skillInfo.itemAmount or 1));
                 for reagentItemId, reagentPerCraft in pairs(skillInfo.reagents) do
-                    local needed = missing * reagentPerCraft;
+                    local needed = craftsNeeded * reagentPerCraft;
                     local reagentStocks = inventoryService:GetItemAmount(reagentItemId);
                     local reagentMissing = math.max(0, needed - reagentStocks);
 
@@ -542,8 +543,9 @@ function BucketListPanel:BuildTree(skillsService, inventoryService)
             if (missing > 0) then
                 local skillInfo = skillsService:GetSkillById(node.skillId);
                 if (skillInfo and skillInfo.reagents) then
+                    local craftsNeeded = math.ceil(missing / (skillInfo.itemAmount or 1));
                     for reagentItemId, reagentPerCraft in pairs(skillInfo.reagents) do
-                        local needed = missing * reagentPerCraft;
+                        local needed = craftsNeeded * reagentPerCraft;
                         local reagentStocks = inventoryService:GetItemAmount(reagentItemId);
                         local reagentMissing = math.max(0, needed - reagentStocks);
 
