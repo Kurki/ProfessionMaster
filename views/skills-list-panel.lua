@@ -880,6 +880,11 @@ function SkillsListPanel:RefreshRows()
 
             -- set item text
             local itemName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
+            local skillInfo = self:GetService("skills"):GetSkillById(skillId);
+            local itemAmount = skillInfo and skillInfo.itemAmount;
+            if (itemAmount and itemAmount > 1) then
+                itemName = itemName .. "|r x" .. itemAmount;
+            end
             row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
 
             -- set player text (use pre-computed cache from AddSkills)
