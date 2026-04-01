@@ -62,6 +62,7 @@ function SkillsService:AddAddonSkills(addonNumber, addonData)
         -- build skill
         local skill = {
             itemId = addonSkillData.itemId,
+            itemAmount = addonSkillData.itemAmount,
             reagents = addonSkillData.reagents
         };
 

@@ -138,7 +138,13 @@ function SkillView:Show(skillRow, professionsView)
     self.parentSkillRow = skillRow;
     self.skill = skill;
     self.skillId = skillId;
-    self.view.titleLabel:SetText(self.addon.shortcut .. (skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name));
+    local skillInfo = self:GetService("skills"):GetSkillById(skillId);
+    local itemAmount = skillInfo and skillInfo.itemAmount;
+    local titleName = skill.itemColor and ("|c" .. skill.itemColor .. skill.name) or skill.name;
+    if (itemAmount and itemAmount > 1) then
+        titleName = titleName .. "|r x" .. itemAmount;
+    end
+    self.view.titleLabel:SetText(self.addon.shortcut .. titleName);
 
     -- set position
     self.view:ClearAllPoints();
