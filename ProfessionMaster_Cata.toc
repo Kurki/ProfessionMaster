@@ -37,6 +37,9 @@ libs\LibDBIcon-1.0.lua
 ProfessionMaster.lua
 models\models.xml
 models\messages\messages.xml
-models\skills\skills.xml
+models\skills\vanilla.lua
+models\skills\bcc.lua
+models\skills\wrath.lua
+models\skills\cata.lua
 services\services.xml
 views\views.xml
