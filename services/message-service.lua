@@ -24,8 +24,6 @@ function MessageService:HandleMessage(prefix, message, sender)
         return;
     end
 
-    self.addon:LogTrace("MessageService", "HandleMessage", "Got message from " .. sender .. ": " .. message);
-
     -- check if own player
     if (self:GetService("player"):IsCurrentPlayer(sender)) then
          return;
@@ -92,7 +90,6 @@ function MessageService:SendToGuild(message)
 
     -- build message string
     local messageString = message.prefix .. ":" .. message:ToString();
-    self.addon:LogTrace("MessageService", "SendToGuild", "GUILD Message: " .. messageString);
     return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "GUILD");
 end
 
@@ -103,7 +100,6 @@ end
 function MessageService:SendToPlayer(player, message)
     -- build message string
     local messageString = message.prefix .. ":" .. message:ToString();
-    self.addon:LogTrace("MessageService", "SendToPlayer", "Player Message to " .. player .. ": " .. messageString);
     return C_ChatInfo.SendAddonMessage(self.messagePrefix, messageString, "WHISPER", player);
 end
 

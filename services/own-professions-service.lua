@@ -34,6 +34,7 @@ function OwnProfessionsService:DetectSpecializations()
         for _, spec in ipairs(specs) do
             if (IsSpellKnown(spec.spellId)) then
                 specializations[professionId] = spec.spellId;
+                self.addon:Log("OwnProfessionsService", "DetectSpecializations", "Detected specialization %s for profession %s", tostring(spec.spellId), tostring(professionId));
                 break;
             end
         end
@@ -218,6 +219,7 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
         -- profession not set before, store all item ids
         playerProfessions[professionId] = skills;
         newSkills = skills;
+        self.addon:Log("OwnProfessionsService", "StoreAndSendOwnProfession", "New profession %s for %s with %d skills", tostring(professionId), playerName, #skills);
     else
         -- get profession
         local profession = playerProfessions[professionId];
@@ -248,6 +250,8 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
     if (#newSkills == 0) then
         return;
     end
+
+    self.addon:Log("OwnProfessionsService", "StoreAndSendOwnProfession", "Sending %d new skills for profession %s", #newSkills, tostring(professionId));
 
     -- add to player professions
     local professionsService = self:GetService("professions");

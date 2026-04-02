@@ -37,9 +37,6 @@ function InventoryService:ScanInventory()
     -- mark cache as clean
     self.inventoryDirty = false;
 
-    -- log trace
-    self.addon:LogTrace("InventoryService", "ScanInventory", "Scanning inventory...");
-
     -- iterate all bags
     for bag = 0, NUM_BAG_SLOTS do
         -- iterate all slots in bag
