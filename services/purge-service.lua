@@ -108,5 +108,21 @@ function PurgeService:PurgeCharacterSilent(characterName)
             break;
         end
     end
+
+    -- remove from specializations
+    for specializationName, _ in pairs(PM_Specializations) do
+        if (string.lower(specializationName) == lowerCharacterName) then
+            PM_Specializations[specializationName] = nil;
+            break;
+        end
+    end
+
+    -- remove from player factions
+    for factionName, _ in pairs(PM_PlayerFactions) do
+        if (string.lower(factionName) == lowerCharacterName) then
+            PM_PlayerFactions[factionName] = nil;
+            break;
+        end
+    end
 end
 

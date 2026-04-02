@@ -326,6 +326,9 @@ function PurgeView:PurgeSelected()
     if (purgedCount > 0) then
         self.addon:Log("PurgeView", "PurgeSelected", "Purged %d player groups", purgedCount);
 
+        -- reset sync times so data can be received again
+        PM_SyncTimes = {};
+
         -- rebuild reverse index after purge
         self:GetService("professions"):RebuildItemIndex();
     end

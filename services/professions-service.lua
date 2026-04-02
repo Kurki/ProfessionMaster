@@ -67,8 +67,26 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
         -- parse message
         local ppMessage = PlayerProfessionsMessage:Parse(message);
 
-        -- log received skills
-        self.addon:Log("ProfessionsService", "CheckMessage", "Received %d skills for profession %s from %s", #ppMessage.skills, tostring(ppMessage.professionId), sender);
+        -- aggregate received skill counts for summary logging
+        local key = ppMessage.playerName .. ":" .. ppMessage.professionId;
+        if (not self.pendingSkillCounts) then
+            self.pendingSkillCounts = {};
+        end
+        if (not self.pendingSkillCounts[key]) then
+            self.pendingSkillCounts[key] = { playerName = ppMessage.playerName, professionId = ppMessage.professionId, count = 0 };
+        end
+        self.pendingSkillCounts[key].count = self.pendingSkillCounts[key].count + #ppMessage.skills;
+
+        -- flush aggregated log after a short delay
+        if (not self.pendingSkillLogTimer) then
+            self.pendingSkillLogTimer = C_Timer.NewTimer(1, function()
+                for _, entry in pairs(self.pendingSkillCounts) do
+                    self.addon:Log("ProfessionsService", "CheckMessage", "Received %d skills for profession %s from %s", entry.count, tostring(entry.professionId), entry.playerName);
+                end
+                self.pendingSkillCounts = {};
+                self.pendingSkillLogTimer = nil;
+            end);
+        end
 
         -- store player skills
         self:StorePlayerSkills(ppMessage.playerName, ppMessage.professionId, ppMessage.skills);
