@@ -67,6 +67,9 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
         -- parse message
         local ppMessage = PlayerProfessionsMessage:Parse(message);
 
+        -- log received skills
+        self.addon:Log("ProfessionsService", "CheckMessage", "Received %d skills for profession %s from %s", #ppMessage.skills, tostring(ppMessage.professionId), sender);
+
         -- store player skills
         self:StorePlayerSkills(ppMessage.playerName, ppMessage.professionId, ppMessage.skills);
 

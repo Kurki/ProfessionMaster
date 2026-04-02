@@ -90,14 +90,13 @@ function CommandsService:HandleCommand(parameters)
         self:GetService("purge"):Purge(string.sub(parameters, 7));
     end
 
-    -- check if history should be shown
-    if (string.lower(parameters) == "debug") then
-        self.addon:ToggleDebug();
+    -- show logs view
+    if (string.lower(parameters) == "logs" and not self.addon.inCombat) then
+        if (not self.logsView) then
+            self.logsView = self.addon:NewView("logs");
+        end
+        self.logsView:Show();
         return;
     end
 
-    -- check if history should be shown
-    if (string.lower(parameters) == "trace") then
-        self.addon:ToggleTrace();
-    end
 end

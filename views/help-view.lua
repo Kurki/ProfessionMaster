@@ -41,7 +41,8 @@ function HelpView:Show()
             localeService:Get("CommandsOverview"),
             localeService:Get("CommandsReagents"),
             localeService:Get("CommandsMinimap"),
-            localeService:Get("CommandsPurge")
+            localeService:Get("CommandsPurge"),
+            localeService:Get("CommandsLogs")
         };
         local helpText = table.concat(helpLines, "\n");
 
