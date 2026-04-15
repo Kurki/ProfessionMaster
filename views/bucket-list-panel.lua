@@ -157,15 +157,18 @@ function BucketListPanel:Refresh()
             -- bind row mouse events
             reagentRow:SetScript("OnLeave", function()
                 C_Timer.After(0, function()
+                    if (not reagentRow:IsVisible()) then return; end
+                    local overRow = reagentRow:IsMouseOver();
+                    local overButton = reagentRow.craftButton:IsVisible() and reagentRow.craftButton:IsMouseOver();
                     self:UpdateReagentRowHoverState(reagentRow);
-                    if (not reagentRow:IsMouseOver() and not reagentRow.craftButton:IsMouseOver()) then
+                    if (not overRow and not overButton) then
                         GameTooltip:Hide();
                     end
                 end);
             end);
             reagentRow:SetScript("OnEnter", function()
                 self:UpdateReagentRowHoverState(reagentRow);
-                if (reagentRow.itemLink and not reagentRow.craftButton:IsMouseOver()) then
+                if (reagentRow.itemLink) then
                     GameTooltip:SetOwner(reagentRow, "ANCHOR_LEFT");
                     GameTooltip:SetHyperlink(reagentRow.itemLink);
                     GameTooltip:Show();
@@ -328,6 +331,7 @@ function BucketListPanel:Refresh()
 
         -- load item or spell info
         local reagentItemId = treeRow.itemId;
+        local rowItemAmount = treeRow.itemAmount;
         if (reagentItemId and reagentItemId > 0 and C_Item.DoesItemExistByID(reagentItemId)) then
             local item = Item:CreateFromItemID(reagentItemId);
             if (not item:IsItemEmpty()) then
@@ -335,7 +339,11 @@ function BucketListPanel:Refresh()
                     item:ContinueOnItemLoad(function()
                         reagentRow.itemLink = item:GetItemLink();
                         reagentRow.iconText:SetText("|T" .. item:GetItemIcon() .. ":16|t");
-                        reagentRow.itemText:SetText("|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName());
+                        local itemName = "|c" .. professionNamesService:GetItemColor(reagentRow.itemLink) .. item:GetItemName();
+                        if (rowItemAmount and rowItemAmount > 1) then
+                            itemName = itemName .. "|r x" .. rowItemAmount;
+                        end
+                        reagentRow.itemText:SetText(itemName);
                     end);
                 end);
             end
@@ -344,7 +352,11 @@ function BucketListPanel:Refresh()
             if (spellName) then
                 reagentRow.itemLink = GetSpellLink(treeRow.skillId);
                 reagentRow.iconText:SetText("|T" .. (spellIcon or 136243) .. ":16|t");
-                reagentRow.itemText:SetText("|cFF71D5FF" .. spellName);
+                local itemName = "|cFF71D5FF" .. spellName;
+                if (rowItemAmount and rowItemAmount > 1) then
+                    itemName = itemName .. "|r x" .. rowItemAmount;
+                end
+                reagentRow.itemText:SetText(itemName);
             end
         end
     end -- if not separator
@@ -447,15 +459,28 @@ function BucketListPanel:BuildTree(skillsService, inventoryService)
             stocks = inventoryService:GetItemAmount(node.itemId);
         end
 
+        -- get skill info for item amount
+        local nodeSkillInfo = skillsService:GetSkillById(node.skillId);
+        local nodeItemAmount = nodeSkillInfo and nodeSkillInfo.itemAmount;
+
+        -- convert to craft units for display
+        local displayAmount = node.amount;
+        local displayStocks = stocks;
+        if (nodeItemAmount and nodeItemAmount > 1) then
+            displayAmount = math.ceil(node.amount / nodeItemAmount);
+            displayStocks = math.floor(stocks / nodeItemAmount);
+        end
+
         -- add main node row
         table.insert(directRows, {
             itemId = node.itemId,
             skillId = node.skillId,
-            amount = node.amount,
-            stocks = stocks,
+            amount = displayAmount,
+            stocks = displayStocks,
             indent = 0,
             isNode = true,
             isBucketListRoot = true,
+            itemAmount = nodeItemAmount,
         });
 
         -- calculate missing quantity
@@ -523,14 +548,27 @@ function BucketListPanel:BuildTree(skillsService, inventoryService)
                 stocks = inventoryService:GetItemAmount(node.itemId);
             end
 
+            -- get skill info for item amount
+            local nodeSkillInfo = skillsService:GetSkillById(node.skillId);
+            local nodeItemAmount = nodeSkillInfo and nodeSkillInfo.itemAmount;
+
+            -- convert to craft units for display
+            local displayAmount = node.amount;
+            local displayStocks = stocks;
+            if (nodeItemAmount and nodeItemAmount > 1) then
+                displayAmount = math.ceil(node.amount / nodeItemAmount);
+                displayStocks = math.floor(stocks / nodeItemAmount);
+            end
+
             table.insert(derivedRows, {
                 itemId = node.itemId,
                 skillId = node.skillId,
-                amount = node.amount,
-                stocks = stocks,
+                amount = displayAmount,
+                stocks = displayStocks,
                 indent = 0,
                 isNode = true,
                 isWatchListRoot = watchedReagents[node.itemId] == true,
+                itemAmount = nodeItemAmount,
             });
 
             -- calculate missing

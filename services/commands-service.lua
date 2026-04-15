@@ -75,13 +75,13 @@ function CommandsService:HandleCommand(parameters)
         return;
     end
 
-    -- check if purge information must be shown
-    if (string.lower(parameters) == "purge") then
-        local chatService = self:GetService("chat");
-        chatService:Write("CommandsPurgeRow1");
-        chatService:Write("CommandsPurgeRow2");
-        chatService:Write("CommandsPurgeRow3");
-        chatService:Write("CommandsPurgeRow4");
+    -- check if purge should be shown or executed
+    if (string.lower(parameters) == "purge" and not self.addon.inCombat) then
+        -- open purge view
+        if (not self.purgeView) then
+            self.purgeView = self.addon:NewView("purge");
+        end
+        self.purgeView:Show();
         return;
     end
 
@@ -90,14 +90,13 @@ function CommandsService:HandleCommand(parameters)
         self:GetService("purge"):Purge(string.sub(parameters, 7));
     end
 
-    -- check if history should be shown
-    if (string.lower(parameters) == "debug") then
-        self.addon:ToggleDebug();
+    -- show logs view
+    if (string.lower(parameters) == "logs" and not self.addon.inCombat) then
+        if (not self.logsView) then
+            self.logsView = self.addon:NewView("logs");
+        end
+        self.logsView:Show();
         return;
     end
 
-    -- check if history should be shown
-    if (string.lower(parameters) == "trace") then
-        self.addon:ToggleTrace();
-    end
 end

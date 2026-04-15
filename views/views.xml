@@ -7,4 +7,6 @@
     <Script file="spec-view.lua" />
     <Script file="welcome-view.lua" />
     <Script file="help-view.lua" />
+    <Script file="logs-view.lua" />
+    <Script file="purge-view.lua" />
 </Ui>

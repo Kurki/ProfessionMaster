@@ -25,6 +25,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Show minimap icon",
             ["CommandsReagents"] = "/pm reagents - Show/Hide missing Reagents",
             ["CommandsPurge"] = "/pm purge [all | own | <player name>] - Delete all data, the data of yourself or of a specific player",
+            ["CommandsLogs"] = "/pm logs - Show log entries",
             ["CommandsPurgeRow1"] = "Possible purge commands:",
             ["CommandsPurgeRow2"] = "/pm purge all - Delete all data",
             ["CommandsPurgeRow3"] = "/pm purge own - Delete data of yourself",
@@ -81,6 +82,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "All data was deleted",
             ["CharacterPurged"] = "Data of %s was deleted",
+            ["PurgeViewTitle"] = "Purge Players",
+            ["PurgeViewDescription"] = "Select the players to remove:",
+            ["PurgeButtonText"] = "Purge selected (%d)",
+            ["PurgeNoStalePlayers"] = "No players found that are no longer in the guild.",
+            ["PurgeHeaderNotInGuild"] = "Players no longer in the guild:",
+            ["PurgeHeaderOtherPlayers"] = "Other players:",
+            ["PurgeNoPlayersFound"] = "No players found.",
+            ["PurgeDone"] = "%d player(s) purged.",
 
             -- who
             ["WhoCraftResponse"] = "I can craft that for you!",
@@ -128,6 +137,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Minimap icon anzeigen",
             ["CommandsReagents"] = "/pm reagents - Fehlende Materialien ein-/ausblenden",
             ["CommandsPurge"] = "/pm purge [all | own | <Spielername>] - Lösche alle Daten, Daten von dir oder von einem spezifischen Spieler",
+            ["CommandsLogs"] = "/pm logs - Protokolleinträge anzeigen",
             ["CommandsPurgeRow1"] = "Mögliche Lösch-Befehle:",
             ["CommandsPurgeRow2"] = "/pm purge all - Lösche alle Daten",
             ["CommandsPurgeRow3"] = "/pm purge own - Lösche Daten von dir",
@@ -178,6 +188,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Alle Daten wurden gelöscht",
             ["CharacterPurged"] = "Daten von %s wurden gelöscht",
+            ["PurgeViewTitle"] = "Spieler bereinigen",
+            ["PurgeViewDescription"] = "Wähle die Spieler die entfernt werden sollen:",
+            ["PurgeButtonText"] = "Ausgewählte (%d) löschen",
+            ["PurgeNoStalePlayers"] = "Keine Spieler gefunden, die nicht mehr in der Gilde sind.",
+            ["PurgeHeaderNotInGuild"] = "Spieler die nicht mehr in der Gilde sind:",
+            ["PurgeHeaderOtherPlayers"] = "Andere Spieler:",
+            ["PurgeNoPlayersFound"] = "Keine Spieler gefunden.",
+            ["PurgeDone"] = "%d Spieler bereinigt.",
 
             -- who
             ["WhoCraftResponse"] = "Ich kann dir das herstellen!",
@@ -219,6 +237,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Показать значок на миникарте",
             ["CommandsReagents"] = "/pm reagents - Показать/скрыть недостающие реагенты",
             ["CommandsPurge"] = "/pm purge [all | own | <имя игрока>] - Удалить все данные, ваши данные или данные определенного игрока",
+            ["CommandsLogs"] = "/pm logs - Показать записи журнала",
             ["CommandsPurgeRow1"] = "Доступные команды удаления:",
             ["CommandsPurgeRow2"] = "/pm purge all - Удалить все данные",
             ["CommandsPurgeRow3"] = "/pm purge own - Удалить ваши данные",
@@ -275,6 +294,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Все данные были удалены",
             ["CharacterPurged"] = "Данные %s были удалены",
+            ["PurgeViewTitle"] = "Удалить игроков",
+            ["PurgeViewDescription"] = "Выберите игроков для удаления:",
+            ["PurgeButtonText"] = "Удалить выбранных (%d)",
+            ["PurgeNoStalePlayers"] = "Не найдено игроков, которых больше нет в гильдии.",
+            ["PurgeHeaderNotInGuild"] = "Игроки, которых больше нет в гильдии:",
+            ["PurgeHeaderOtherPlayers"] = "Другие игроки:",
+            ["PurgeNoPlayersFound"] = "Игроки не найдены.",
+            ["PurgeDone"] = "%d игрок(ов) удалено.",
 
             -- who
             ["WhoCraftResponse"] = "Я могу это для тебя сделать!",
@@ -316,6 +343,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Mostrar icono del minimapa",
             ["CommandsReagents"] = "/pm reagents - Mostrar/Ocultar materiales faltantes",
             ["CommandsPurge"] = "/pm purge [all | own | <nombre del jugador>] - Eliminar todos los datos, tus datos o los de un jugador específico",
+            ["CommandsLogs"] = "/pm logs - Mostrar entradas del registro",
             ["CommandsPurgeRow1"] = "Comandos de eliminación disponibles:",
             ["CommandsPurgeRow2"] = "/pm purge all - Eliminar todos los datos",
             ["CommandsPurgeRow3"] = "/pm purge own - Eliminar tus datos",
@@ -372,6 +400,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Todos los datos fueron eliminados",
             ["CharacterPurged"] = "Los datos de %s fueron eliminados",
+            ["PurgeViewTitle"] = "Purgar jugadores",
+            ["PurgeViewDescription"] = "Selecciona los jugadores a eliminar:",
+            ["PurgeButtonText"] = "Purgar seleccionados (%d)",
+            ["PurgeNoStalePlayers"] = "No se encontraron jugadores que ya no est\195\169n en la hermandad.",
+            ["PurgeHeaderNotInGuild"] = "Jugadores que ya no están en la hermandad:",
+            ["PurgeHeaderOtherPlayers"] = "Otros jugadores:",
+            ["PurgeNoPlayersFound"] = "No se encontraron jugadores.",
+            ["PurgeDone"] = "%d jugador(es) purgado(s).",
 
             -- who
             ["WhoCraftResponse"] = "¡Puedo fabricarte eso!",
@@ -413,6 +449,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Afficher l'icône de la minicarte",
             ["CommandsReagents"] = "/pm reagents - Afficher/Masquer les composants manquants",
             ["CommandsPurge"] = "/pm purge [all | own | <nom du joueur>] - Supprimer toutes les données, vos données ou celles d'un joueur spécifique",
+            ["CommandsLogs"] = "/pm logs - Afficher les entrées du journal",
             ["CommandsPurgeRow1"] = "Commandes de suppression disponibles :",
             ["CommandsPurgeRow2"] = "/pm purge all - Supprimer toutes les données",
             ["CommandsPurgeRow3"] = "/pm purge own - Supprimer vos données",
@@ -469,6 +506,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Toutes les données ont été supprimées",
             ["CharacterPurged"] = "Les données de %s ont été supprimées",
+            ["PurgeViewTitle"] = "Purger les joueurs",
+            ["PurgeViewDescription"] = "Sélectionnez les joueurs à supprimer :",
+            ["PurgeButtonText"] = "Purger la sélection (%d)",
+            ["PurgeNoStalePlayers"] = "Aucun joueur trouvé qui n'est plus dans la guilde.",
+            ["PurgeHeaderNotInGuild"] = "Joueurs qui ne sont plus dans la guilde :",
+            ["PurgeHeaderOtherPlayers"] = "Autres joueurs :",
+            ["PurgeNoPlayersFound"] = "Aucun joueur trouvé.",
+            ["PurgeDone"] = "%d joueur(s) purgé(s).",
 
             -- who
             ["WhoCraftResponse"] = "Je peux fabriquer ça pour vous !",
@@ -510,6 +555,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Mostra icona della minimappa",
             ["CommandsReagents"] = "/pm reagents - Mostra/Nascondi reagenti mancanti",
             ["CommandsPurge"] = "/pm purge [all | own | <nome giocatore>] - Elimina tutti i dati, i tuoi dati o quelli di un giocatore specifico",
+            ["CommandsLogs"] = "/pm logs - Mostra le voci del registro",
             ["CommandsPurgeRow1"] = "Comandi di eliminazione disponibili:",
             ["CommandsPurgeRow2"] = "/pm purge all - Elimina tutti i dati",
             ["CommandsPurgeRow3"] = "/pm purge own - Elimina i tuoi dati",
@@ -566,6 +612,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Tutti i dati sono stati eliminati",
             ["CharacterPurged"] = "I dati di %s sono stati eliminati",
+            ["PurgeViewTitle"] = "Elimina giocatori",
+            ["PurgeViewDescription"] = "Seleziona i giocatori da rimuovere:",
+            ["PurgeButtonText"] = "Elimina selezionati (%d)",
+            ["PurgeNoStalePlayers"] = "Nessun giocatore trovato che non \195\168 pi\195\185 nella gilda.",
+            ["PurgeHeaderNotInGuild"] = "Giocatori non più nella gilda:",
+            ["PurgeHeaderOtherPlayers"] = "Altri giocatori:",
+            ["PurgeNoPlayersFound"] = "Nessun giocatore trovato.",
+            ["PurgeDone"] = "%d giocatore/i eliminato/i.",
 
             -- who
             ["WhoCraftResponse"] = "Posso fabbricarlo per te!",
@@ -607,6 +661,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - 미니맵 아이콘 표시",
             ["CommandsReagents"] = "/pm reagents - 부족한 재료 표시/숨기기",
             ["CommandsPurge"] = "/pm purge [all | own | <플레이어 이름>] - 모든 데이터, 내 데이터 또는 특정 플레이어의 데이터 삭제",
+            ["CommandsLogs"] = "/pm logs - 로그 항목 표시",
             ["CommandsPurgeRow1"] = "사용 가능한 삭제 명령어:",
             ["CommandsPurgeRow2"] = "/pm purge all - 모든 데이터 삭제",
             ["CommandsPurgeRow3"] = "/pm purge own - 내 데이터 삭제",
@@ -663,6 +718,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "모든 데이터가 삭제되었습니다",
             ["CharacterPurged"] = "%s의 데이터가 삭제되었습니다",
+            ["PurgeViewTitle"] = "플레이어 정리",
+            ["PurgeViewDescription"] = "삭제할 플레이어를 선택하세요:",
+            ["PurgeButtonText"] = "선택된 항목 삭제 (%d)",
+            ["PurgeNoStalePlayers"] = "길드에 없는 플레이어가 없습니다.",
+            ["PurgeHeaderNotInGuild"] = "더 이상 길드에 없는 플레이어:",
+            ["PurgeHeaderOtherPlayers"] = "다른 플레이어:",
+            ["PurgeNoPlayersFound"] = "플레이어를 찾을 수 없습니다.",
+            ["PurgeDone"] = "%d명의 플레이어가 삭제되었습니다.",
 
             -- who
             ["WhoCraftResponse"] = "제가 제작해 드릴 수 있습니다!",
@@ -704,6 +767,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - Mostrar ícone do minimapa",
             ["CommandsReagents"] = "/pm reagents - Mostrar/Ocultar reagentes faltantes",
             ["CommandsPurge"] = "/pm purge [all | own | <nome do jogador>] - Apagar todos os dados, seus dados ou de um jogador específico",
+            ["CommandsLogs"] = "/pm logs - Mostrar entradas do registro",
             ["CommandsPurgeRow1"] = "Comandos de exclusão disponíveis:",
             ["CommandsPurgeRow2"] = "/pm purge all - Apagar todos os dados",
             ["CommandsPurgeRow3"] = "/pm purge own - Apagar seus dados",
@@ -760,6 +824,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "Todos os dados foram apagados",
             ["CharacterPurged"] = "Os dados de %s foram apagados",
+            ["PurgeViewTitle"] = "Limpar jogadores",
+            ["PurgeViewDescription"] = "Selecione os jogadores a remover:",
+            ["PurgeButtonText"] = "Limpar selecionados (%d)",
+            ["PurgeNoStalePlayers"] = "Nenhum jogador encontrado que não está mais na guilda.",
+            ["PurgeHeaderNotInGuild"] = "Jogadores que não estão mais na guilda:",
+            ["PurgeHeaderOtherPlayers"] = "Outros jogadores:",
+            ["PurgeNoPlayersFound"] = "Nenhum jogador encontrado.",
+            ["PurgeDone"] = "%d jogador(es) removido(s).",
 
             -- who
             ["WhoCraftResponse"] = "Posso fabricar isso para você!",
@@ -801,6 +873,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - 显示小地图图标",
             ["CommandsReagents"] = "/pm reagents - 显示/隐藏缺少的材料",
             ["CommandsPurge"] = "/pm purge [all | own | <玩家名称>] - 删除所有数据、你的数据或特定玩家的数据",
+            ["CommandsLogs"] = "/pm logs - 显示日志条目",
             ["CommandsPurgeRow1"] = "可用的删除命令：",
             ["CommandsPurgeRow2"] = "/pm purge all - 删除所有数据",
             ["CommandsPurgeRow3"] = "/pm purge own - 删除你的数据",
@@ -857,6 +930,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "所有数据已删除",
             ["CharacterPurged"] = "%s 的数据已删除",
+            ["PurgeViewTitle"] = "清理玩家",
+            ["PurgeViewDescription"] = "选择要移除的玩家：",
+            ["PurgeButtonText"] = "清理已选 (%d)",
+            ["PurgeNoStalePlayers"] = "没有找到不再在公会中的玩家。",
+            ["PurgeHeaderNotInGuild"] = "不再在公会中的玩家：",
+            ["PurgeHeaderOtherPlayers"] = "其他玩家：",
+            ["PurgeNoPlayersFound"] = "未找到玩家。",
+            ["PurgeDone"] = "已清理 %d 名玩家。",
 
             -- who
             ["WhoCraftResponse"] = "我可以为你制作！",
@@ -898,6 +979,7 @@ function LocalesModel:Create()
             ["CommandsMinimap"] = "/pm minimap - 顯示小地圖圖示",
             ["CommandsReagents"] = "/pm reagents - 顯示/隱藏缺少的材料",
             ["CommandsPurge"] = "/pm purge [all | own | <玩家名稱>] - 刪除所有資料、你的資料或特定玩家的資料",
+            ["CommandsLogs"] = "/pm logs - 顯示日誌條目",
             ["CommandsPurgeRow1"] = "可用的刪除指令：",
             ["CommandsPurgeRow2"] = "/pm purge all - 刪除所有資料",
             ["CommandsPurgeRow3"] = "/pm purge own - 刪除你的資料",
@@ -954,6 +1036,14 @@ function LocalesModel:Create()
             -- purge
             ["AllDataPurged"] = "所有資料已刪除",
             ["CharacterPurged"] = "%s 的資料已刪除",
+            ["PurgeViewTitle"] = "清理玩家",
+            ["PurgeViewDescription"] = "選擇要移除的玩家：",
+            ["PurgeButtonText"] = "清理已選 (%d)",
+            ["PurgeNoStalePlayers"] = "沒有找到不再在公會中的玩家。",
+            ["PurgeHeaderNotInGuild"] = "不再在公會中的玩家：",
+            ["PurgeHeaderOtherPlayers"] = "其他玩家：",
+            ["PurgeNoPlayersFound"] = "未找到玩家。",
+            ["PurgeDone"] = "已清理 %d 名玩家。",
 
             -- who
             ["WhoCraftResponse"] = "我可以為你製作！",

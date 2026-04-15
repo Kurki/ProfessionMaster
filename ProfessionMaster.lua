@@ -37,10 +37,7 @@ function ProfessionMasterAddon:Create()
         name = addonName,
         version = addonVersion,
         shortcut = addonShortcut,
-        debug = false,
-        trace = false,
         frame = CreateFrame("Frame"),
-        logLevel = 0,
         loaded = false,
         isVanilla = string.find(wowBuild, "1.") == 1,
         isBcc = string.find(wowBuild, "2.") == 1,
@@ -188,60 +185,12 @@ function ProfessionMasterAddon:GetModel(name)
     return self.modelTypes[name];
 end
 
---- Toggle debug flag.
-function ProfessionMasterAddon:ToggleDebug()
-    if (self.logLevel == 1) then
-        self.logLevel = 0;
-        self:GetService("chat"):WriteBare("Debug-Mode disabled.");
-    elseif (self.logLevel == 0) then
-        self.logLevel = 1;
-        self:GetService("chat"):WriteBare("Debug-Mode enabled.");
-    end
-end
-
---- Toggle trace flag.
-function ProfessionMasterAddon:ToggleTrace()
-    if (self.logLevel == 2) then
-        self.logLevel = 0;
-        self:GetService("chat"):WriteBare("Trace-Mode disabled.");
-    elseif (self.logLevel == 0) then
-        self.logLevel = 2;
-        self:GetService("chat"):WriteBare("Trace-Mode enabled.");
-    end
-end
-
---- Log debug message.
+--- Log a message.
 -- @param class Name of class to log within.
 -- @param method Name of method to log within.
 -- @param message Log message.
-function ProfessionMasterAddon:LogDebug(class, method, message, ...)
-    -- check if trace not enabled
-    if (self.logLevel < 1) then
-        return;
-    end
-
-    -- add to logs
-    table.insert(PM_Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Debug] " .. string.format(message, ...));
-
-    -- print out trace
-    print("[Debug] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
-end
-
---- Log trace message.
--- @param class Name of class to log within.
--- @param method Name of method to log within.
--- @param message Log message.
-function ProfessionMasterAddon:LogTrace(class, method, message, ...)
-    -- check if trace not enabled
-    if (self.logLevel < 2) then
-        return;
-    end
-
-    -- add to logs
-    table.insert(PM_Logs, date("%Y-%m-%dT%H-%M-%S") .. " " .. class .. ":" .. method .. " [Trace] " .. string.format(message, ...));
-
-    -- print out trace
-    print("[Trace] " .. class .. ":" .. method .. " - " .. string.format(message, ...));
+function ProfessionMasterAddon:Log(class, method, message, ...)
+    self:GetService("log"):AddEntry(class .. ":" .. method .. " - " .. string.format(message, ...));
 end
 
 --- Handle event.

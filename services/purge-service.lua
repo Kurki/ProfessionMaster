@@ -54,7 +54,29 @@ end
 
 --- Purge character.
 function PurgeService:PurgeCharacter(characterName) 
-    -- get lower charatcer name
+    -- purge character data silently
+    self:PurgeCharacterSilent(characterName);
+
+    -- reset all sync times
+    PM_SyncTimes = {};
+
+    -- reset storage id to recieve data again
+    PM_Settings.storageId = nil;
+
+    -- check settings
+    self.addon:CheckSettings();
+
+    -- rebuild reverse index after purge
+    self:GetService("professions"):RebuildItemIndex();
+
+    -- send message
+    self:GetService("chat"):Write("CharacterPurged", characterName);
+end
+
+--- Purge character data without chat output or sync reset.
+-- Used for batch purging.
+function PurgeService:PurgeCharacterSilent(characterName)
+    -- get lower character name
     local lowerCharacterName = string.lower(characterName);
 
     -- remove from own professions
@@ -77,18 +99,30 @@ function PurgeService:PurgeCharacter(characterName)
                 end
             end
         end  
-    end  
+    end
 
-    -- reset all sync times
-    PM_SyncTimes = {};
+    -- remove from guildmates
+    for guildmateName, _ in pairs(PM_Guildmates) do
+        if (string.lower(guildmateName) == lowerCharacterName) then
+            PM_Guildmates[guildmateName] = nil;
+            break;
+        end
+    end
 
-    -- reset storage id to recieve data again
-    PM_Settings.storageId = nil;
+    -- remove from specializations
+    for specializationName, _ in pairs(PM_Specializations) do
+        if (string.lower(specializationName) == lowerCharacterName) then
+            PM_Specializations[specializationName] = nil;
+            break;
+        end
+    end
 
-    -- check settings
-    self.addon:CheckSettings();
-
-    -- send message
-    self:GetService("chat"):Write("CharacterPurged", characterName);
+    -- remove from player factions
+    for factionName, _ in pairs(PM_PlayerFactions) do
+        if (string.lower(factionName) == lowerCharacterName) then
+            PM_PlayerFactions[factionName] = nil;
+            break;
+        end
+    end
 end
 

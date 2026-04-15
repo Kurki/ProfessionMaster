@@ -80,6 +80,14 @@ function ProfessionsView:Show()
         helpButton:SetHighlightFontObject("GameFontHighlight");
         uiService:BindTooltip(helpButton, localeService:Get("HelpTooltip"));
 
+        -- add purge button (broom icon left of help button)
+        self.purgeView = self.addon:NewView("purge");
+        local purgeButton = uiService:CreateFlatSquareButton(view, "D", function()
+            self.purgeView:Show();
+        end, 16);
+        purgeButton:SetPoint("RIGHT", helpButton, "LEFT", -8, 0);
+        uiService:BindTooltip(purgeButton, localeService:Get("PurgeViewTitle"));
+
         -- add footer
         local footerLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalLeft");
         footerLabel:SetPoint("BOTTOMLEFT", 16, 10);
