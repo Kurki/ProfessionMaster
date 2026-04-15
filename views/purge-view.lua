@@ -114,7 +114,7 @@ function PurgeView:CollectPlayers()
                     if (not isOwnCharacter and not anyInGuild) then
                         entry.checked = true;
                         table.insert(staleEntries, entry);
-                    else
+                    elseif (not isOwnCharacter) then
                         entry.checked = false;
                         table.insert(otherEntries, entry);
                     end
@@ -349,7 +349,7 @@ function PurgeView:RefreshRows()
 
             local entry = displayRow.entry;
             row.checkbox:SetChecked(entry.checked);
-            row.checkbox:SetEnabled(not entry.isOwnCharacter);
+            row.checkbox:SetEnabled(true);
             row.nameText:SetTextColor(1, 1, 1);
             row.nameText:SetText(entry.displayText);
         end
