@@ -86,6 +86,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Select the players to remove:",
             ["PurgeButtonText"] = "Purge selected (%d)",
             ["PurgeNoStalePlayers"] = "No players found that are no longer in the guild.",
+            ["PurgeHeaderNotInGuild"] = "Players no longer in the guild:",
+            ["PurgeHeaderOtherPlayers"] = "Other players:",
+            ["PurgeNoPlayersFound"] = "No players found.",
             ["PurgeDone"] = "%d player(s) purged.",
 
             -- who
@@ -189,6 +192,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Wähle die Spieler die entfernt werden sollen:",
             ["PurgeButtonText"] = "Ausgewählte (%d) löschen",
             ["PurgeNoStalePlayers"] = "Keine Spieler gefunden, die nicht mehr in der Gilde sind.",
+            ["PurgeHeaderNotInGuild"] = "Spieler die nicht mehr in der Gilde sind:",
+            ["PurgeHeaderOtherPlayers"] = "Andere Spieler:",
+            ["PurgeNoPlayersFound"] = "Keine Spieler gefunden.",
             ["PurgeDone"] = "%d Spieler bereinigt.",
 
             -- who
@@ -292,6 +298,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Выберите игроков для удаления:",
             ["PurgeButtonText"] = "Удалить выбранных (%d)",
             ["PurgeNoStalePlayers"] = "Не найдено игроков, которых больше нет в гильдии.",
+            ["PurgeHeaderNotInGuild"] = "Игроки, которых больше нет в гильдии:",
+            ["PurgeHeaderOtherPlayers"] = "Другие игроки:",
+            ["PurgeNoPlayersFound"] = "Игроки не найдены.",
             ["PurgeDone"] = "%d игрок(ов) удалено.",
 
             -- who
@@ -395,6 +404,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Selecciona los jugadores a eliminar:",
             ["PurgeButtonText"] = "Purgar seleccionados (%d)",
             ["PurgeNoStalePlayers"] = "No se encontraron jugadores que ya no est\195\169n en la hermandad.",
+            ["PurgeHeaderNotInGuild"] = "Jugadores que ya no están en la hermandad:",
+            ["PurgeHeaderOtherPlayers"] = "Otros jugadores:",
+            ["PurgeNoPlayersFound"] = "No se encontraron jugadores.",
             ["PurgeDone"] = "%d jugador(es) purgado(s).",
 
             -- who
@@ -498,6 +510,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Sélectionnez les joueurs à supprimer :",
             ["PurgeButtonText"] = "Purger la sélection (%d)",
             ["PurgeNoStalePlayers"] = "Aucun joueur trouvé qui n'est plus dans la guilde.",
+            ["PurgeHeaderNotInGuild"] = "Joueurs qui ne sont plus dans la guilde :",
+            ["PurgeHeaderOtherPlayers"] = "Autres joueurs :",
+            ["PurgeNoPlayersFound"] = "Aucun joueur trouvé.",
             ["PurgeDone"] = "%d joueur(s) purgé(s).",
 
             -- who
@@ -601,6 +616,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Seleziona i giocatori da rimuovere:",
             ["PurgeButtonText"] = "Elimina selezionati (%d)",
             ["PurgeNoStalePlayers"] = "Nessun giocatore trovato che non \195\168 pi\195\185 nella gilda.",
+            ["PurgeHeaderNotInGuild"] = "Giocatori non più nella gilda:",
+            ["PurgeHeaderOtherPlayers"] = "Altri giocatori:",
+            ["PurgeNoPlayersFound"] = "Nessun giocatore trovato.",
             ["PurgeDone"] = "%d giocatore/i eliminato/i.",
 
             -- who
@@ -704,6 +722,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "삭제할 플레이어를 선택하세요:",
             ["PurgeButtonText"] = "선택된 항목 삭제 (%d)",
             ["PurgeNoStalePlayers"] = "길드에 없는 플레이어가 없습니다.",
+            ["PurgeHeaderNotInGuild"] = "더 이상 길드에 없는 플레이어:",
+            ["PurgeHeaderOtherPlayers"] = "다른 플레이어:",
+            ["PurgeNoPlayersFound"] = "플레이어를 찾을 수 없습니다.",
             ["PurgeDone"] = "%d명의 플레이어가 삭제되었습니다.",
 
             -- who
@@ -807,6 +828,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "Selecione os jogadores a remover:",
             ["PurgeButtonText"] = "Limpar selecionados (%d)",
             ["PurgeNoStalePlayers"] = "Nenhum jogador encontrado que não está mais na guilda.",
+            ["PurgeHeaderNotInGuild"] = "Jogadores que não estão mais na guilda:",
+            ["PurgeHeaderOtherPlayers"] = "Outros jogadores:",
+            ["PurgeNoPlayersFound"] = "Nenhum jogador encontrado.",
             ["PurgeDone"] = "%d jogador(es) removido(s).",
 
             -- who
@@ -910,6 +934,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "选择要移除的玩家：",
             ["PurgeButtonText"] = "清理已选 (%d)",
             ["PurgeNoStalePlayers"] = "没有找到不再在公会中的玩家。",
+            ["PurgeHeaderNotInGuild"] = "不再在公会中的玩家：",
+            ["PurgeHeaderOtherPlayers"] = "其他玩家：",
+            ["PurgeNoPlayersFound"] = "未找到玩家。",
             ["PurgeDone"] = "已清理 %d 名玩家。",
 
             -- who
@@ -1013,6 +1040,9 @@ function LocalesModel:Create()
             ["PurgeViewDescription"] = "選擇要移除的玩家：",
             ["PurgeButtonText"] = "清理已選 (%d)",
             ["PurgeNoStalePlayers"] = "沒有找到不再在公會中的玩家。",
+            ["PurgeHeaderNotInGuild"] = "不再在公會中的玩家：",
+            ["PurgeHeaderOtherPlayers"] = "其他玩家：",
+            ["PurgeNoPlayersFound"] = "未找到玩家。",
             ["PurgeDone"] = "已清理 %d 名玩家。",
 
             -- who

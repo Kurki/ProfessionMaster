@@ -9,8 +9,8 @@
 local PurgeView = _G.professionMaster:CreateView("purge");
 
 --- Collect all players grouped by character set.
--- Non-guild players are sorted to the top and checked by default.
--- @return List of entries: { characters, characterSet, displayText, checked, stale }
+-- Returns two sorted lists: staleEntries (not in guild) and otherEntries (in guild / own).
+-- @return staleEntries, otherEntries
 function PurgeView:CollectPlayers()
     local playerService = self:GetService("player");
 
@@ -33,7 +33,8 @@ function PurgeView:CollectPlayers()
 
     -- group players by character set
     local visited = {};
-    local entries = {};
+    local staleEntries = {};
+    local otherEntries = {};
 
     for playerName, _ in pairs(allPlayers) do
         if (not visited[playerName]) then
@@ -58,7 +59,7 @@ function PurgeView:CollectPlayers()
                     visited[playerName] = true;
                 end
 
-                -- skip own characters
+                -- check if own character
                 local isOwnCharacter = false;
                 for _, characterName in ipairs(groupMembers) do
                     if (playerService:IsCurrentPlayer(characterName) or PM_OwnProfessions[characterName]) then
@@ -67,7 +68,7 @@ function PurgeView:CollectPlayers()
                     end
                 end
 
-                if (not isOwnCharacter and #groupMembers > 0) then
+                if (#groupMembers > 0) then
                     -- check if ANY character in the group is still in the guild
                     local anyInGuild = false;
                     for _, characterName in ipairs(groupMembers) do
@@ -103,27 +104,59 @@ function PurgeView:CollectPlayers()
                         displayText = displayText .. " +" .. altCount .. " alts";
                     end
 
-                    table.insert(entries, {
+                    local entry = {
                         characters = groupMembers,
                         characterSet = characterSet,
                         displayText = displayText,
-                        stale = not anyInGuild,
-                        checked = not anyInGuild
-                    });
+                        isOwnCharacter = isOwnCharacter
+                    };
+
+                    if (not isOwnCharacter and not anyInGuild) then
+                        entry.checked = true;
+                        table.insert(staleEntries, entry);
+                    else
+                        entry.checked = false;
+                        table.insert(otherEntries, entry);
+                    end
                 end
             end
         end -- realm/faction filter
     end
 
-    -- sort: stale (not in guild) first, then alphabetically within each group
-    table.sort(entries, function(a, b)
-        if (a.stale ~= b.stale) then
-            return a.stale;
-        end
-        return a.displayText < b.displayText;
-    end);
+    -- sort alphabetically within each group
+    table.sort(staleEntries, function(a, b) return a.displayText < b.displayText; end);
+    table.sort(otherEntries, function(a, b) return a.displayText < b.displayText; end);
 
-    return entries;
+    return staleEntries, otherEntries;
+end
+
+--- Build a flat display list with headers, entries and empty placeholders.
+-- @return displayRows: list of { type, entry?, text? }
+function PurgeView:BuildDisplayRows(staleEntries, otherEntries)
+    local localeService = self:GetService("locale");
+    local displayRows = {};
+
+    -- section 1: not in guild
+    table.insert(displayRows, { type = "header", text = localeService:Get("PurgeHeaderNotInGuild") });
+    if (#staleEntries == 0) then
+        table.insert(displayRows, { type = "empty", text = localeService:Get("PurgeNoPlayersFound") });
+    else
+        for _, entry in ipairs(staleEntries) do
+            table.insert(displayRows, { type = "entry", entry = entry });
+        end
+    end
+
+    -- section 2: other players
+    table.insert(displayRows, { type = "header", text = localeService:Get("PurgeHeaderOtherPlayers") });
+    if (#otherEntries == 0) then
+        table.insert(displayRows, { type = "empty", text = localeService:Get("PurgeNoPlayersFound") });
+    else
+        for _, entry in ipairs(otherEntries) do
+            table.insert(displayRows, { type = "entry", entry = entry });
+        end
+    end
+
+    return displayRows;
 end
 
 --- Show purge view.
@@ -132,8 +165,11 @@ function PurgeView:Show()
     local uiService = self:GetService("ui");
     local localeService = self:GetService("locale");
 
-    -- collect all players
-    self.staleEntries = self:CollectPlayers();
+    -- collect all players and build display rows
+    local staleEntries, otherEntries = self:CollectPlayers();
+    self.staleEntries = staleEntries;
+    self.otherEntries = otherEntries;
+    self.displayRows = self:BuildDisplayRows(staleEntries, otherEntries);
 
     -- check if view created
     if (self.view == nil) then
@@ -155,18 +191,9 @@ function PurgeView:Show()
         closeButton:SetWidth(22);
         closeButton:SetPoint("TOPRIGHT", -12, -8);
 
-        -- add description label
-        local descriptionLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        descriptionLabel:SetPoint("TOPLEFT", 16, -36);
-        descriptionLabel:SetPoint("RIGHT", -16, 0);
-        descriptionLabel:SetJustifyH("LEFT");
-        descriptionLabel:SetTextColor(0.7, 0.7, 0.7);
-        descriptionLabel:SetText(localeService:Get("PurgeViewDescription"));
-        self.descriptionLabel = descriptionLabel;
-
         -- add players frame
         local playersFrame = uiService:CreatePanel(view);
-        playersFrame:SetPoint("TOPLEFT", 12, -54);
+        playersFrame:SetPoint("TOPLEFT", 12, -36);
         playersFrame:SetPoint("BOTTOMRIGHT", -12, 42);
         self.playersFrame = playersFrame;
 
@@ -195,7 +222,7 @@ function PurgeView:Show()
     end
 
     -- update scroll content height
-    self.playerScrollChild:SetHeight(#self.staleEntries * 24);
+    self.playerScrollChild:SetHeight(#self.displayRows * 24);
     self.playerScrollTop = 0;
 
     -- refresh
@@ -216,6 +243,11 @@ function PurgeView:UpdatePurgeButtonText()
             selectedCount = selectedCount + 1;
         end
     end
+    for _, entry in ipairs(self.otherEntries) do
+        if (entry.checked) then
+            selectedCount = selectedCount + 1;
+        end
+    end
     self.purgeButton:SetText(localeService:Get("PurgeButtonText", selectedCount));
 end
 
@@ -225,7 +257,7 @@ function PurgeView:RefreshRows()
 
     -- get visible range
     local startIndex = math.max(math.floor(self.playerScrollTop / rowHeight) - 1, 1);
-    local endIndex = math.min(startIndex + 25, #self.staleEntries);
+    local endIndex = math.min(startIndex + 25, #self.displayRows);
     local visibleCount = math.max(endIndex - startIndex + 1, 0);
 
     -- ensure pool has enough frames
@@ -246,9 +278,9 @@ function PurgeView:RefreshRows()
         checkbox:SetHeight(20);
         checkbox:SetPoint("LEFT", 4, 0);
         checkbox:SetScript("OnClick", function()
-            local entryIndex = row.entryIndex;
-            if (entryIndex and self.staleEntries[entryIndex]) then
-                self.staleEntries[entryIndex].checked = checkbox:GetChecked();
+            local displayRow = row.displayRow;
+            if (displayRow and displayRow.entry) then
+                displayRow.entry.checked = checkbox:GetChecked();
                 self:UpdatePurgeButtonText();
             end
         end);
@@ -262,6 +294,14 @@ function PurgeView:RefreshRows()
         nameText:SetJustifyV("MIDDLE");
         row.nameText = nameText;
 
+        -- add header/label text (full width, no checkbox)
+        local headerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+        headerText:SetPoint("LEFT", 8, 0);
+        headerText:SetPoint("RIGHT", row, "RIGHT", -6, 0);
+        headerText:SetJustifyH("LEFT");
+        headerText:SetJustifyV("MIDDLE");
+        row.headerText = headerText;
+
         self.rowPool[poolIndex] = row;
     end
 
@@ -271,14 +311,13 @@ function PurgeView:RefreshRows()
     end
 
     -- bind pool frames to visible data
-    local uiService = self:GetService("ui");
     for i = 0, visibleCount - 1 do
         local rowIndex = startIndex + i;
-        local entry = self.staleEntries[rowIndex];
+        local displayRow = self.displayRows[rowIndex];
         local row = self.rowPool[i + 1];
 
-        -- set background color
-        uiService:SetRowColor(row, rowIndex);
+        -- clear background
+        row:SetBackdropColor(0, 0, 0, 0);
 
         -- position
         local top = (rowIndex - 1) * rowHeight;
@@ -286,15 +325,35 @@ function PurgeView:RefreshRows()
         row:SetPoint("TOPLEFT", self.playerScrollChild, "TOPLEFT", 0, -top);
         row:SetPoint("RIGHT", self.playerScrollChild, "RIGHT", -28, 0);
 
-        -- set data
-        row.entryIndex = rowIndex;
-        row.checkbox:SetChecked(entry.checked);
-        if (entry.stale) then
-            row.nameText:SetTextColor(1, 1, 1);
+        row.displayRow = displayRow;
+
+        if (displayRow.type == "header") then
+            -- header row: golden text, no checkbox
+            row.checkbox:Hide();
+            row.nameText:Hide();
+            row.headerText:SetText(displayRow.text);
+            row.headerText:SetTextColor(1, 0.82, 0);
+            row.headerText:Show();
+        elseif (displayRow.type == "empty") then
+            -- empty placeholder: gray text, no checkbox
+            row.checkbox:Hide();
+            row.nameText:Hide();
+            row.headerText:SetText(displayRow.text);
+            row.headerText:SetTextColor(0.5, 0.5, 0.5);
+            row.headerText:Show();
         else
-            row.nameText:SetTextColor(0.5, 0.5, 0.5);
+            -- entry row: checkbox + name
+            row.headerText:Hide();
+            row.checkbox:Show();
+            row.nameText:Show();
+
+            local entry = displayRow.entry;
+            row.checkbox:SetChecked(entry.checked);
+            row.checkbox:SetEnabled(not entry.isOwnCharacter);
+            row.nameText:SetTextColor(1, 1, 1);
+            row.nameText:SetText(entry.displayText);
         end
-        row.nameText:SetText(entry.displayText);
+
         row:Show();
     end
 end
@@ -304,7 +363,15 @@ function PurgeView:PurgeSelected()
     local purgeService = self:GetService("purge");
     local purgedCount = 0;
 
+    local allEntries = {};
     for _, entry in ipairs(self.staleEntries) do
+        table.insert(allEntries, entry);
+    end
+    for _, entry in ipairs(self.otherEntries) do
+        table.insert(allEntries, entry);
+    end
+
+    for _, entry in ipairs(allEntries) do
         if (entry.checked) then
             -- purge all characters in the group
             for _, characterName in ipairs(entry.characters) do
@@ -336,6 +403,12 @@ function PurgeView:PurgeSelected()
     -- hide and notify
     self:Hide();
     self:GetService("chat"):WriteBare(self:GetService("locale"):Get("PurgeDone", purgedCount));
+
+    -- refresh professions view if open
+    local professionsView = self.addon.professionsView;
+    if (professionsView and professionsView.visible) then
+        professionsView.skillsListPanel:AddSkills();
+    end
 end
 
 --- Hide view.
