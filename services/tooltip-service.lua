@@ -95,6 +95,11 @@ function TooltipService:CheckTooltip(tooltip)
         return;
     end
 
+    -- skip skills without a profession (e.g. poisons)
+    if (not professionId) then
+        return;
+    end
+
     -- get player names from PM_Professions
     local professionsService = self:GetService("professions");
     local players = professionsService:GetSkillPlayers(professionId, skillId);
