@@ -63,7 +63,8 @@ function SkillsService:AddAddonSkills(addonNumber, addonData)
         local skill = {
             itemId = addonSkillData.itemId,
             itemAmount = addonSkillData.itemAmount,
-            reagents = addonSkillData.reagents
+            reagents = addonSkillData.reagents,
+            professionId = addonSkillData.p
         };
 
         -- get addon

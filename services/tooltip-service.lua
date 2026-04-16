@@ -95,8 +95,10 @@ function TooltipService:CheckTooltip(tooltip)
         return;
     end
 
-    -- get player names
-    local playerNames = self:GetService("player"):CombinePlayerNames(skill.players, 5);
+    -- get player names from PM_Professions
+    local professionsService = self:GetService("professions");
+    local players = professionsService:GetSkillPlayers(professionId, skillId);
+    local playerNames = self:GetService("player"):CombinePlayerNames(players, 5);
 
     -- get profession icon
     local professionNamesService = self:GetService("profession-names");
@@ -107,22 +109,22 @@ function TooltipService:CheckTooltip(tooltip)
 end
 
 --- Fill tooltip.
-function TooltipService:ShowTooltip(tooltip, professionId, skillId, skill)
+function TooltipService:ShowTooltip(tooltip, professionId, skillId, skillMeta, players)
     -- check skill link
-    if (skill.skillLink) then
-        tooltip:SetHyperlink(skill.skillLink);
+    if (skillMeta.skillLink) then
+        tooltip:SetHyperlink(skillMeta.skillLink);
         return;
     end
     
     -- check item link
-    if (skill.itemLink) then
-        tooltip:SetHyperlink(skill.itemLink);
+    if (skillMeta.itemLink) then
+        tooltip:SetHyperlink(skillMeta.itemLink);
         return;
     end
 
     -- clear tooltip
     tooltip:ClearLines();
-    tooltip:SetText(self:GetService("profession-names"):GetProfessionName(professionId) .. ": " .. skill.name);
+    tooltip:SetText(self:GetService("profession-names"):GetProfessionName(professionId) .. ": " .. skillMeta.name);
 
     -- add reagents
     self:GetTooltipReagents(skillId, function(reagents)
@@ -132,7 +134,7 @@ function TooltipService:ShowTooltip(tooltip, professionId, skillId, skill)
         end
 
         -- add players
-        local playerNames = self:GetService("player"):CombinePlayerNames(skill.players, 5);
+        local playerNames = self:GetService("player"):CombinePlayerNames(players, 5);
         tooltip:AddLine("|cffffffff" .. self:GetService("locale"):Get("SkillViewPlayers") .. ": " .. table.concat(playerNames, ", "));
         tooltip:Show();
     end);
