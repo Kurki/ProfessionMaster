@@ -272,9 +272,12 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
     for characterName, professions in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
-             -- iterate all professions
-            for professionId, skills in pairs(professions) do
-                self:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, characterName);
+            -- check if character is in guild or setting allows non-guild characters
+            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+                 -- iterate all professions
+                for professionId, skills in pairs(professions) do
+                    self:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, characterName);
+                end
             end
         end
     end
@@ -307,8 +310,11 @@ function OwnProfessionsService:SendMyCharacters(playerName)
     for characterName, _ in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
-            -- add short name to result
-            table.insert(messageCharacters, playerService:GetShortName(characterName));
+            -- check if character is in guild or setting allows non-guild characters
+            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+                -- add short name to result
+                table.insert(messageCharacters, playerService:GetShortName(characterName));
+            end
         end
     end
 
@@ -336,19 +342,22 @@ function OwnProfessionsService:SendSpecializations(playerName)
     for characterName, _ in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
-            -- get specializations for this character
-            local specializations = PM_Specializations[characterName];
-            if (specializations) then
-                -- check if has any specializations
-                local hasSpecializations = false;
-                for _ in pairs(specializations) do
-                    hasSpecializations = true;
-                    break;
-                end
+            -- check if character is in guild or setting allows non-guild characters
+            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+                -- get specializations for this character
+                local specializations = PM_Specializations[characterName];
+                if (specializations) then
+                    -- check if has any specializations
+                    local hasSpecializations = false;
+                    for _ in pairs(specializations) do
+                        hasSpecializations = true;
+                        break;
+                    end
 
-                -- send if has specializations
-                if (hasSpecializations) then
-                    messageService:SendToPlayer(playerName, PlayerSpecializationsMessage:Create(characterName, specializations));
+                    -- send if has specializations
+                    if (hasSpecializations) then
+                        messageService:SendToPlayer(playerName, PlayerSpecializationsMessage:Create(characterName, specializations));
+                    end
                 end
             end
         end

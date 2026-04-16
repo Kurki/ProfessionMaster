@@ -119,6 +119,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Respond to !who",
+            ["SettingsSendNonGuildCharacters"] = "Send professions of characters outside the guild",
             ["SettingsPurgeAll"] = "Delete all data",
             ["SkillCacheUpdating"] = "Data is being updated...",
             ["SkillCacheUpdated"] = "%d skills have been updated."
@@ -232,6 +233,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Auf !who reagieren",
+            ["SettingsSendNonGuildCharacters"] = "Berufe von Charakteren au\195\159erhalb der Gilde senden",
             ["SettingsPurgeAll"] = "Alle Daten löschen",
             ["SkillCacheUpdating"] = "Daten werden aktualisiert...",
             ["SkillCacheUpdated"] = "%d Daten wurden aktualisiert."
@@ -345,6 +347,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Отвечать на !who",
+            ["SettingsSendNonGuildCharacters"] = "Отправлять профессии персонажей вне гильдии",
             ["SettingsPurgeAll"] = "Удалить все данные",
             ["SkillCacheUpdating"] = "Данные обновляются...",
             ["SkillCacheUpdated"] = "Обновлено навыков: %d."
@@ -458,6 +461,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsSendNonGuildCharacters"] = "Enviar profesiones de personajes fuera del gremio",
             ["SettingsPurgeAll"] = "Eliminar todos los datos",
             ["SkillCacheUpdating"] = "Actualizando datos...",
             ["SkillCacheUpdated"] = "%d datos han sido actualizados."
@@ -571,6 +575,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Répondre à !who",
+            ["SettingsSendNonGuildCharacters"] = "Envoyer les métiers des personnages hors guilde",
             ["SettingsPurgeAll"] = "Supprimer toutes les données",
             ["SkillCacheUpdating"] = "Mise à jour des données...",
             ["SkillCacheUpdated"] = "%d données ont été mises à jour."
@@ -684,6 +689,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Rispondi a !who",
+            ["SettingsSendNonGuildCharacters"] = "Invia professioni dei personaggi fuori dalla gilda",
             ["SettingsPurgeAll"] = "Elimina tutti i dati",
             ["SkillCacheUpdating"] = "Aggiornamento dati in corso...",
             ["SkillCacheUpdated"] = "%d dati sono stati aggiornati."
@@ -797,6 +803,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "!who에 응답",
+            ["SettingsSendNonGuildCharacters"] = "길드 외 캐릭터의 전문 기술 전송",
             ["SettingsPurgeAll"] = "모든 데이터 삭제",
             ["SkillCacheUpdating"] = "데이터 업데이트 중...",
             ["SkillCacheUpdated"] = "%d개의 데이터가 업데이트되었습니다."
@@ -910,6 +917,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsSendNonGuildCharacters"] = "Enviar profissões de personagens fora da guilda",
             ["SettingsPurgeAll"] = "Apagar todos os dados",
             ["SkillCacheUpdating"] = "Atualizando dados...",
             ["SkillCacheUpdated"] = "%d dados foram atualizados."
@@ -1023,6 +1031,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "响应 !who",
+            ["SettingsSendNonGuildCharacters"] = "发送公会外角色的专业技能",
             ["SettingsPurgeAll"] = "删除所有数据",
             ["SkillCacheUpdating"] = "数据正在更新...",
             ["SkillCacheUpdated"] = "已更新 %d 条数据。"
@@ -1136,6 +1145,7 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "回應 !who",
+            ["SettingsSendNonGuildCharacters"] = "發送公會外角色的專業技能",
             ["SettingsPurgeAll"] = "刪除所有資料",
             ["SkillCacheUpdating"] = "資料正在更新...",
             ["SkillCacheUpdated"] = "已更新 %d 筆資料。"

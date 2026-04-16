@@ -93,6 +93,9 @@ function ProfessionMasterAddon:CheckSettings()
     if (PM_Settings.respondToWho == nil) then
         PM_Settings.respondToWho = true;
     end
+    if (PM_Settings.sendNonGuildCharacters == nil) then
+        PM_Settings.sendNonGuildCharacters = true;
+    end
 end
 
 --- Create view.
