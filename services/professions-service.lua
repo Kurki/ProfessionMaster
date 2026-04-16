@@ -128,7 +128,7 @@ function ProfessionsService:LoadSkillIntoCache(skillId, itemId, professionId, pr
                         if (not entry.name) then
                             entry.name = itemName;
                         end
-                        if (not entry.skillLink) then
+                        if (not entry.skillLink and professionId) then
                             entry.skillLink = professionNamesService:GetSkillLink(professionId, skillId, itemName);
                         end
                     end);
