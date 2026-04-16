@@ -558,8 +558,12 @@ function UiService:CreateMinimapIcon()
         label = "Profession Master",
 		icon = "Interface\\Icons\\Inv_misc_book_05",
 		OnClick = function(_, button)
-            if (button == "LeftButton" and not service.addon.inCombat) then
-                service.addon.professionsView:ToggleVisibility();
+            if (button == "LeftButton") then
+                if (IsShiftKeyDown()) then
+                    service.addon.settingsView:Open();
+                elseif (not service.addon.inCombat) then
+                    service.addon.professionsView:ToggleVisibility();
+                end
             elseif (button == "RightButton") then
                 if (IsShiftKeyDown()) then
                     libDbIcon:Hide("ProfessionMaster");
@@ -574,6 +578,7 @@ function UiService:CreateMinimapIcon()
             tooltip:SetText(localeService:Get("MinimapButtonTitle"));
             tooltip:AddLine(" ");
             tooltip:AddLine(localeService:Get("MinimapButtonLeftClick"));
+            tooltip:AddLine(localeService:Get("MinimapButtonShiftLeftClick"));
             tooltip:AddLine(localeService:Get("MinimapButtonRightClick"));
             tooltip:AddLine(localeService:Get("MinimapButtonShiftRightClick"));
 		end,

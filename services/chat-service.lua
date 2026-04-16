@@ -175,7 +175,7 @@ function ChatService:CheckChat(_, event, message, player, l, cs, t, flag, channe
     local isWhisper = (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_BN_WHISPER");
 
     -- check for !who command (only in guild, party and raid)
-    if (message and (event == "CHAT_MSG_GUILD" 
+    if (PM_Settings.respondToWho and message and (event == "CHAT_MSG_GUILD" 
         or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER"
         or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER"
         or isWhisper)) then
