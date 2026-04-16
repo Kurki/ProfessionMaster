@@ -26,6 +26,7 @@ if (not PM_CharacterSettings) then PM_CharacterSettings = {}; end
 if (not PM_Guildmates) then PM_Guildmates = {}; end
 if (not PM_PlayerFactions) then PM_PlayerFactions = {}; end
 if (not PM_Specializations) then PM_Specializations = {}; end
+if (not PM_Skills) then PM_Skills = {}; end
 
 --- Create new addon container.
 function ProfessionMasterAddon:Create()

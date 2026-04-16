@@ -446,8 +446,8 @@ function SkillsListPanel:AddSkills()
     -- pre-compute player name strings
     local playerService = self:GetService("player");
     for _, skillData in ipairs(self.skills) do
-        if (skillData.skill and skillData.skill.players) then
-            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(skillData.skill.players, 12), ", ");
+        if (skillData.players) then
+            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(skillData.players, 12), ", ");
         end
     end
 
@@ -468,18 +468,20 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
     local playerService = self:GetService("player");
 
     if (profession) then
-        for skillId, skill in pairs(profession) do
-            if (skill.name ~= nil) then
+        for skillId, skillEntry in pairs(profession) do
+            local skillMeta = PM_Skills[skillId];
+            if (skillMeta and skillMeta.name ~= nil) then
                 local skillInfo = skillsService:GetSkillById(skillId);
                 if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
-                    if (skill.players and playerService:HasVisiblePlayers(skill.players)) then
+                    if (skillEntry.players and playerService:HasVisiblePlayers(skillEntry.players)) then
                         local bucketListAmount = PM_BucketList[skillId];
 
                         if (#searchParts == 0) then
                             table.insert(self.skills, {
                                 professionId = professionId,
                                 skillId = skillId,
-                                skill = skill,
+                                skill = skillMeta,
+                                players = skillEntry.players,
                                 bucketListAmount = bucketListAmount
                             });
                             if (bucketListAmount) then
@@ -488,7 +490,7 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
                         else
                             local skillValid = true;
                             for i, part in ipairs(searchParts) do
-                                if (string.len(part) > 0 and string.find(string.lower(skill.name), part) == nil) then
+                                if (string.len(part) > 0 and string.find(string.lower(skillMeta.name), part) == nil) then
                                     skillValid = false;
                                     break;
                                 end
@@ -498,7 +500,8 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
                                 table.insert(self.skills, {
                                     professionId = professionId,
                                     skillId = skillId,
-                                    skill = skill,
+                                    skill = skillMeta,
+                                    players = skillEntry.players,
                                     bucketListAmount = bucketListAmount
                                 });
                                 if (bucketListAmount) then
@@ -788,7 +791,7 @@ function SkillsListPanel:RefreshRows()
         row:SetScript("OnEnter", function()
             row:SetBackdropColor(0.2, 0.2, 0.2);
             GameTooltip:SetOwner(row, "ANCHOR_LEFT");
-            self:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill);
+            self:GetService("tooltip"):ShowTooltip(GameTooltip, row.professionId, row.skillId, row.skill, row.players);
         end);
 
         -- handle row mouse click
@@ -902,6 +905,7 @@ function SkillsListPanel:RefreshRows()
             row.professionId = professionId;
             row.skill = skill;
             row.skillId = skillId;
+            row.players = skillData.players or (skill and skill.players);
             row.isSpecialization = skillData.isSpecialization;
 
             -- show
