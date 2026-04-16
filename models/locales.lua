@@ -40,6 +40,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Left Click:|cffffffff Show overview|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Left Click:|cffffffff Open settings|r",
             ["MinimapButtonRightClick"] = "|cff999999Right Click:|cffffffff Show/Hide missing Reagents|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Right Click:|cffffffff Hide minimap button|r",
 
@@ -114,7 +115,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Shadoweave Tailoring",
             ["Spec26798"] = "Mooncloth Tailoring",
             ["Spec20219"] = "Gnomish Engineering",
-            ["Spec20222"] = "Goblin Engineering"
+            ["Spec20222"] = "Goblin Engineering",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Respond to !who",
+            ["SettingsPurgeAll"] = "Delete all data"
         },
         -- define de locale
         ["de"] = {
@@ -146,6 +151,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Linksklick:|cffffffff Übersicht anzeigen|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Linksklick:|cffffffff Einstellungen öffnen|r",
             ["MinimapButtonRightClick"] = "|cff999999Rechtsklick:|cffffffff Fehlende Materialien ein-/ausblenden|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Rechtsklick:|cffffffff Minimap Schaltfläche ausblenden|r",
 
@@ -220,7 +226,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Schattenweberschneiderei",
             ["Spec26798"] = "Urmondstoffschneiderei",
             ["Spec20219"] = "Gnomeningenieur",
-            ["Spec20222"] = "Gobliningenieur"
+            ["Spec20222"] = "Gobliningenieur",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Auf !who reagieren",
+            ["SettingsPurgeAll"] = "Alle Daten löschen"
         },
         -- define ru locale
         ["ru"] = {
@@ -252,6 +262,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Левый клик:|cffffffff Показать обзор|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Левый клик:|cffffffff Открыть настройки|r",
             ["MinimapButtonRightClick"] = "|cff999999Правый клик:|cffffffff Показать/скрыть недостающие реагенты|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Правый клик:|cffffffff Скрыть кнопку на миникарте|r",
 
@@ -326,7 +337,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Тень",
             ["Spec26798"] = "Лунная ткань",
             ["Spec20219"] = "Гномская инженерия",
-            ["Spec20222"] = "Гоблинская инженерия"
+            ["Spec20222"] = "Гоблинская инженерия",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Отвечать на !who",
+            ["SettingsPurgeAll"] = "Удалить все данные"
         },
         -- define es locale
         ["es"] = {
@@ -358,6 +373,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Clic izquierdo:|cffffffff Mostrar vista general|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Clic izquierdo:|cffffffff Abrir ajustes|r",
             ["MinimapButtonRightClick"] = "|cff999999Clic derecho:|cffffffff Mostrar/Ocultar materiales faltantes|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic derecho:|cffffffff Ocultar botón del minimapa|r",
 
@@ -432,7 +448,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Sastrería de tejido de sombras",
             ["Spec26798"] = "Sastrería de tela lunar",
             ["Spec20219"] = "Ingeniería gnómica",
-            ["Spec20222"] = "Ingeniería goblin"
+            ["Spec20222"] = "Ingeniería goblin",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsPurgeAll"] = "Eliminar todos los datos"
         },
         -- define fr locale
         ["fr"] = {
@@ -464,6 +484,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Clic gauche :|cffffffff Afficher l'aperçu|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Clic gauche :|cffffffff Ouvrir les paramètres|r",
             ["MinimapButtonRightClick"] = "|cff999999Clic droit :|cffffffff Afficher/Masquer les composants manquants|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic droit :|cffffffff Masquer le bouton de la minicarte|r",
 
@@ -538,7 +559,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Couture de tisse-ombre",
             ["Spec26798"] = "Couture de tissu lunaire",
             ["Spec20219"] = "Ingénierie gnome",
-            ["Spec20222"] = "Ingénierie gobeline"
+            ["Spec20222"] = "Ingénierie gobeline",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Répondre à !who",
+            ["SettingsPurgeAll"] = "Supprimer toutes les données"
         },
         -- define it locale
         ["it"] = {
@@ -570,6 +595,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Clic sinistro:|cffffffff Mostra panoramica|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Clic sinistro:|cffffffff Apri impostazioni|r",
             ["MinimapButtonRightClick"] = "|cff999999Clic destro:|cffffffff Mostra/Nascondi reagenti mancanti|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clic destro:|cffffffff Nascondi pulsante della minimappa|r",
 
@@ -644,7 +670,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Sartoria dell'ombra",
             ["Spec26798"] = "Sartoria della stoffa lunare",
             ["Spec20219"] = "Ingegneria gnomesca",
-            ["Spec20222"] = "Ingegneria goblin"
+            ["Spec20222"] = "Ingegneria goblin",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Rispondi a !who",
+            ["SettingsPurgeAll"] = "Elimina tutti i dati"
         },
         -- define ko locale
         ["ko"] = {
@@ -676,6 +706,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999좌클릭:|cffffffff 개요 표시|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + 좌클릭:|cffffffff 설정 열기|r",
             ["MinimapButtonRightClick"] = "|cff999999우클릭:|cffffffff 부족한 재료 표시/숨기기|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 우클릭:|cffffffff 미니맵 버튼 숨기기|r",
 
@@ -750,7 +781,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "그림자매듭 재봉술",
             ["Spec26798"] = "달빛매듭 재봉술",
             ["Spec20219"] = "노움 공학",
-            ["Spec20222"] = "고블린 공학"
+            ["Spec20222"] = "고블린 공학",
+
+            -- settings
+            ["SettingsRespondToWho"] = "!who에 응답",
+            ["SettingsPurgeAll"] = "모든 데이터 삭제"
         },
         -- define pt locale
         ["pt"] = {
@@ -782,6 +817,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999Clique esquerdo:|cffffffff Mostrar visão geral|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + Clique esquerdo:|cffffffff Abrir configurações|r",
             ["MinimapButtonRightClick"] = "|cff999999Clique direito:|cffffffff Mostrar/Ocultar reagentes faltantes|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + Clique direito:|cffffffff Ocultar botão do minimapa|r",
 
@@ -856,7 +892,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "Alfaiataria de teia de sombras",
             ["Spec26798"] = "Alfaiataria de tecido lunar",
             ["Spec20219"] = "Engenharia gnômica",
-            ["Spec20222"] = "Engenharia goblin"
+            ["Spec20222"] = "Engenharia goblin",
+
+            -- settings
+            ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsPurgeAll"] = "Apagar todos os dados"
         },
         -- define zhCN locale (Simplified Chinese)
         ["zhCN"] = {
@@ -888,6 +928,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999左键点击：|cffffffff 显示概览|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + 左键点击：|cffffffff 打开设置|r",
             ["MinimapButtonRightClick"] = "|cff999999右键点击：|cffffffff 显示/隐藏缺少的材料|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 右键点击：|cffffffff 隐藏小地图按钮|r",
 
@@ -962,7 +1003,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "暗影裁缝",
             ["Spec26798"] = "月布裁缝",
             ["Spec20219"] = "侏儒工程学",
-            ["Spec20222"] = "地精工程学"
+            ["Spec20222"] = "地精工程学",
+
+            -- settings
+            ["SettingsRespondToWho"] = "响应 !who",
+            ["SettingsPurgeAll"] = "删除所有数据"
         },
         -- define zhTW locale (Traditional Chinese)
         ["zhTW"] = {
@@ -994,6 +1039,7 @@ function LocalesModel:Create()
             -- minimap button
             ["MinimapButtonTitle"] = self.addon.shortcut .. self.addon.name,
             ["MinimapButtonLeftClick"] = "|cff999999左鍵點擊：|cffffffff 顯示概覽|r",
+            ["MinimapButtonShiftLeftClick"] = "|cff999999Shift + 左鍵點擊：|cffffffff 開啟設定|r",
             ["MinimapButtonRightClick"] = "|cff999999右鍵點擊：|cffffffff 顯示/隱藏缺少的材料|r",
             ["MinimapButtonShiftRightClick"] = "|cff999999Shift + 右鍵點擊：|cffffffff 隱藏小地圖按鈕|r",
 
@@ -1068,7 +1114,11 @@ function LocalesModel:Create()
             ["Spec26801"] = "暗影裁縫",
             ["Spec26798"] = "月布裁縫",
             ["Spec20219"] = "乘儒工程學",
-            ["Spec20222"] = "乘精工程學"
+            ["Spec20222"] = "乘精工程學",
+
+            -- settings
+            ["SettingsRespondToWho"] = "回應 !who",
+            ["SettingsPurgeAll"] = "刪除所有資料"
         }
     };
 end

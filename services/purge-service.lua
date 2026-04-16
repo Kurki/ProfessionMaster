@@ -34,6 +34,11 @@ function PurgeService:Purge(context)
         -- rebuild reverse index after purge
         self:GetService("professions"):RebuildItemIndex();
 
+        -- refresh professions view
+        if (self.addon.professionsView) then
+            self.addon.professionsView:Refresh();
+        end
+
         -- send message
         chatService:Write("AllDataPurged");
         return;
@@ -68,6 +73,11 @@ function PurgeService:PurgeCharacter(characterName)
 
     -- rebuild reverse index after purge
     self:GetService("professions"):RebuildItemIndex();
+
+    -- refresh professions view
+    if (self.addon.professionsView) then
+        self.addon.professionsView:Refresh();
+    end
 
     -- send message
     self:GetService("chat"):Write("CharacterPurged", characterName);

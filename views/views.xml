@@ -9,4 +9,5 @@
     <Script file="help-view.lua" />
     <Script file="logs-view.lua" />
     <Script file="purge-view.lua" />
+    <Script file="settings-view.lua" />
 </Ui>
