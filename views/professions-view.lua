@@ -192,6 +192,15 @@ function ProfessionsView:Hide()
     self.visible = false;
 end
 
+--- Refresh data in skills list and bucket list while view is open.
+function ProfessionsView:Refresh()
+    if (not self.visible) then
+        return;
+    end
+    self.skillsListPanel:AddSkills();
+    self:CheckBucketList();
+end
+
 --- Toggle visibility.
 function ProfessionsView:ToggleVisibility()
     -- show view if not visible

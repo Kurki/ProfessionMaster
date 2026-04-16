@@ -31,6 +31,15 @@ function SettingsView:Initialize()
         PM_Settings.respondToWho = self:GetChecked();
     end);
 
+    -- add purge all button
+    local purgeAllButton = CreateFrame("Button", "PmSettingsPurgeAll", panel, "UIPanelButtonTemplate");
+    purgeAllButton:SetPoint("TOPLEFT", respondToWhoCheckbox, "BOTTOMLEFT", 0, -16);
+    purgeAllButton:SetSize(180, 24);
+    purgeAllButton:SetText(localeService:Get("SettingsPurgeAll"));
+    purgeAllButton:SetScript("OnClick", function()
+        self:GetService("purge"):Purge("all");
+    end);
+
     -- register in interface options
     if (Settings and Settings.RegisterCanvasLayoutCategory) then
         local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name);
