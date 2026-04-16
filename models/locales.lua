@@ -119,7 +119,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Respond to !who",
-            ["SettingsPurgeAll"] = "Delete all data"
+            ["SettingsSendNonGuildCharacters"] = "Send professions of characters outside the guild",
+            ["SettingsPurgeAll"] = "Delete all data",
+            ["SkillCacheUpdating"] = "Data is being updated...",
+            ["SkillCacheUpdated"] = "%d skills have been updated."
         },
         -- define de locale
         ["de"] = {
@@ -230,7 +233,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Auf !who reagieren",
-            ["SettingsPurgeAll"] = "Alle Daten löschen"
+            ["SettingsSendNonGuildCharacters"] = "Berufe von Charakteren au\195\159erhalb der Gilde senden",
+            ["SettingsPurgeAll"] = "Alle Daten löschen",
+            ["SkillCacheUpdating"] = "Daten werden aktualisiert...",
+            ["SkillCacheUpdated"] = "%d Daten wurden aktualisiert."
         },
         -- define ru locale
         ["ru"] = {
@@ -341,7 +347,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Отвечать на !who",
-            ["SettingsPurgeAll"] = "Удалить все данные"
+            ["SettingsSendNonGuildCharacters"] = "Отправлять профессии персонажей вне гильдии",
+            ["SettingsPurgeAll"] = "Удалить все данные",
+            ["SkillCacheUpdating"] = "Данные обновляются...",
+            ["SkillCacheUpdated"] = "Обновлено навыков: %d."
         },
         -- define es locale
         ["es"] = {
@@ -452,7 +461,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Responder a !who",
-            ["SettingsPurgeAll"] = "Eliminar todos los datos"
+            ["SettingsSendNonGuildCharacters"] = "Enviar profesiones de personajes fuera del gremio",
+            ["SettingsPurgeAll"] = "Eliminar todos los datos",
+            ["SkillCacheUpdating"] = "Actualizando datos...",
+            ["SkillCacheUpdated"] = "%d datos han sido actualizados."
         },
         -- define fr locale
         ["fr"] = {
@@ -563,7 +575,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Répondre à !who",
-            ["SettingsPurgeAll"] = "Supprimer toutes les données"
+            ["SettingsSendNonGuildCharacters"] = "Envoyer les métiers des personnages hors guilde",
+            ["SettingsPurgeAll"] = "Supprimer toutes les données",
+            ["SkillCacheUpdating"] = "Mise à jour des données...",
+            ["SkillCacheUpdated"] = "%d données ont été mises à jour."
         },
         -- define it locale
         ["it"] = {
@@ -674,7 +689,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Rispondi a !who",
-            ["SettingsPurgeAll"] = "Elimina tutti i dati"
+            ["SettingsSendNonGuildCharacters"] = "Invia professioni dei personaggi fuori dalla gilda",
+            ["SettingsPurgeAll"] = "Elimina tutti i dati",
+            ["SkillCacheUpdating"] = "Aggiornamento dati in corso...",
+            ["SkillCacheUpdated"] = "%d dati sono stati aggiornati."
         },
         -- define ko locale
         ["ko"] = {
@@ -785,7 +803,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "!who에 응답",
-            ["SettingsPurgeAll"] = "모든 데이터 삭제"
+            ["SettingsSendNonGuildCharacters"] = "길드 외 캐릭터의 전문 기술 전송",
+            ["SettingsPurgeAll"] = "모든 데이터 삭제",
+            ["SkillCacheUpdating"] = "데이터 업데이트 중...",
+            ["SkillCacheUpdated"] = "%d개의 데이터가 업데이트되었습니다."
         },
         -- define pt locale
         ["pt"] = {
@@ -896,7 +917,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "Responder a !who",
-            ["SettingsPurgeAll"] = "Apagar todos os dados"
+            ["SettingsSendNonGuildCharacters"] = "Enviar profissões de personagens fora da guilda",
+            ["SettingsPurgeAll"] = "Apagar todos os dados",
+            ["SkillCacheUpdating"] = "Atualizando dados...",
+            ["SkillCacheUpdated"] = "%d dados foram atualizados."
         },
         -- define zhCN locale (Simplified Chinese)
         ["zhCN"] = {
@@ -1007,7 +1031,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "响应 !who",
-            ["SettingsPurgeAll"] = "删除所有数据"
+            ["SettingsSendNonGuildCharacters"] = "发送公会外角色的专业技能",
+            ["SettingsPurgeAll"] = "删除所有数据",
+            ["SkillCacheUpdating"] = "数据正在更新...",
+            ["SkillCacheUpdated"] = "已更新 %d 条数据。"
         },
         -- define zhTW locale (Traditional Chinese)
         ["zhTW"] = {
@@ -1118,7 +1145,10 @@ function LocalesModel:Create()
 
             -- settings
             ["SettingsRespondToWho"] = "回應 !who",
-            ["SettingsPurgeAll"] = "刪除所有資料"
+            ["SettingsSendNonGuildCharacters"] = "發送公會外角色的專業技能",
+            ["SettingsPurgeAll"] = "刪除所有資料",
+            ["SkillCacheUpdating"] = "資料正在更新...",
+            ["SkillCacheUpdated"] = "已更新 %d 筆資料。"
         }
     };
 end

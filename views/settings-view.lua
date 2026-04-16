@@ -26,14 +26,25 @@ function SettingsView:Initialize()
     local respondToWhoCheckbox = CreateFrame("CheckButton", "PmSettingsRespondToWho", panel, "InterfaceOptionsCheckButtonTemplate");
     respondToWhoCheckbox:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -16);
     respondToWhoCheckbox.Text:SetText(localeService:Get("SettingsRespondToWho"));
+    respondToWhoCheckbox.Text:SetPoint("LEFT", respondToWhoCheckbox, "RIGHT", 4, 0);
     respondToWhoCheckbox:SetChecked(PM_Settings.respondToWho);
     respondToWhoCheckbox:SetScript("OnClick", function(self)
         PM_Settings.respondToWho = self:GetChecked();
     end);
 
+    -- add send non-guild characters checkbox
+    local sendNonGuildCheckbox = CreateFrame("CheckButton", "PmSettingsSendNonGuildCharacters", panel, "InterfaceOptionsCheckButtonTemplate");
+    sendNonGuildCheckbox:SetPoint("TOPLEFT", respondToWhoCheckbox, "BOTTOMLEFT", 0, -8);
+    sendNonGuildCheckbox.Text:SetText(localeService:Get("SettingsSendNonGuildCharacters"));
+    sendNonGuildCheckbox.Text:SetPoint("LEFT", sendNonGuildCheckbox, "RIGHT", 4, 0);
+    sendNonGuildCheckbox:SetChecked(PM_Settings.sendNonGuildCharacters);
+    sendNonGuildCheckbox:SetScript("OnClick", function(self)
+        PM_Settings.sendNonGuildCharacters = self:GetChecked();
+    end);
+
     -- add purge all button
     local purgeAllButton = CreateFrame("Button", "PmSettingsPurgeAll", panel, "UIPanelButtonTemplate");
-    purgeAllButton:SetPoint("TOPLEFT", respondToWhoCheckbox, "BOTTOMLEFT", 0, -16);
+    purgeAllButton:SetPoint("TOPLEFT", sendNonGuildCheckbox, "BOTTOMLEFT", 0, -16);
     purgeAllButton:SetSize(180, 24);
     purgeAllButton:SetText(localeService:Get("SettingsPurgeAll"));
     purgeAllButton:SetScript("OnClick", function()

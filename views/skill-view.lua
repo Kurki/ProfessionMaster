@@ -154,7 +154,8 @@ function SkillView:Show(skillRow, professionsView)
     self:RefreshBucketListAmount();
 
     -- get player names
-    self.playerNames = self:GetService("player"):CombinePlayerNames(skill.players);
+    local players = skillRow.players or {};
+    self.playerNames = self:GetService("player"):CombinePlayerNames(players);
     self.playerScrollChild:SetHeight(#self.playerNames * 20);
     self:RefreshPlayerRows();
 
