@@ -118,7 +118,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Goblin Engineering",
 
             -- settings
-            ["SettingsRespondToWho"] = "Respond to !who"
+            ["SettingsRespondToWho"] = "Respond to !who",
+            ["SettingsPurgeAll"] = "Delete all data"
         },
         -- define de locale
         ["de"] = {
@@ -228,7 +229,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Gobliningenieur",
 
             -- settings
-            ["SettingsRespondToWho"] = "Auf !who reagieren"
+            ["SettingsRespondToWho"] = "Auf !who reagieren",
+            ["SettingsPurgeAll"] = "Alle Daten löschen"
         },
         -- define ru locale
         ["ru"] = {
@@ -338,7 +340,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Гоблинская инженерия",
 
             -- settings
-            ["SettingsRespondToWho"] = "Отвечать на !who"
+            ["SettingsRespondToWho"] = "Отвечать на !who",
+            ["SettingsPurgeAll"] = "Удалить все данные"
         },
         -- define es locale
         ["es"] = {
@@ -448,7 +451,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Ingeniería goblin",
 
             -- settings
-            ["SettingsRespondToWho"] = "Responder a !who"
+            ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsPurgeAll"] = "Eliminar todos los datos"
         },
         -- define fr locale
         ["fr"] = {
@@ -558,7 +562,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Ingénierie gobeline",
 
             -- settings
-            ["SettingsRespondToWho"] = "Répondre à !who"
+            ["SettingsRespondToWho"] = "Répondre à !who",
+            ["SettingsPurgeAll"] = "Supprimer toutes les données"
         },
         -- define it locale
         ["it"] = {
@@ -668,7 +673,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Ingegneria goblin",
 
             -- settings
-            ["SettingsRespondToWho"] = "Rispondi a !who"
+            ["SettingsRespondToWho"] = "Rispondi a !who",
+            ["SettingsPurgeAll"] = "Elimina tutti i dati"
         },
         -- define ko locale
         ["ko"] = {
@@ -778,7 +784,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "고블린 공학",
 
             -- settings
-            ["SettingsRespondToWho"] = "!who에 응답"
+            ["SettingsRespondToWho"] = "!who에 응답",
+            ["SettingsPurgeAll"] = "모든 데이터 삭제"
         },
         -- define pt locale
         ["pt"] = {
@@ -888,7 +895,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "Engenharia goblin",
 
             -- settings
-            ["SettingsRespondToWho"] = "Responder a !who"
+            ["SettingsRespondToWho"] = "Responder a !who",
+            ["SettingsPurgeAll"] = "Apagar todos os dados"
         },
         -- define zhCN locale (Simplified Chinese)
         ["zhCN"] = {
@@ -998,7 +1006,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "地精工程学",
 
             -- settings
-            ["SettingsRespondToWho"] = "响应 !who"
+            ["SettingsRespondToWho"] = "响应 !who",
+            ["SettingsPurgeAll"] = "删除所有数据"
         },
         -- define zhTW locale (Traditional Chinese)
         ["zhTW"] = {
@@ -1108,7 +1117,8 @@ function LocalesModel:Create()
             ["Spec20222"] = "乘精工程學",
 
             -- settings
-            ["SettingsRespondToWho"] = "回應 !who"
+            ["SettingsRespondToWho"] = "回應 !who",
+            ["SettingsPurgeAll"] = "刪除所有資料"
         }
     };
 end

@@ -317,6 +317,17 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
             table.insert(playerNames, playerName);
         end
     end
+
+    -- debounced refresh of professions view
+    if (self.refreshPending) then
+        self.refreshPending:Cancel();
+    end
+    self.refreshPending = C_Timer.NewTimer(1, function()
+        self.refreshPending = nil;
+        if (self.addon.professionsView) then
+            self.addon.professionsView:Refresh();
+        end
+    end);
 end
 
 --- Find skill by item link.
