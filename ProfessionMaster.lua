@@ -89,6 +89,9 @@ function ProfessionMasterAddon:CheckSettings()
             hide = false
         };
     end
+    if (PM_Settings.respondToWho == nil) then
+        PM_Settings.respondToWho = true;
+    end
 end
 
 --- Create view.
@@ -247,6 +250,10 @@ function ProfessionMasterAddon:RegisterEvents()
 
         -- create minimap icon
         self:GetService("ui"):CreateMinimapIcon();
+
+        -- initialize settings panel
+        self.settingsView = self:NewView("settings");
+        self.settingsView:Initialize();
 
         -- watch tooltip
         self:GetService("tooltip"):WatchTooltip();
