@@ -45,6 +45,24 @@ function SkillView:Show(skillRow, professionsView)
         playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 42);
         self.playersFrame = playersFrame;
 
+        -- add recipe label
+        local recipeLabel = CreateFrame("Button", nil, view);
+        recipeLabel:SetPoint("BOTTOMLEFT", 16, 14);
+        recipeLabel:SetHeight(14);
+        recipeLabel.text = recipeLabel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+        recipeLabel.text:SetPoint("LEFT", 0, 0);
+        recipeLabel:SetScript("OnEnter", function()
+            if (self.recipeItemLink) then
+                GameTooltip:SetOwner(recipeLabel, "ANCHOR_TOPRIGHT");
+                GameTooltip:SetHyperlink(self.recipeItemLink);
+                GameTooltip:Show();
+            end
+        end);
+        recipeLabel:SetScript("OnLeave", function()
+            GameTooltip:Hide();
+        end);
+        self.recipeLabel = recipeLabel;
+
         -- add players label
         local playersLabel = playersFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
         playersLabel:SetPoint("TOPLEFT", 13, -12);
@@ -148,7 +166,33 @@ function SkillView:Show(skillRow, professionsView)
     if (itemAmount and itemAmount > 1) then
         titleName = titleName .. "|r x" .. itemAmount;
     end
+
+    -- append difficulty colors
+    if (skillInfo and skillInfo.difficulty) then
+        local d = skillInfo.difficulty;
+        titleName = titleName .. "|r - "
+            .. "|cffff8040" .. d[1] .. "|r "
+            .. "|cffffff00" .. d[2] .. "|r "
+            .. "|cff40bf40" .. d[3] .. "|r "
+            .. "|cff808080" .. d[4] .. "|r";
+    end
+
     self.view.titleLabel:SetText(self.addon.shortcut .. titleName);
+
+    -- update recipe label
+    self.recipeItemLink = nil;
+    local taughtByText = localeService:Get("SkillViewTaughtBy") .. " ";
+    if (skillInfo and skillInfo.recipe and skillInfo.recipe.itemLink) then
+        self.recipeItemLink = skillInfo.recipe.itemLink;
+        local recipeColor = skillInfo.recipe.itemColor or "FF1EFF00";
+        self.recipeLabel.text:SetText(taughtByText .. "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r");
+        self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
+        self.recipeLabel:Show();
+    else
+        self.recipeLabel.text:SetText(taughtByText .. localeService:Get("SkillViewTrainer"));
+        self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
+        self.recipeLabel:Show();
+    end
 
     -- set position
     self.view:ClearAllPoints();
