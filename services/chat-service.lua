@@ -36,13 +36,13 @@ function ChatService:Initialize()
         if (chatFrame) then
             chatFrame:HookScript("OnHyperlinkEnter", function(_, link)
                 local skillId = tonumber(link:match("^enchant:(%d+)"));
-                if (not skillId or not PM_Skills) then return; end
-                local skillMeta = PM_Skills[skillId];
-                if (skillMeta) then
+                if (not skillId) then return; end
+                local skillData = self:GetService("skills"):GetSkillById(skillId);
+                if (skillData) then
                     local professionsService = self:GetService("professions");
-                    local players = professionsService:GetSkillPlayers(skillMeta.professionId, skillId);
+                    local players = professionsService:GetSkillPlayers(skillData.professionId, skillId);
                     GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR");
-                    self:GetService("tooltip"):ShowTooltip(GameTooltip, skillMeta.professionId, skillId, skillMeta, players);
+                    self:GetService("tooltip"):ShowTooltip(GameTooltip, skillData.professionId, skillId, skillData, players);
                 end
             end);
             chatFrame:HookScript("OnHyperlinkLeave", function()

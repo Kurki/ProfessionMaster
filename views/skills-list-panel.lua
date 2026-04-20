@@ -469,10 +469,9 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
 
     if (profession) then
         for skillId, skillEntry in pairs(profession) do
-            local skillMeta = PM_Skills[skillId];
-            if (skillMeta and skillMeta.name ~= nil) then
-                local skillInfo = skillsService:GetSkillById(skillId);
-                if ((not skillInfo) or addonId == nil or addonId == skillInfo.addon) then
+            local skillData = skillsService:GetSkillById(skillId);
+            if (skillData and skillData.name ~= nil) then
+                if (addonId == nil or addonId == skillData.addon) then
                     if (skillEntry.players and playerService:HasVisiblePlayers(skillEntry.players)) then
                         local bucketListAmount = PM_BucketList[skillId];
 
@@ -480,7 +479,7 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
                             table.insert(self.skills, {
                                 professionId = professionId,
                                 skillId = skillId,
-                                skill = skillMeta,
+                                skill = skillData,
                                 players = skillEntry.players,
                                 bucketListAmount = bucketListAmount
                             });
@@ -490,7 +489,7 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
                         else
                             local skillValid = true;
                             for i, part in ipairs(searchParts) do
-                                if (string.len(part) > 0 and string.find(string.lower(skillMeta.name), part) == nil) then
+                                if (string.len(part) > 0 and string.find(string.lower(skillData.name), part) == nil) then
                                     skillValid = false;
                                     break;
                                 end
@@ -500,7 +499,7 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
                                 table.insert(self.skills, {
                                     professionId = professionId,
                                     skillId = skillId,
-                                    skill = skillMeta,
+                                    skill = skillData,
                                     players = skillEntry.players,
                                     bucketListAmount = bucketListAmount
                                 });

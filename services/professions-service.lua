@@ -7,134 +7,14 @@
 -- create service
 local ProfessionsService = _G.professionMaster:CreateService("professions");
 
--- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 1;
-
 --- Initialize service.
 function ProfessionsService:Initialize()
-    -- check if skill cache needs rebuilding
-    local needsRebuild = (not PM_Settings.skillCacheVersion) or (PM_Settings.skillCacheVersion < SKILL_CACHE_VERSION) or (not PM_Skills) or (not next(PM_Skills));
-
-    if (needsRebuild) then
-        -- notify player
-        local chatService = self:GetService("chat");
-        chatService:Write("SkillCacheUpdating");
-
-        -- reset and rebuild skill cache from scratch
-        PM_Skills = {};
-        self:BuildSkillCache();
-        PM_Settings.skillCacheVersion = SKILL_CACHE_VERSION;
-
-        -- strip legacy metadata from PM_Professions (keep only players and itemId)
-        self:CleanProfessionsData();
-
-        -- count cached skills and notify player
-        local skillCount = 0;
-        for _ in pairs(PM_Skills) do
-            skillCount = skillCount + 1;
-        end
-        chatService:Write("SkillCacheUpdated", skillCount);
-    end
-
-    -- always rebuild runtime reverse index
-    self:RebuildItemIndex();
-end
-
---- Build PM_Skills cache from SkillsService data and existing PM_Professions entries.
-function ProfessionsService:BuildSkillCache()
+    -- initialize skills service (handles PM_Skills rebuild if needed)
     local skillsService = self:GetService("skills");
-    local professionNamesService = self:GetService("profession-names");
-    local bopItems = self:GetModel("bop-items");
 
-    -- build from SkillsService static data (has itemId and professionId)
-    for skillId, skillInfo in pairs(skillsService.allSkills) do
-        self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService, bopItems);
-    end
-
-    -- also build from existing PM_Professions entries (for skills not in static data)
-    if (PM_Professions) then
-        for professionId, profession in pairs(PM_Professions) do
-            for skillId, skill in pairs(profession) do
-                if (not PM_Skills[skillId]) then
-                    local itemId = skill.itemId or 0;
-                    self:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems);
-                end
-            end
-        end
-    end
-end
-
---- Load a single skill into PM_Skills cache.
-function ProfessionsService:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems)
-    -- check if already cached
-    if (PM_Skills[skillId]) then
-        return;
-    end
-
-    -- create cache entry
-    local entry = {
-        name = nil,
-        skillLink = nil,
-        itemId = itemId or 0,
-        itemLink = nil,
-        itemColor = nil,
-        icon = nil,
-        bop = false,
-        professionId = professionId
-    };
-    PM_Skills[skillId] = entry;
-
-    -- update reverse index
-    if (itemId and itemId ~= 0) then
-        if (not self.itemIndex) then self.itemIndex = {}; end
-        self.itemIndex[itemId] = {
-            skillId = skillId,
-            professionId = professionId
-        };
-    end
-
-    -- handle enchantment spells (profession 333)
-    if (professionId == 333) then
-        local spellName, _, spellIcon = GetSpellInfo(skillId);
-        if (spellName) then
-            entry.name = spellName;
-            entry.icon = spellIcon;
-            entry.itemColor = "FF71D5FF";
-            if (self.addon.isVanilla) then
-                entry.skillLink = "|cFF71D5FF|Henchant:" .. skillId .. "|h[" .. spellName .. "]|h|r";
-            else
-                entry.skillLink = GetSpellLink(skillId);
-            end
-        end
-        return;
-    end
-
-    -- handle item-based skills
-    if (itemId and itemId ~= 0 and type(itemId) == "number") then
-        -- check bop
-        entry.bop = bopItems[itemId] or false;
-
-        -- load item data asynchronously
-        if (C_Item.DoesItemExistByID(itemId)) then
-            local item = Item:CreateFromItemID(itemId);
-            if (not item:IsItemEmpty()) then
-                pcall(function()
-                    item:ContinueOnItemLoad(function()
-                        local itemName = item:GetItemName();
-                        local itemLink = item:GetItemLink();
-                        entry.itemLink = itemLink;
-                        entry.itemColor = professionNamesService:GetItemColor(itemLink);
-                        entry.icon = item:GetItemIcon();
-                        if (not entry.name) then
-                            entry.name = itemName;
-                        end
-                        if (not entry.skillLink and professionId) then
-                            entry.skillLink = professionNamesService:GetSkillLink(professionId, skillId, itemName);
-                        end
-                    end);
-                end);
-            end
-        end
+    -- clean professions data if skill cache was just rebuilt
+    if (skillsService.cacheRebuilt) then
+        self:CleanProfessionsData();
     end
 end
 
@@ -153,23 +33,6 @@ function ProfessionsService:CleanProfessionsData()
             else
                 profession[skillId] = { players = {}, itemId = itemId };
             end
-        end
-    end
-end
-
---- Rebuild the itemId -> {skillId, professionId} reverse index from PM_Skills.
--- Call once at init or after data migration.
-function ProfessionsService:RebuildItemIndex()
-    self.itemIndex = {};
-    if (not PM_Skills) then
-        return;
-    end
-    for skillId, skill in pairs(PM_Skills) do
-        if (skill.itemId and skill.itemId ~= 0) then
-            self.itemIndex[skill.itemId] = {
-                skillId = skillId,
-                professionId = skill.professionId
-            };
         end
     end
 end
@@ -340,8 +203,6 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 
     -- get profession
     local profession = PM_Professions[professionId];
-    local professionNamesService = self:GetService("profession-names");
-    local bopItems = self:GetModel("bop-items");
     local skillsService = self:GetService("skills");
 
     -- check skills
@@ -351,18 +212,8 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
             profession[skill.skillId] = { players = {}, itemId = skill.itemId };
         end
 
-        -- ensure PM_Skills cache entry exists
-        if (not PM_Skills[skill.skillId]) then
-            local itemId = skill.itemId;
-            -- try to resolve itemId from skills service
-            if ((not itemId or itemId == 0) and skillsService) then
-                local skillInfo = skillsService:GetSkillById(skill.skillId);
-                if (skillInfo) then
-                    itemId = skillInfo.itemId;
-                end
-            end
-            self:LoadSkillIntoCache(skill.skillId, itemId or 0, professionId, professionNamesService, bopItems);
-        end
+        -- ensure skill cache entry exists
+        skillsService:EnsureSkillCached(skill.skillId, skill.itemId, professionId);
 
         -- get player names
         local playerNames = profession[skill.skillId].players;
@@ -395,10 +246,10 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
 end
 
 --- Find skill by item link.
--- @return skillId, skillMeta (PM_Skills entry), professionId or nil
+-- @return skillId, skillData, professionId or nil
 function ProfessionsService:FindSkillByItemLink(itemLink)
-    -- check profession storage
-    if ((not PM_Skills) or (not itemLink)) then
+    -- check input
+    if (not itemLink) then
         return nil;
     end
 
@@ -408,14 +259,13 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
         return nil;
     end
 
-    -- use reverse index for O(1) lookup
-    if (self.itemIndex) then
-        local entry = self.itemIndex[itemId];
-        if (entry) then
-            local skillMeta = PM_Skills[entry.skillId];
-            if (skillMeta) then
-                return entry.skillId, skillMeta, entry.professionId;
-            end
+    -- use skills service for O(1) lookup
+    local skillsService = self:GetService("skills");
+    local skillId = skillsService:GetSkillIdByItemId(itemId);
+    if (skillId) then
+        local skillData = skillsService:GetSkillById(skillId);
+        if (skillData) then
+            return skillId, skillData, skillData.professionId;
         end
     end
     return nil;
@@ -424,28 +274,32 @@ end
 --- Find skill by skill id or item id.
 -- @param targetSkillId Skill id to find (optional if item id provided).
 -- @param targetItemId Item id to find (optional if skill id provided).
--- @return skillId, skillMeta (PM_Skills entry), professionId or nil
+-- @return skillId, skillData, professionId or nil
 function ProfessionsService:FindSkillByIdOrItemId(targetSkillId, targetItemId)
     -- check values
-    if ((not PM_Skills) or ((not targetSkillId) and (not targetItemId))) then
+    if ((not targetSkillId) and (not targetItemId)) then
         return nil;
     end
 
-    -- try reverse index for item id (O(1))
-    if (targetItemId and self.itemIndex) then
-        local entry = self.itemIndex[targetItemId];
-        if (entry) then
-            local skillMeta = PM_Skills[entry.skillId];
-            if (skillMeta) then
-                return entry.skillId, skillMeta, entry.professionId;
+    local skillsService = self:GetService("skills");
+
+    -- try item id lookup (O(1))
+    if (targetItemId) then
+        local skillId = skillsService:GetSkillIdByItemId(targetItemId);
+        if (skillId) then
+            local skillData = skillsService:GetSkillById(skillId);
+            if (skillData) then
+                return skillId, skillData, skillData.professionId;
             end
         end
     end
 
-    -- try direct skill id lookup in PM_Skills
-    if (targetSkillId and PM_Skills[targetSkillId]) then
-        local skillMeta = PM_Skills[targetSkillId];
-        return targetSkillId, skillMeta, skillMeta.professionId;
+    -- try direct skill id lookup
+    if (targetSkillId) then
+        local skillData = skillsService:GetSkillById(targetSkillId);
+        if (skillData) then
+            return targetSkillId, skillData, skillData.professionId;
+        end
     end
     return nil;
 end
@@ -503,10 +357,10 @@ function ProfessionsService:FindCrafterForSkill(targetSkillId, targetItemId)
 end
 
 --- Find skill by skill name.
--- @return skillId, skillMeta (PM_Skills entry), professionId or nil
+-- @return skillId, skillData, professionId or nil
 function ProfessionsService:FindSkillByName(skillName)
-    -- check skill cache
-    if (not skillName or not PM_Skills) then
+    -- check input
+    if (not skillName) then
         return nil;
     end
 
@@ -529,10 +383,11 @@ function ProfessionsService:FindSkillByName(skillName)
     -- get name
     local skillName = string.trim(skillName);
 
-    -- search PM_Skills for matching name and profession
-    for skillId, skillMeta in pairs(PM_Skills) do
-        if (skillMeta.professionId == professionId and skillMeta.name and skillMeta.name == skillName) then
-            return skillId, skillMeta, professionId;
+    -- search skills for matching name and profession
+    local skillsService = self:GetService("skills");
+    for skillId, skillData in pairs(skillsService.allSkills) do
+        if (skillData.professionId == professionId and skillData.name and skillData.name == skillName) then
+            return skillId, skillData, professionId;
         end
     end
 end

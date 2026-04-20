@@ -8,41 +8,198 @@
 -- create service
 local SkillsService = _G.professionMaster:CreateService("skills");
 
+-- skill cache version (bump when static skill data or cache structure changes)
+local SKILL_CACHE_VERSION = 2;
+
 --- Initialize service.
 function SkillsService:Initialize()
-    -- preapre all skills
-    self.allSkills = {};
-    self.allItems = {};
+    -- check if skill cache needs rebuilding
+    self.cacheRebuilt = (not PM_Settings.skillCacheVersion) or (PM_Settings.skillCacheVersion < SKILL_CACHE_VERSION) or (not PM_Skills) or (not next(PM_Skills));
 
-    -- add vanilla
-    self:AddAddonSkills(1, self:GetModel('vanilla-skills'));
+    if (self.cacheRebuilt) then
+        -- notify player
+        local chatService = self:GetService("chat");
+        chatService:Write("SkillCacheUpdating");
 
-    -- add bcc
-    if (self.addon.isBccAtLeast) then
-        self:AddAddonSkills(2, self:GetModel('bcc-skills'));
-    end
+        -- reset and rebuild skill cache from scratch
+        PM_Skills = {};
+        self:BuildCache();
+        PM_Settings.skillCacheVersion = SKILL_CACHE_VERSION;
 
-    -- add wrath
-    if (self.addon.isWrathAtLeast) then
-        self:AddAddonSkills(3, self:GetModel('wrath-skills'));
-    end
-
-    -- add cata
-    if (self.addon.isCataAtLeast) then
-        self:AddAddonSkills(4, self:GetModel('cata-skills'));
-    end
-
-    -- add mop
-    if (self.addon.isMopAtLeast) then
-        self:AddAddonSkills(5, self:GetModel('mop-skills'));
-    end
-
-    -- index skill by item id
-    for skillId, skillData in pairs(self.allSkills) do
-        local itemId = skillData["itemId"];
-        if itemId then 
-            self.allItems[itemId] = skillId; 
+        -- count cached skills and notify player
+        local skillCount = 0;
+        for _ in pairs(PM_Skills) do
+            skillCount = skillCount + 1;
         end
+        chatService:Write("SkillCacheUpdated", skillCount);
+    end
+
+    -- allSkills always references PM_Skills
+    self.allSkills = PM_Skills;
+
+    -- build reverse index
+    self.allItems = {};
+    for skillId, skillData in pairs(self.allSkills) do
+        local itemId = skillData.itemId;
+        if (itemId and itemId ~= 0) then
+            self.allItems[itemId] = skillId;
+        end
+    end
+
+    -- free source model data to allow garbage collection
+    self:FreeSkillModels();
+end
+
+--- Build PM_Skills cache from source data files and existing PM_Professions entries.
+function SkillsService:BuildCache()
+    local professionNamesService = self:GetService("profession-names");
+    local bopItems = self:GetModel("bop-items");
+
+    -- load from source data files into temporary table
+    local sourceSkills = {};
+    self:MergeSourceSkills(sourceSkills, 1, self:GetModel('vanilla-skills'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeSourceSkills(sourceSkills, 2, self:GetModel('bcc-skills'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeSourceSkills(sourceSkills, 3, self:GetModel('wrath-skills'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeSourceSkills(sourceSkills, 4, self:GetModel('cata-skills'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeSourceSkills(sourceSkills, 5, self:GetModel('mop-skills'));
+    end
+
+    -- build PM_Skills from source data
+    for skillId, skillInfo in pairs(sourceSkills) do
+        self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService, bopItems);
+
+        -- store recipe data in PM_Skills for future cache-based loading
+        local entry = PM_Skills[skillId];
+        if (entry) then
+            entry.reagents = skillInfo.reagents;
+            entry.itemAmount = skillInfo.itemAmount;
+            entry.addon = skillInfo.addon;
+        end
+    end
+
+    -- also build from existing PM_Professions entries (for skills not in source data)
+    if (PM_Professions) then
+        for professionId, profession in pairs(PM_Professions) do
+            for skillId, skill in pairs(profession) do
+                if (not PM_Skills[skillId]) then
+                    local itemId = skill.itemId or 0;
+                    self:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems);
+                end
+            end
+        end
+    end
+end
+
+--- Merge source skill data from an addon into the target table.
+function SkillsService:MergeSourceSkills(targetTable, addonNumber, addonData)
+    for skillId, skillData in pairs(addonData) do
+        local skill = {
+            itemId = skillData.itemId,
+            itemAmount = skillData.itemAmount,
+            reagents = skillData.reagents,
+            professionId = skillData.p
+        };
+
+        if (targetTable[skillId]) then
+            skill.addon = targetTable[skillId].addon;
+        else
+            skill.addon = addonNumber;
+        end
+
+        targetTable[skillId] = skill;
+    end
+end
+
+--- Load a single skill into PM_Skills cache.
+function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems)
+    -- check if already cached
+    if (PM_Skills[skillId]) then
+        return;
+    end
+
+    -- create cache entry
+    local entry = {
+        name = nil,
+        skillLink = nil,
+        itemId = itemId or 0,
+        itemLink = nil,
+        itemColor = nil,
+        icon = nil,
+        bop = false,
+        professionId = professionId
+    };
+    PM_Skills[skillId] = entry;
+
+    -- handle enchantment spells (profession 333)
+    if (professionId == 333) then
+        local spellName, _, spellIcon = GetSpellInfo(skillId);
+        if (spellName) then
+            entry.name = spellName;
+            entry.icon = spellIcon;
+            entry.itemColor = "FF71D5FF";
+            if (self.addon.isVanilla) then
+                entry.skillLink = "|cFF71D5FF|Henchant:" .. skillId .. "|h[" .. spellName .. "]|h|r";
+            else
+                entry.skillLink = GetSpellLink(skillId);
+            end
+        end
+        return;
+    end
+
+    -- handle item-based skills
+    if (itemId and itemId ~= 0 and type(itemId) == "number") then
+        -- check bop
+        entry.bop = bopItems[itemId] or false;
+
+        -- load item data asynchronously
+        if (C_Item.DoesItemExistByID(itemId)) then
+            local item = Item:CreateFromItemID(itemId);
+            if (not item:IsItemEmpty()) then
+                pcall(function()
+                    item:ContinueOnItemLoad(function()
+                        local itemName = item:GetItemName();
+                        local itemLink = item:GetItemLink();
+                        entry.itemLink = itemLink;
+                        entry.itemColor = professionNamesService:GetItemColor(itemLink);
+                        entry.icon = item:GetItemIcon();
+                        if (not entry.name) then
+                            entry.name = itemName;
+                        end
+                        if (not entry.skillLink and professionId) then
+                            entry.skillLink = professionNamesService:GetSkillLink(professionId, skillId, itemName);
+                        end
+                    end);
+                end);
+            end
+        end
+    end
+end
+
+--- Ensure a skill exists in the cache, creating it if necessary.
+function SkillsService:EnsureSkillCached(skillId, itemId, professionId)
+    if (self.allSkills[skillId]) then
+        return;
+    end
+
+    local professionNamesService = self:GetService("profession-names");
+    local bopItems = self:GetModel("bop-items");
+    self:LoadSkillIntoCache(skillId, itemId or 0, professionId, professionNamesService, bopItems);
+
+    -- update reverse index
+    local entry = self.allSkills[skillId];
+    if (entry and entry.itemId and entry.itemId ~= 0) then
+        self.allItems[entry.itemId] = skillId;
     end
 end
 
@@ -56,25 +213,12 @@ function SkillsService:GetSkillIdByItemId(itemId)
    return self.allItems[itemId];
 end
 
---- Add addon skills to all skills.
-function SkillsService:AddAddonSkills(addonNumber, addonData) 
-    for addonSkillId, addonSkillData in pairs(addonData) do
-        -- build skill
-        local skill = {
-            itemId = addonSkillData.itemId,
-            itemAmount = addonSkillData.itemAmount,
-            reagents = addonSkillData.reagents,
-            professionId = addonSkillData.p
-        };
-
-        -- get addon
-        if (self.allSkills[addonSkillId]) then
-            skill.addon = self.allSkills[addonSkillId].addon;
-        else
-            skill.addon = addonNumber;
-        end
-
-        -- store skill
-        self.allSkills[addonSkillId] = skill;
-    end
+--- Free skill model data references so Lua garbage collector can reclaim source file tables.
+function SkillsService:FreeSkillModels()
+    local modelTypes = self.addon.modelTypes;
+    modelTypes["vanilla-skills"] = nil;
+    modelTypes["bcc-skills"] = nil;
+    modelTypes["wrath-skills"] = nil;
+    modelTypes["cata-skills"] = nil;
+    modelTypes["mop-skills"] = nil;
 end
