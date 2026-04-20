@@ -39,10 +39,14 @@ function SkillsService:Initialize()
 
     -- build reverse index
     self.allItems = {};
+    self.allRecipes = {};
     for skillId, skillData in pairs(self.allSkills) do
         local itemId = skillData.itemId;
         if (itemId and itemId ~= 0) then
             self.allItems[itemId] = skillId;
+        end
+        if (skillData.recipe and skillData.recipe.itemId) then
+            self.allRecipes[skillData.recipe.itemId] = skillId;
         end
     end
 
@@ -240,6 +244,11 @@ end
 --- Get skill id by item id.
 function SkillsService:GetSkillIdByItemId(itemId)
    return self.allItems[itemId];
+end
+
+--- Get skill id by recipe item id.
+function SkillsService:GetSkillIdByRecipeItemId(recipeItemId)
+   return self.allRecipes[recipeItemId];
 end
 
 --- Free skill model data references so Lua garbage collector can reclaim source file tables.

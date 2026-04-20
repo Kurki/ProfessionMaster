@@ -268,6 +268,16 @@ function ProfessionsService:FindSkillByItemLink(itemLink)
             return skillId, skillData, skillData.professionId;
         end
     end
+
+    -- check if item is a recipe
+    local recipeSkillId = skillsService:GetSkillIdByRecipeItemId(itemId);
+    if (recipeSkillId) then
+        local skillData = skillsService:GetSkillById(recipeSkillId);
+        if (skillData) then
+            return recipeSkillId, skillData, skillData.professionId;
+        end
+    end
+
     return nil;
 end
 
