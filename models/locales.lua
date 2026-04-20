@@ -71,6 +71,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Add 1 to shopping list",
             ["SkillViewRemoveOneFromBucketList"] = "Remove 1 from shopping list",
             ["SkillViewRemoveFromBucketList"] = "Remove item from shopping list",
+            ["SkillViewRecipe"] = "Recipe",
+            ["SkillViewTaughtBy"] = "Taught by:",
+            ["SkillViewTrainer"] = "Trainer",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Missing Reagents",
@@ -185,6 +188,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Menge 1 zu Einkaufsliste hinzufügen",
             ["SkillViewRemoveOneFromBucketList"] = "Menge 1 von Einkaufsliste entfernen",
             ["SkillViewRemoveFromBucketList"] = "Gegenstand von Einkaufsliste entfernen",
+            ["SkillViewRecipe"] = "Rezept",
+            ["SkillViewTaughtBy"] = "Gelehrt durch:",
+            ["SkillViewTrainer"] = "Lehrer",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Fehlende Materialien",
@@ -299,6 +305,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Добавить 1 в список покупок",
             ["SkillViewRemoveOneFromBucketList"] = "Убрать 1 из списка покупок",
             ["SkillViewRemoveFromBucketList"] = "Удалить предмет из списка покупок",
+            ["SkillViewRecipe"] = "Рецепт",
+            ["SkillViewTaughtBy"] = "Изучается через:",
+            ["SkillViewTrainer"] = "Учитель",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Недостающие реагенты",
@@ -413,6 +422,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Añadir 1 a la lista de compras",
             ["SkillViewRemoveOneFromBucketList"] = "Quitar 1 de la lista de compras",
             ["SkillViewRemoveFromBucketList"] = "Quitar objeto de la lista de compras",
+            ["SkillViewRecipe"] = "Receta",
+            ["SkillViewTaughtBy"] = "Enseñado por:",
+            ["SkillViewTrainer"] = "Instructor",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Materiales faltantes",
@@ -527,6 +539,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Ajouter 1 à la liste de courses",
             ["SkillViewRemoveOneFromBucketList"] = "Retirer 1 de la liste de courses",
             ["SkillViewRemoveFromBucketList"] = "Retirer l'objet de la liste de courses",
+            ["SkillViewRecipe"] = "Recette",
+            ["SkillViewTaughtBy"] = "Appris par :",
+            ["SkillViewTrainer"] = "Maître",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Composants manquants",
@@ -641,6 +656,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Aggiungi 1 alla lista della spesa",
             ["SkillViewRemoveOneFromBucketList"] = "Rimuovi 1 dalla lista della spesa",
             ["SkillViewRemoveFromBucketList"] = "Rimuovi oggetto dalla lista della spesa",
+            ["SkillViewRecipe"] = "Ricetta",
+            ["SkillViewTaughtBy"] = "Insegnato da:",
+            ["SkillViewTrainer"] = "Istruttore",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagenti mancanti",
@@ -755,6 +773,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "구매 목록에 1개 추가",
             ["SkillViewRemoveOneFromBucketList"] = "구매 목록에서 1개 제거",
             ["SkillViewRemoveFromBucketList"] = "구매 목록에서 아이템 제거",
+            ["SkillViewRecipe"] = "레시피",
+            ["SkillViewTaughtBy"] = "배우는 경로:",
+            ["SkillViewTrainer"] = "훈련사",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "부족한 재료",
@@ -869,6 +890,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "Adicionar 1 à lista de compras",
             ["SkillViewRemoveOneFromBucketList"] = "Remover 1 da lista de compras",
             ["SkillViewRemoveFromBucketList"] = "Remover item da lista de compras",
+            ["SkillViewRecipe"] = "Receita",
+            ["SkillViewTaughtBy"] = "Ensinado por:",
+            ["SkillViewTrainer"] = "Treinador",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagentes faltantes",
@@ -983,6 +1007,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "向购物清单添加1个",
             ["SkillViewRemoveOneFromBucketList"] = "从购物清单移除1个",
             ["SkillViewRemoveFromBucketList"] = "从购物清单移除物品",
+            ["SkillViewRecipe"] = "配方",
+            ["SkillViewTaughtBy"] = "学习途径：",
+            ["SkillViewTrainer"] = "训练师",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
@@ -1097,6 +1124,9 @@ function LocalesModel:Create()
             ["SkillViewAddToBucketList"] = "向購物清單添加1個",
             ["SkillViewRemoveOneFromBucketList"] = "從購物清單移除1個",
             ["SkillViewRemoveFromBucketList"] = "從購物清單移除物品",
+            ["SkillViewRecipe"] = "配方",
+            ["SkillViewTaughtBy"] = "學習途徑：",
+            ["SkillViewTrainer"] = "訓練師",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
