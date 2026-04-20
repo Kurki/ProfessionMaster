@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 2;
+local SKILL_CACHE_VERSION = 4;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -85,6 +85,10 @@ function SkillsService:BuildCache()
             entry.reagents = skillInfo.reagents;
             entry.itemAmount = skillInfo.itemAmount;
             entry.addon = skillInfo.addon;
+            entry.difficulty = skillInfo.difficulty;
+            if (skillInfo.recipeItemId) then
+                self:LoadRecipeItem(entry, skillInfo.recipeItemId, professionNamesService);
+            end
         end
     end
 
@@ -108,7 +112,9 @@ function SkillsService:MergeSourceSkills(targetTable, addonNumber, addonData)
             itemId = skillData.itemId,
             itemAmount = skillData.itemAmount,
             reagents = skillData.reagents,
-            professionId = skillData.p
+            professionId = skillData.p,
+            difficulty = skillData.d,
+            recipeItemId = skillData.r
         };
 
         if (targetTable[skillId]) then
@@ -182,6 +188,29 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
                     end);
                 end);
             end
+        end
+    end
+end
+
+--- Load recipe item data (name, link, color) into a cache entry.
+function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesService)
+    entry.recipe = {
+        itemId = recipeItemId,
+        name = nil,
+        itemLink = nil,
+        itemColor = nil
+    };
+
+    if (C_Item.DoesItemExistByID(recipeItemId)) then
+        local item = Item:CreateFromItemID(recipeItemId);
+        if (not item:IsItemEmpty()) then
+            pcall(function()
+                item:ContinueOnItemLoad(function()
+                    entry.recipe.name = item:GetItemName();
+                    entry.recipe.itemLink = item:GetItemLink();
+                    entry.recipe.itemColor = professionNamesService:GetItemColor(item:GetItemLink());
+                end);
+            end);
         end
     end
 end
