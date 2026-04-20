@@ -93,7 +93,7 @@ end
 function UiService:SetupResizable(view)
     local service = self;
     view:SetResizable(true);
-    view:SetResizeBounds(view.defaultWidth * 0.6, view.defaultHeight * 0.6);
+    view:SetResizeBounds(view.defaultWidth * 0.67, view.defaultHeight * 0.6);
 
     local edgeSize = 6;
     local resizeDirection = nil;
@@ -510,7 +510,7 @@ function UiService:RestoreSize(frame, defaultWidth, defaultHeight)
     local data = PM_Frames[frame.positionName];
     if (data and data.width and data.height) then
         -- enforce minimum size
-        local minWidth = defaultWidth * 0.5;
+        local minWidth = defaultWidth * 0.67;
         local minHeight = defaultHeight * 0.5;
         frame:SetWidth(math.max(data.width, minWidth));
         frame:SetHeight(math.max(data.height, minHeight));

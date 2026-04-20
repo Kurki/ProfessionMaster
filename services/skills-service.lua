@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 4;
+local SKILL_CACHE_VERSION = 5;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -147,7 +147,10 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
         itemColor = nil,
         icon = nil,
         bop = false,
-        professionId = professionId
+        professionId = professionId,
+        classId = nil,
+        subclassId = nil,
+        equipLoc = nil
     };
     PM_Skills[skillId] = entry;
 
@@ -158,6 +161,7 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
             entry.name = spellName;
             entry.icon = spellIcon;
             entry.itemColor = "FF71D5FF";
+            entry.equipLoc = self:GetEnchantEquipLoc(spellName);
             if (self.addon.isVanilla) then
                 entry.skillLink = "|cFF71D5FF|Henchant:" .. skillId .. "|h[" .. spellName .. "]|h|r";
             else
@@ -189,6 +193,12 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
                         if (not entry.skillLink and professionId) then
                             entry.skillLink = professionNamesService:GetSkillLink(professionId, skillId, itemName);
                         end
+
+                        -- store item classification for filtering
+                        local _, _, _, itemEquipLoc, _, classID, subclassID = GetItemInfoInstant(itemId);
+                        entry.classId = classID;
+                        entry.subclassId = subclassID;
+                        entry.equipLoc = itemEquipLoc or nil;
                     end);
                 end);
             end
@@ -217,6 +227,27 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
             end);
         end
     end
+end
+
+--- Determine equip location for an enchantment based on spell name patterns.
+function SkillsService:GetEnchantEquipLoc(spellName)
+    if (not spellName) then return nil; end
+    local name = string.lower(spellName);
+
+    if (string.find(name, "bracer") or string.find(name, "wrist")) then return "INVTYPE_WRIST"; end
+    if (string.find(name, "chest") or string.find(name, "torso")) then return "INVTYPE_CHEST"; end
+    if (string.find(name, "cloak") or string.find(name, "back")) then return "INVTYPE_CLOAK"; end
+    if (string.find(name, "boots") or string.find(name, "feet") or string.find(name, "speed")) then return "INVTYPE_FEET"; end
+    if (string.find(name, "gloves") or string.find(name, "hands") or string.find(name, "glove")) then return "INVTYPE_HAND"; end
+    if (string.find(name, "shield")) then return "INVTYPE_SHIELD"; end
+    if (string.find(name, "2h weapon") or string.find(name, "two%-hand")) then return "INVTYPE_2HWEAPON"; end
+    if (string.find(name, "weapon") or string.find(name, "striking") or string.find(name, "fiery") or string.find(name, "lifestealing") or string.find(name, "crusader") or string.find(name, "mongoose") or string.find(name, "berserking") or string.find(name, "executioner") or string.find(name, "blade")) then return "INVTYPE_WEAPON"; end
+    if (string.find(name, "head") or string.find(name, "helm")) then return "INVTYPE_HEAD"; end
+    if (string.find(name, "shoulder")) then return "INVTYPE_SHOULDER"; end
+    if (string.find(name, "legs") or string.find(name, "leg")) then return "INVTYPE_LEGS"; end
+    if (string.find(name, "ring")) then return "INVTYPE_FINGER"; end
+
+    return nil;
 end
 
 --- Ensure a skill exists in the cache, creating it if necessary.
