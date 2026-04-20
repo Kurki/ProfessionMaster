@@ -81,8 +81,10 @@ function SkillView:Show(skillRow, professionsView)
 
         -- amount plus button
         local amountPlusButton = uiService:CreateFlatSquareButton(bucketListFrame, "+", function()
-            -- update amount
-            PM_BucketList[self.skillId] = self.bucketListAmount + 1;
+            -- update amount by item yield
+            local skillInfo = self:GetService("skills"):GetSkillById(self.skillId);
+            local itemAmount = (skillInfo and skillInfo.itemAmount) or 1;
+            PM_BucketList[self.skillId] = self.bucketListAmount + itemAmount;
             self:RefreshBucketListAmount();
             professionsView:CheckBucketList();
 
@@ -95,11 +97,13 @@ function SkillView:Show(skillRow, professionsView)
 
         -- amount minus button
         local amountMinusButton = uiService:CreateFlatSquareButton(bucketListFrame, "-", function()
-            -- update amount
-            if (self.bucketListAmount <= 1) then
+            -- update amount by item yield
+            local skillInfo = self:GetService("skills"):GetSkillById(self.skillId);
+            local itemAmount = (skillInfo and skillInfo.itemAmount) or 1;
+            if (self.bucketListAmount <= itemAmount) then
                 PM_BucketList[self.skillId] = nil;
             else
-                PM_BucketList[self.skillId] = self.bucketListAmount - 1;
+                PM_BucketList[self.skillId] = self.bucketListAmount - itemAmount;
             end
             self:RefreshBucketListAmount();
             professionsView:CheckBucketList();
