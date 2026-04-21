@@ -25,6 +25,7 @@ function ProfessionsView:Show()
         view:SetScript("OnKeyDown", function(_, key)
             -- check escape
             if (key == "ESCAPE") then
+                view:SetPropagateKeyboardInput(false);
                 if (self.skillViewVisible) then
                     self:HideSkillView();
                 elseif (self.specViewVisible) then
@@ -32,8 +33,8 @@ function ProfessionsView:Show()
                 else
                     self:Hide();
                 end
-            elseif (key == "ENTER") then
-                ChatFrame_OpenChat("", nil, nil);
+            else
+                view:SetPropagateKeyboardInput(true);
             end
         end)
 
@@ -117,9 +118,6 @@ function ProfessionsView:Show()
     self:HideSkillView(true);
     self:HideSpecView();
     self:CheckBucketList();
-
-    -- focus search
-    self.skillsListPanel:FocusSearch();
 
     -- show view
     self.view:Show();

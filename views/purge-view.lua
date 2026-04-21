@@ -72,14 +72,14 @@ function PurgeView:CollectPlayers()
                     -- check if ANY character in the group is still in the guild
                     local anyInGuild = false;
                     for _, characterName in ipairs(groupMembers) do
-                        if (PM_Guildmates[characterName]) then
+                        if (playerService:IsGuildmate(characterName)) then
                             anyInGuild = true;
                             break;
                         end
                     end
                     if (not anyInGuild and characterSet) then
                         for _, characterName in ipairs(characterSet) do
-                            if (PM_Guildmates[characterName]) then
+                            if (playerService:IsGuildmate(characterName)) then
                                 anyInGuild = true;
                                 break;
                             end
