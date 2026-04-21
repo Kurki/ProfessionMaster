@@ -273,7 +273,7 @@ function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStor
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+            if (PM_Settings.sendNonGuildCharacters or playerService:IsGuildmate(characterName)) then
                  -- iterate all professions
                 for professionId, skills in pairs(professions) do
                     self:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, characterName);
@@ -311,7 +311,7 @@ function OwnProfessionsService:SendMyCharacters(playerName)
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+            if (PM_Settings.sendNonGuildCharacters or playerService:IsGuildmate(characterName)) then
                 -- add short name to result
                 table.insert(messageCharacters, playerService:GetShortName(characterName));
             end
@@ -343,7 +343,7 @@ function OwnProfessionsService:SendSpecializations(playerName)
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
+            if (PM_Settings.sendNonGuildCharacters or playerService:IsGuildmate(characterName)) then
                 -- get specializations for this character
                 local specializations = PM_Specializations[characterName];
                 if (specializations) then
