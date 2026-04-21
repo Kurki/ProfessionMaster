@@ -908,7 +908,7 @@ function SkillsListPanel:AddSpecializationSkills(searchParts)
                 local players = {};
                 for characterName, characterSpecs in pairs(PM_Specializations) do
                     if (characterSpecs[professionId] == spec.spellId) then
-                        if ((playerService:IsSameRealm(characterName) or PM_Guildmates[characterName]) and playerService:IsSameFaction(characterName)) then
+                        if (playerService:IsVisiblePlayer(characterName)) then
                             table.insert(players, characterName);
                         end
                     end
@@ -988,7 +988,7 @@ function SkillsListPanel:RefreshSpecializationRows()
         local players = {};
         for characterName, characterSpecs in pairs(PM_Specializations) do
             if (characterSpecs[professionId] == spec.spellId) then
-                if ((playerService:IsSameRealm(characterName) or PM_Guildmates[characterName]) and playerService:IsSameFaction(characterName)) then
+                if (playerService:IsVisiblePlayer(characterName)) then
                     table.insert(players, characterName);
                 end
             end

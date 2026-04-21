@@ -345,9 +345,10 @@ function ProfessionsService:FindCrafterForSkill(targetSkillId, targetItemId)
     local eligiblePlayers = {};
     for _, playerName in ipairs(players) do
         -- check if is same realm and guild mate
-        if (playerService:IsSameRealm(playerName) and PM_Guildmates[playerName]) then
+        if (playerService:IsSameRealm(playerName) and playerService:IsGuildmate(playerName)) then
             -- check if is online
-            if (PM_Guildmates[playerName].online) then
+            local guildmate = playerService:GetGuildmate(playerName);
+            if (guildmate and guildmate.online) then
                 guildMateOnline = true;
             end
 

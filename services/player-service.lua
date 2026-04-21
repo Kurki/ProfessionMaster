@@ -21,6 +21,31 @@ function PlayerService:Initialize()
     local factionGroup = UnitFactionGroup("player");
     self.faction = (factionGroup == "Horde") and "H" or "A";
     PM_PlayerFactions[self.current] = self.faction;
+
+    -- initialize guildmates (in-memory only, rebuilt each session)
+    self.guildmates = {};
+    self.guildmatesLoaded = false;
+
+    -- debounced guild roster refresh (first call is immediate)
+    self:HandleEvent("GUILD_ROSTER_UPDATE", function()
+        if (not self.guildmatesLoaded) then
+            self.guildmatesLoaded = true;
+            self:RefreshGuildmates();
+            return;
+        end
+        if (self.guildRefreshPending) then
+            self.guildRefreshPending:Cancel();
+        end
+        self.guildRefreshPending = C_Timer.NewTimer(0.3, function()
+            self.guildRefreshPending = nil;
+            self:RefreshGuildmates();
+        end);
+    end);
+
+    -- request guild roster update in case GUILD_ROSTER_UPDATE already fired before we registered
+    if (IsInGuild()) then
+        GuildRoster();
+    end
 end
 
 --- Parse a player name into short name and realm check (cached).
@@ -53,11 +78,8 @@ end
 
 --- Refresh guildmates.
 function PlayerService:RefreshGuildmates()
-    -- set all guildmates offline
-    if (not PM_Guildmates) then PM_Guildmates = {}; end
-    for _, guildmate in pairs(PM_Guildmates) do
-        guildmate.online = false;
-    end
+    -- rebuild guildmates from current guild roster
+    self.guildmates = {};
 
     -- iterate all members
     for guildIndex = 1, GetNumGuildMembers() do
@@ -66,15 +88,23 @@ function PlayerService:RefreshGuildmates()
 
         -- check player name
         if (playerName) then
-            -- check if not in guild mates
-            if (not PM_Guildmates[playerName]) then
-                PM_Guildmates[playerName] = {};
-            end
-
-            -- set online/offline
-            PM_Guildmates[playerName].online = online;
+            self.guildmates[playerName] = { online = online };
         end
     end
+end
+
+--- Get guildmate entry by name.
+-- @param name Player name.
+-- @return Guildmate table or nil.
+function PlayerService:GetGuildmate(name)
+    return self.guildmates[name];
+end
+
+--- Check if player is a guildmate.
+-- @param name Player name.
+-- @return boolean
+function PlayerService:IsGuildmate(name)
+    return self.guildmates[name] ~= nil;
 end
 
 --- Get player short name.
@@ -93,6 +123,12 @@ function PlayerService:IsSameFaction(name)
     local storedFaction = PM_PlayerFactions[name];
     -- nil = neutral (backward compatible), otherwise must match
     return storedFaction == nil or storedFaction == self.faction;
+end
+
+--- Check if a player should be visible (same realm/connected realm and same faction).
+-- Guildmates from connected realms are included since guildmates are rebuilt per session.
+function PlayerService:IsVisiblePlayer(name)
+    return (self:IsSameRealm(name) or self.guildmates[name]) and self:IsSameFaction(name);
 end
 
 --- Check name and add realm if not set.
@@ -126,7 +162,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
     -- iterate all player names
     for _, playerName in ipairs(playerNames) do
         -- check realm and faction
-        if ((self:IsSameRealm(playerName) or PM_Guildmates[playerName]) and self:IsSameFaction(playerName)) then
+        if (self:IsVisiblePlayer(playerName)) then
             -- get short player name
             local shortPlayerName = self:GetShortName(playerName);
 
@@ -145,7 +181,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                 end
             else
                 -- check if is online
-                local guildPlayer = PM_Guildmates[playerName];
+                local guildPlayer = self.guildmates[playerName];
                 if (guildPlayer and guildPlayer.online) then
                     -- set online player
                     onlinePlayers[shortPlayerName] = {};
@@ -157,7 +193,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                         -- check if twink online
                         local twinkNamesOnline = {};
                         for _, twinkName in ipairs(characterSet) do
-                            local twinkGuildPlayer = PM_Guildmates[twinkName];
+                            local twinkGuildPlayer = self.guildmates[twinkName];
                             if (twinkGuildPlayer and twinkGuildPlayer.online) then
                                 table.insert(twinkNamesOnline, twinkName);
                             end
@@ -192,7 +228,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                                     end
 
                                     -- check if is in guild
-                                    if (PM_Guildmates[playerName]) then
+                                    if (self.guildmates[playerName]) then
                                         table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
                                     else
                                         table.insert(onlinePlayers[shortTwinkNameOnline], "alt");
@@ -204,7 +240,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
 
                     -- check if is offline
                     if (addToOffline) then
-                        if (PM_Guildmates[playerName]) then
+                        if (self.guildmates[playerName]) then
                             -- add to offline players
                             table.insert(offlinePlayers, shortPlayerName);
                         elseif (characterSet) then
@@ -218,7 +254,7 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                                 end
                                 
                                 -- get guild twink name
-                                if (PM_Guildmates[twinkName] and not guildTwinkName) then  
+                                if (self.guildmates[twinkName] and not guildTwinkName) then  
                                     guildTwinkName = shortTwinkName;
                                 end
                             end
@@ -287,7 +323,7 @@ end
 --- Check if at least one player would be visible (same realm/guild and same faction).
 function PlayerService:HasVisiblePlayers(playerNames)
     for _, playerName in ipairs(playerNames) do
-        if ((self:IsSameRealm(playerName) or PM_Guildmates[playerName]) and self:IsSameFaction(playerName)) then
+        if (self:IsVisiblePlayer(playerName)) then
             return true;
         end
     end

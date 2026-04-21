@@ -23,7 +23,6 @@ if (not PM_CharacterSets) then PM_CharacterSets = {}; end
 if (not PM_BucketList) then PM_BucketList = {}; end
 if (not PM_ReagentWatchList) then PM_ReagentWatchList = {}; end
 if (not PM_CharacterSettings) then PM_CharacterSettings = {}; end
-if (not PM_Guildmates) then PM_Guildmates = {}; end
 if (not PM_PlayerFactions) then PM_PlayerFactions = {}; end
 if (not PM_Specializations) then PM_Specializations = {}; end
 if (not PM_Skills) then PM_Skills = {}; end
@@ -246,6 +245,9 @@ function ProfessionMasterAddon:RegisterEvents()
     self:HandleEvent("PLAYER_LOGIN", function()
         self.frame:UnregisterEvent("PLAYER_LOGIN");
 
+        -- initialize player service early so it catches GUILD_ROSTER_UPDATE
+        self:GetService("player");
+
         -- create professions view
         self.professionsView = self:NewView("professions");
 
@@ -292,11 +294,6 @@ function ProfessionMasterAddon:RegisterEvents()
     -- handle craft update
     self:HandleEvent("CRAFT_UPDATE", function()
         self:GetService("own-professions"):GetProfessionData();
-    end);
-
-    -- handle guild roster update
-    self:HandleEvent("GUILD_ROSTER_UPDATE", function()
-        self:GetService("player"):RefreshGuildmates();
     end);
 
     -- handle combat enter
@@ -374,7 +371,6 @@ function ProfessionMasterAddon:Migrate()
         MigrateSavedVariable("BucketList", "PM_BucketList");
         MigrateSavedVariable("ReagentWatchList", "PM_ReagentWatchList");
         MigrateSavedVariable("CharacterSettings", "PM_CharacterSettings");
-        MigrateSavedVariable("Guildmates", "PM_Guildmates");
         MigrateSavedVariable("Convert", "PM_Convert");
         MigrateSavedVariable("PlayerFactions", "PM_PlayerFactions");
         MigrateSavedVariable("Frames", "PM_Frames");
