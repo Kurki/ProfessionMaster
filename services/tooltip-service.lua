@@ -161,16 +161,16 @@ function TooltipService:GetTooltipReagents(skillId, callback)
     local inventoryService = self:GetService("inventory");
     inventoryService:ScanInventory();
 
-    -- count reaegnts
+    -- count reagents
     local reagentCount = 0;
-    if skillInfo.reaegnts then 
-        for _ in pairs(skillInfo.reaegnts) do
+    if skillInfo.reagents then 
+        for _ in pairs(skillInfo.reagents) do
             reagentCount = reagentCount + 1;
         end
 
         -- iterate skill reagents
         local result = {};
-        for reagentItemId, reagentAmount in pairs(skillInfo.reaegnts) do
+        for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
             -- check if item id known
             if (C_Item.DoesItemExistByID(reagentItemId)) then
                 -- get item data
@@ -211,5 +211,7 @@ function TooltipService:GetTooltipReagents(skillId, callback)
                 end
             end
         end
+    else
+        callback(nil);
     end
 end

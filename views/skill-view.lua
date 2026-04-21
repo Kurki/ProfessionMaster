@@ -315,6 +315,7 @@ function SkillView:RefreshBucketListAmount()
 
     -- show reagents
     local rowAmount = 0;
+    if (not skillInfo.reagents) then return; end
     for reagentItemId, reagentAmount in pairs(skillInfo.reagents) do
         rowAmount = rowAmount + 1;
         if (#self.reagentRows < rowAmount) then
@@ -378,7 +379,7 @@ function SkillView:RefreshBucketListAmount()
         end
 
         -- get row
-        row = self.reagentRows[rowAmount];
+        local row = self.reagentRows[rowAmount];
         row:Show();
 
         -- update amount
