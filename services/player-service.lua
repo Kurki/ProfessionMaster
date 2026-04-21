@@ -44,7 +44,7 @@ function PlayerService:Initialize()
 
     -- request guild roster update in case GUILD_ROSTER_UPDATE already fired before we registered
     if (IsInGuild()) then
-        GuildRoster();
+        C_GuildInfo.GuildRoster();
     end
 end
 
