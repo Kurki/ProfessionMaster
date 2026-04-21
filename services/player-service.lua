@@ -353,3 +353,54 @@ function PlayerService:FindCharacterSet(characterName)
     end
     return nil;
 end
+
+--- Check if a guildmate is online.
+-- @param name Player name.
+-- @return boolean
+function PlayerService:IsGuildmateOnline(name)
+    local guildmate = self.guildmates[name];
+    return guildmate and guildmate.online;
+end
+
+--- Get sorted list of online guildmate names (excluding self).
+-- @return Array of online guildmate names.
+function PlayerService:GetOnlineGuildmates()
+    local result = {};
+    for name, guildmate in pairs(self.guildmates) do
+        if (guildmate.online and name ~= self.current) then
+            table.insert(result, name);
+        end
+    end
+    table.sort(result);
+    return result;
+end
+
+--- Get this player's relay index among online guildmates.
+-- Used to partition relay work so each online player relays a subset of offline players.
+-- @return myIndex (0-based), onlineCount
+function PlayerService:GetRelaySlot()
+    local onlineGuildmates = self:GetOnlineGuildmates();
+    -- include self in the sorted list
+    table.insert(onlineGuildmates, self.current);
+    table.sort(onlineGuildmates);
+    local onlineCount = #onlineGuildmates;
+    local myIndex = 0;
+    for i, name in ipairs(onlineGuildmates) do
+        if (name == self.current) then
+            myIndex = i - 1;
+            break;
+        end
+    end
+    return myIndex, onlineCount;
+end
+
+--- Deterministic hash for relay partitioning.
+-- @param str String to hash.
+-- @return Hash value (integer).
+function PlayerService:HashString(str)
+    local hash = 0;
+    for i = 1, #str do
+        hash = (hash * 31 + string.byte(str, i)) % 1000003;
+    end
+    return hash;
+end

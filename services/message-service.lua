@@ -11,7 +11,7 @@ local MessageService = _G.professionMaster:CreateService("message");
 --- Initialize service.
 function MessageService:Initialize()
     -- handle addon messages
-    self.messageVersion = 1;
+    self.messageVersion = 2;
     self.messagePrefix = "PmV" .. self.messageVersion;
     self.splitPatternCache = {};
     C_ChatInfo.RegisterAddonMessagePrefix(self.messagePrefix);

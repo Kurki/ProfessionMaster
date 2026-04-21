@@ -16,6 +16,10 @@ function ProfessionsService:Initialize()
     if (skillsService.cacheRebuilt) then
         self:CleanProfessionsData();
     end
+
+    -- session-level tracking for guild broadcasts
+    self.lastGuildBroadcast = 0;
+    self.relayedPlayers = {};
 end
 
 --- Strip legacy metadata fields from PM_Professions, keeping only players and itemId.
@@ -42,18 +46,19 @@ function ProfessionsService:CheckMessage(prefix, sender, message)
     -- check if is hello message
     local HelloMessage = self:GetModel("hello-message");
     if (prefix == HelloMessage.prefix) then
-        -- request professions from player
-        local helloMessage = HelloMessage:Parse(message);
-        self:RequestProfessionsFromPlayer(sender, helloMessage.storageId, true);
-        return;
-    end
+        -- broadcast own data to guild (debounced: skip if already broadcast in last 30s)
+        local now = time();
+        if (now - self.lastGuildBroadcast >= 30) then
+            self.lastGuildBroadcast = now;
 
-    -- check if is request profession message
-    local RequestProfessionsMessage = self:GetModel("request-professions-message");
-    if (prefix == RequestProfessionsMessage.prefix) then
-        -- send all own professions to sender
-        local rpMessage = RequestProfessionsMessage:Parse(message);
-        self:GetService("own-professions"):SendOwnProfessionsToPlayer(sender, rpMessage.storageId, rpMessage.lastSyncDate, rpMessage.sendBack);
+            -- broadcast own skills + alts + character sets + specializations to guild
+            self:GetService("own-professions"):BroadcastOwnProfessionsToGuild();
+
+            -- relay offline players' skills after a delay (partitioned across online players)
+            C_Timer.After(math.random(20, 50) / 10, function()
+                self:RelayOfflinePlayers();
+            end);
+        end
         return;
     end
 
@@ -115,15 +120,6 @@ end
 function ProfessionsService:SayHelloToGuild()
     -- send hello message to guild
     self:GetService("message"):SendToGuild(self:GetModel("hello-message"):Create(PM_Settings.storageId));
-end
-
---- Request profession from other player.
-function ProfessionsService:RequestProfessionsFromPlayer(playerName, playerStorageId, sendBack)
-    -- get last sync
-    local lastSyncDate = self:GetLastSyncDate(playerStorageId);
-
-    -- send request professions message to player
-    self:GetService("message"):SendToPlayer(playerName, self:GetModel("request-professions-message"):Create(PM_Settings.storageId, lastSyncDate, sendBack));
 end
 
 --- Get last sync date of storage.
@@ -243,6 +239,70 @@ function ProfessionsService:StorePlayerSkills(playerName, professionId, skills)
             self.addon.professionsView:Refresh();
         end
     end);
+end
+
+--- Relay offline players' skills to guild.
+-- Partitions the work: each online player only relays a subset of offline players
+-- based on a deterministic hash, so the load is distributed evenly.
+function ProfessionsService:RelayOfflinePlayers()
+    local playerService = self:GetService("player");
+    local messageService = self:GetService("message");
+    local PlayerProfessionsMessage = self:GetModel("player-professions-message");
+
+    -- get relay slot for this player
+    local myIndex, onlineCount = playerService:GetRelaySlot();
+    if (onlineCount == 0) then
+        return;
+    end
+
+    -- build reverse index: playerName → { professionId → { {skillId, itemId}, ... } }
+    local offlinePlayers = {};
+    for professionId, profession in pairs(PM_Professions) do
+        for skillId, skillEntry in pairs(profession) do
+            if (skillEntry.players) then
+                for _, playerName in ipairs(skillEntry.players) do
+                    -- only relay visible players who are offline and not ourselves
+                    if (playerService:IsVisiblePlayer(playerName)
+                        and not playerService:IsGuildmateOnline(playerName)
+                        and not playerService:IsCurrentPlayer(playerName)
+                        and not PM_OwnProfessions[playerName]
+                        and not self.relayedPlayers[playerName]) then
+                        -- check if this player's hash matches our relay slot
+                        if (playerService:HashString(playerName) % onlineCount == myIndex) then
+                            if (not offlinePlayers[playerName]) then
+                                offlinePlayers[playerName] = {};
+                            end
+                            if (not offlinePlayers[playerName][professionId]) then
+                                offlinePlayers[playerName][professionId] = {};
+                            end
+                            table.insert(offlinePlayers[playerName][professionId], {
+                                skillId = skillId,
+                                itemId = skillEntry.itemId or 0,
+                            });
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- send relayed skills to guild (batched)
+    for playerName, professions in pairs(offlinePlayers) do
+        self.relayedPlayers[playerName] = true;
+        for professionId, skills in pairs(professions) do
+            local messageSkills = {};
+            for _, skill in ipairs(skills) do
+                table.insert(messageSkills, skill);
+                if (#messageSkills == 8) then
+                    messageService:SendToGuild(PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, playerName, messageSkills));
+                    messageSkills = {};
+                end
+            end
+            if (#messageSkills > 0) then
+                messageService:SendToGuild(PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, playerName, messageSkills));
+            end
+        end
+    end
 end
 
 --- Find skill by item link.

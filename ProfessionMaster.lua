@@ -376,6 +376,10 @@ function ProfessionMasterAddon:Migrate()
         MigrateSavedVariable("Frames", "PM_Frames");
     end
 
+    -- clear legacy guildmates data (now in-memory only)
+    _G["Guildmates"] = nil;
+    _G["PM_Guildmates"] = nil;
+
     -- set store version
     PM_Settings.storeVersion = 7;
 end

@@ -261,146 +261,79 @@ function OwnProfessionsService:StoreAndSendOwnProfession(professionId, skills)
     professionsService:SayHelloToGuild();
 end
 
---- Send all own profession to player.
--- @param playerName Name of player to send professions to.
--- @param playerStorageId Storage id of player to send professions to.
--- @param lastSyncDate Date of last sync.
--- @param sendBack Indicates if can sync back.
-function OwnProfessionsService:SendOwnProfessionsToPlayer(playerName, playerStorageId, lastSyncDate, sendBack)
-    -- iterate all players
+--- Broadcast all own professions (self + alts) to guild channel.
+-- Used by the new GUILD-based sync protocol.
+-- @param lastSyncDate Optional timestamp; only send skills added after this date.
+function OwnProfessionsService:BroadcastOwnProfessionsToGuild(lastSyncDate)
     local playerService = self:GetService("player");
+    local messageService = self:GetService("message");
+    local PlayerProfessionsMessage = self:GetModel("player-professions-message");
+    local MyCharactersMessage = self:GetModel("my-characters-message");
+    local PlayerSpecializationsMessage = self:GetModel("player-specializations-message");
+
+    local messageCharacters = {};
+
+    -- iterate all own characters
     for characterName, professions in pairs(PM_OwnProfessions) do
         -- check if is same realm and same faction
         if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
             -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
-                 -- iterate all professions
-                for professionId, skills in pairs(professions) do
-                    self:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, characterName);
-                end
-            end
-        end
-    end
-
-    -- send my characters
-    self:SendMyCharacters(playerName);
-
-    -- send specializations for all own characters
-    self:SendSpecializations(playerName);
-
-    -- check if should send back
-    if (sendBack) then
-        -- request professions from other player
-        self:GetService("professions"):RequestProfessionsFromPlayer(playerName, playerStorageId, false);
-    end
-end
-
---- Send my characters.
--- @param playerName Name of player to send characters to.
-function OwnProfessionsService:SendMyCharacters(playerName)
-    -- prepare skills to send
-    local messageCharacters = {};
-
-    -- get services and model
-    local messageService = self:GetService("message");
-    local playerService = self:GetService("player");
-    local MyCharactersMessage = self:GetModel("my-characters-message");
-
-    -- iterate all characters
-    for characterName, _ in pairs(PM_OwnProfessions) do
-        -- check if is same realm and same faction
-        if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
-            -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
-                -- add short name to result
+            if (PM_Settings.sendNonGuildCharacters or playerService:IsGuildmate(characterName)) then
+                -- collect character name for character set message
                 table.insert(messageCharacters, playerService:GetShortName(characterName));
-            end
-        end
-    end
 
-    -- check if charatcers to send
-    if (#messageCharacters > 0) then
-        -- send message
-        messageService:SendToPlayer(playerName, MyCharactersMessage:Create(messageCharacters)); 
-    end
-end
+                -- broadcast skills for each profession
+                for professionId, skills in pairs(professions) do
+                    self:BroadcastProfessionToGuild(professionId, skills, lastSyncDate, characterName);
+                end
 
---- Send specializations of all own characters to a player.
--- @param playerName Name of player to send specializations to.
-function OwnProfessionsService:SendSpecializations(playerName)
-    -- only available from TBC onwards
-    if (self.addon.isVanilla) then
-        return;
-    end
-
-    -- get services and model
-    local messageService = self:GetService("message");
-    local playerService = self:GetService("player");
-    local PlayerSpecializationsMessage = self:GetModel("player-specializations-message");
-
-    -- only iterate own characters (from PM_OwnProfessions)
-    for characterName, _ in pairs(PM_OwnProfessions) do
-        -- check if is same realm and same faction
-        if (playerService:IsSameRealm(characterName) and playerService:IsSameFaction(characterName)) then
-            -- check if character is in guild or setting allows non-guild characters
-            if (PM_Settings.sendNonGuildCharacters or PM_Guildmates[characterName]) then
-                -- get specializations for this character
-                local specializations = PM_Specializations[characterName];
-                if (specializations) then
-                    -- check if has any specializations
-                    local hasSpecializations = false;
-                    for _ in pairs(specializations) do
-                        hasSpecializations = true;
-                        break;
-                    end
-
-                    -- send if has specializations
-                    if (hasSpecializations) then
-                        messageService:SendToPlayer(playerName, PlayerSpecializationsMessage:Create(characterName, specializations));
+                -- broadcast specializations (TBC+)
+                if (not self.addon.isVanilla) then
+                    local specializations = PM_Specializations[characterName];
+                    if (specializations) then
+                        local hasSpecializations = false;
+                        for _ in pairs(specializations) do
+                            hasSpecializations = true;
+                            break;
+                        end
+                        if (hasSpecializations) then
+                            messageService:SendToGuild(PlayerSpecializationsMessage:Create(characterName, specializations));
+                        end
                     end
                 end
             end
         end
     end
+
+    -- broadcast character set
+    if (#messageCharacters > 0) then
+        messageService:SendToGuild(MyCharactersMessage:Create(messageCharacters));
+    end
 end
 
---- Send own profession to player.
--- @param playerName Name of player to send profession to.
--- @param professionId Id of profession to send.
--- @param skills List of skills of this profession to send.
--- @param lastSyncDate Date of alst sync.
--- @param ownPlayerName Own player name to to send professions from.
-function OwnProfessionsService:SendOwnProfessionToPlayer(playerName, professionId, skills, lastSyncDate, ownPlayerName)
-    -- prepare skills to send
-    local messageSkills = {};
-
-    -- get service and model
+--- Broadcast a single profession's skills to guild channel.
+-- @param professionId Profession ID.
+-- @param skills Skills array from PM_OwnProfessions.
+-- @param lastSyncDate Optional timestamp filter.
+-- @param characterName Character name who owns the skills.
+function OwnProfessionsService:BroadcastProfessionToGuild(professionId, skills, lastSyncDate, characterName)
     local messageService = self:GetService("message");
     local PlayerProfessionsMessage = self:GetModel("player-professions-message");
+    local messageSkills = {};
 
-    -- iterate all skills
     for skillIndex = 1, #skills do
-        -- get skill
         local skill = skills[skillIndex];
-
-        -- check last sync date
         if ((not lastSyncDate) or skill.added > lastSyncDate) then
-            -- add skill
             table.insert(messageSkills, skill);
-
-            -- check if 8 skills added
             if (#messageSkills == 8) then
-                -- send message
-                messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, ownPlayerName, messageSkills));
+                messageService:SendToGuild(PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, characterName, messageSkills));
                 messageSkills = {};
             end
         end
     end
 
-    -- check if skills to send
     if (#messageSkills > 0) then
-        -- send message
-        messageService:SendToPlayer(playerName, PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, ownPlayerName, messageSkills)); 
+        messageService:SendToGuild(PlayerProfessionsMessage:Create(professionId, PM_Settings.storageId, characterName, messageSkills));
     end
 end
 
