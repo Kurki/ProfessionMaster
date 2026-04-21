@@ -65,7 +65,7 @@ function OwnProfessionsService:GetProfessionData()
         professionPlayerName = self:GetService("player"):GetLongName(professionPlayerName);
 
         -- check if is guild mate
-        if (not PM_Guildmates or not PM_Guildmates[professionPlayerName]) then
+        if (not self:GetService("player"):IsGuildmate(professionPlayerName)) then
             return;
         end
     end

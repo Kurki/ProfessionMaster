@@ -112,9 +112,10 @@ function PurgeService:PurgeCharacterSilent(characterName)
     end
 
     -- remove from guildmates
-    for guildmateName, _ in pairs(PM_Guildmates) do
+    local playerService = self:GetService("player");
+    for guildmateName, _ in pairs(playerService.guildmates) do
         if (string.lower(guildmateName) == lowerCharacterName) then
-            PM_Guildmates[guildmateName] = nil;
+            playerService.guildmates[guildmateName] = nil;
             break;
         end
     end
