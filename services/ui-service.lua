@@ -88,6 +88,41 @@ function UiService:CreateView(name, width, height, title, showShortcut, resizabl
     return view;
 end
 
+--- Show the custom resize cursor frame at the mouse position.
+-- @param texture Cursor texture path.
+-- @param rotation Rotation in degrees.
+function UiService:ShowResizeCursor(texture, rotation)
+    if (not self.resizeCursorFrame) then
+        local frame = CreateFrame("Frame", nil, UIParent);
+        frame:Hide();
+        frame:SetSize(24, 24);
+        frame:SetFrameStrata("TOOLTIP");
+        frame.texture = frame:CreateTexture();
+        frame.texture:SetAllPoints();
+        frame:SetScript("OnUpdate", function(cursorFrame)
+            local cursorX, cursorY = GetCursorPosition();
+            local scale = cursorFrame:GetEffectiveScale();
+            cursorFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", cursorX / scale, cursorY / scale);
+        end);
+        self.resizeCursorFrame = frame;
+    end
+    self.resizeCursorFrame.texture:SetTexture(texture);
+    self.resizeCursorFrame.texture:SetRotation(math.rad(rotation), { x = 0.5, y = 0.5 });
+    -- set initial position immediately so the frame is visible on the first render
+    local cursorX, cursorY = GetCursorPosition();
+    local scale = self.resizeCursorFrame:GetEffectiveScale();
+    self.resizeCursorFrame:ClearAllPoints();
+    self.resizeCursorFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", cursorX / scale, cursorY / scale);
+    self.resizeCursorFrame:Show();
+end
+
+--- Hide the custom resize cursor frame.
+function UiService:HideResizeCursor()
+    if (self.resizeCursorFrame) then
+        self.resizeCursorFrame:Hide();
+    end
+end
+
 --- Set up resizable behavior on a view frame.
 -- @param view The frame to make resizable.
 function UiService:SetupResizable(view)
@@ -98,60 +133,29 @@ function UiService:SetupResizable(view)
     local edgeSize = 6;
     local resizeDirection = nil;
     view.amResizing = false;
+    local currentCursor = nil;
 
-    -- create edge overlay textures for per-side coloring
-    local edgeThickness = 1;
-    local edgeTop = view:CreateTexture(nil, "OVERLAY");
-    edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-    edgeTop:SetPoint("TOPLEFT", 0, 0);
-    edgeTop:SetPoint("TOPRIGHT", 0, 0);
-    edgeTop:SetHeight(edgeThickness);
-
-    local edgeBottom = view:CreateTexture(nil, "OVERLAY");
-    edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-    edgeBottom:SetPoint("BOTTOMLEFT", 0, 0);
-    edgeBottom:SetPoint("BOTTOMRIGHT", 0, 0);
-    edgeBottom:SetHeight(edgeThickness);
-
-    local edgeLeft = view:CreateTexture(nil, "OVERLAY");
-    edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-    edgeLeft:SetPoint("TOPLEFT", 0, 0);
-    edgeLeft:SetPoint("BOTTOMLEFT", 0, 0);
-    edgeLeft:SetWidth(edgeThickness);
-
-    local edgeRight = view:CreateTexture(nil, "OVERLAY");
-    edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-    edgeRight:SetPoint("TOPRIGHT", 0, 0);
-    edgeRight:SetPoint("BOTTOMRIGHT", 0, 0);
-    edgeRight:SetWidth(edgeThickness);
-
-    -- map resize directions to active edges
-    local directionEdges = {
-        TOP         = { top = true },
-        BOTTOM      = { bottom = true },
-        LEFT        = { left = true },
-        RIGHT       = { right = true },
-        TOPLEFT     = { top = true, left = true },
-        TOPRIGHT    = { top = true, right = true },
-        BOTTOMLEFT  = { bottom = true, left = true },
-        BOTTOMRIGHT = { bottom = true, right = true },
+    -- map resize directions to cursor texture and rotation (in degrees)
+    local directionCursors = {
+        TOPLEFT     = { texture = [[Interface\CURSOR\UI-Cursor-SizeRight]],  rotation = 0  },
+        BOTTOMRIGHT = { texture = [[Interface\CURSOR\UI-Cursor-SizeRight]],  rotation = 0  },
+        TOPRIGHT    = { texture = [[Interface\CURSOR\UI-Cursor-SizeLeft]],   rotation = 0  },
+        BOTTOMLEFT  = { texture = [[Interface\CURSOR\UI-Cursor-SizeLeft]],   rotation = 0  },
+        TOP         = { texture = [[Interface\CURSOR\UI-Cursor-SizeLeft]],   rotation = 45 },
+        BOTTOM      = { texture = [[Interface\CURSOR\UI-Cursor-SizeLeft]],   rotation = 45 },
+        LEFT        = { texture = [[Interface\CURSOR\UI-Cursor-SizeRight]],  rotation = 45 },
+        RIGHT       = { texture = [[Interface\CURSOR\UI-Cursor-SizeRight]],  rotation = 45 },
     };
 
-    local function UpdateEdgeColors(direction)
-        if (not direction) then
-            -- default: all gray
-            edgeTop:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-            edgeBottom:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-            edgeLeft:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-            edgeRight:SetColorTexture(0.5, 0.5, 0.5, 0.5);
-            return;
+    local function UpdateResizeCursor(direction)
+        if (direction == currentCursor) then return; end
+        currentCursor = direction;
+        if (direction) then
+            local cursorInfo = directionCursors[direction];
+            service:ShowResizeCursor(cursorInfo.texture, cursorInfo.rotation);
+        else
+            service:HideResizeCursor();
         end
-        local active = directionEdges[direction] or {};
-        -- active edges golden, others white
-        if (active.top) then edgeTop:SetColorTexture(1, 0.82, 0, 1); else edgeTop:SetColorTexture(1, 1, 1, 1); end
-        if (active.bottom) then edgeBottom:SetColorTexture(1, 0.82, 0, 1); else edgeBottom:SetColorTexture(1, 1, 1, 1); end
-        if (active.left) then edgeLeft:SetColorTexture(1, 0.82, 0, 1); else edgeLeft:SetColorTexture(1, 1, 1, 1); end
-        if (active.right) then edgeRight:SetColorTexture(1, 0.82, 0, 1); else edgeRight:SetColorTexture(1, 1, 1, 1); end
     end
 
     local function GetResizeDirection()
@@ -186,7 +190,7 @@ function UiService:SetupResizable(view)
     view:HookScript("OnUpdate", function()
         if (resizeDirection) then return; end
         local dir = GetResizeDirection();
-        UpdateEdgeColors(dir);
+        UpdateResizeCursor(dir);
     end);
 
     view:HookScript("OnMouseDown", function(_, button)
@@ -197,7 +201,6 @@ function UiService:SetupResizable(view)
                 view.amResizing = true;
                 view:StopMovingOrSizing();
                 view:StartSizing(dir);
-                UpdateEdgeColors(dir);
             end
         end
     end);
@@ -208,7 +211,7 @@ function UiService:SetupResizable(view)
             resizeDirection = nil;
             view.amResizing = false;
             local dir = GetResizeDirection();
-            UpdateEdgeColors(dir);
+            UpdateResizeCursor(dir);
             service:StorePosition(view);
             service:StoreSize(view);
         end
@@ -216,7 +219,7 @@ function UiService:SetupResizable(view)
 
     view:HookScript("OnLeave", function()
         if (not resizeDirection) then
-            UpdateEdgeColors(nil);
+            UpdateResizeCursor(nil);
         end
     end);
 end
