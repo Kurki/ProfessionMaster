@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 5;
+local SKILL_CACHE_VERSION = 6;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -154,8 +154,8 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
     };
     PM_Skills[skillId] = entry;
 
-    -- handle enchantment spells (profession 333)
-    if (professionId == 333) then
+    -- handle enchantment spells (profession 333) without an item result
+    if (professionId == 333 and (not itemId or itemId == 0)) then
         local spellName, _, spellIcon = GetSpellInfo(skillId);
         if (spellName) then
             entry.name = spellName;
