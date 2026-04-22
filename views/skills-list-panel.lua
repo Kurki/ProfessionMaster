@@ -196,12 +196,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add category filter dropdown
     local categoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    categoryLabel:SetPoint("TOPLEFT", 18, -60);
+    categoryLabel:SetPoint("TOPLEFT", 18, -64);
     categoryLabel:SetText(localeService:Get("ProfessionsViewCategory"));
     self.categoryLabel = categoryLabel;
     local categorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
     categorySelection:ClearAllPoints();
-    categorySelection:SetPoint("TOPLEFT", 0, -74);
+    categorySelection:SetPoint("TOPLEFT", 0, -78);
     UIDropDownMenu_SetWidth(categorySelection, 130);
     self.categorySelection = categorySelection;
     self.categoryId = nil;
@@ -212,12 +212,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add subcategory filter dropdown
     local subcategoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    subcategoryLabel:SetPoint("TOPLEFT", 188, -60);
+    subcategoryLabel:SetPoint("TOPLEFT", 188, -64);
     subcategoryLabel:SetText(localeService:Get("ProfessionsViewSubcategory"));
     self.subcategoryLabel = subcategoryLabel;
     local subcategorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
     subcategorySelection:ClearAllPoints();
-    subcategorySelection:SetPoint("TOPLEFT", 170, -74);
+    subcategorySelection:SetPoint("TOPLEFT", 170, -78);
     UIDropDownMenu_SetWidth(subcategorySelection, 130);
     self.subcategorySelection = subcategorySelection;
     self.subcategoryId = nil;
@@ -239,12 +239,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     local bucketListIcon = frame:CreateTexture(nil, "OVERLAY");
     bucketListIcon:SetSize(16, 16);
     bucketListIcon:SetTexture("Interface\\Buttons\\UI-GuildButton-PublicNote-Up");
-    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -109);
+    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -113);
     self.bucketListIcon = bucketListIcon;
 
     -- add specialization area (between search and item list)
     local specArea = CreateFrame("Frame", nil, frame);
-    specArea:SetPoint("TOPLEFT", 10, -104);
+    specArea:SetPoint("TOPLEFT", 10, -108);
     specArea:SetPoint("RIGHT", frame, "RIGHT", -12, 0);
     specArea:SetHeight(1);
     specArea:Hide();
@@ -264,22 +264,22 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add skill text (anchored below spec area)
     local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    skillText:SetPoint("TOPLEFT", 18, -111);
+    skillText:SetPoint("TOPLEFT", 18, -115);
     self.skillText = skillText;
-    self.skillTextDefaultTop = -111;
+    self.skillTextDefaultTop = -115;
 
     -- add player text
     local playerText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    playerText:SetPoint("TOPLEFT", 292, -111);
+    playerText:SetPoint("TOPLEFT", 292, -115);
     playerText:SetText(localeService:Get("ProfessionsViewPlayers"));
     self.playerHeaderText = playerText;
-    self.playerHeaderDefaultTop = -111;
+    self.playerHeaderDefaultTop = -115;
 
     -- create scroll frame
     local scrollFrame, scrollChild, scrollElement = uiService:CreateScrollFrame(frame);
-    scrollFrame:SetPoint("TOPLEFT", 10, -124);
+    scrollFrame:SetPoint("TOPLEFT", 10, -128);
     scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
-    self.scrollFrameDefaultTop = -124;
+    self.scrollFrameDefaultTop = -128;
     scrollElement:SetScript("OnVerticalScroll", function(_, top)
         self.scrollTop = top;
         self:RefreshRows();
@@ -486,10 +486,15 @@ function SkillsListPanel:GetCategoryText(categoryId)
 end
 
 --- Get localized text for a subcategory id.
--- Subcategory IDs: "sub:classId:subclassId" (weapon types) or "slot:INVTYPE_X" (equip slots)
+-- Subcategory IDs: "sub:classId:subclassId" (weapon types), "slot:INVTYPE_X" (equip slots),
+-- or "ec:CategoryName" (enchant categories from spell name)
 function SkillsListPanel:GetSubcategoryText(subcategoryId)
     if (not subcategoryId) then
         return self:GetService("locale"):Get("ProfessionsViewSubcategoryAll");
+    end
+
+    if (string.sub(subcategoryId, 1, 3) == "ec:") then
+        return string.sub(subcategoryId, 4);
     end
 
     if (string.sub(subcategoryId, 1, 4) == "sub:") then
@@ -567,7 +572,7 @@ function SkillsListPanel:PopulateCategoryDropdown()
         local professionId = entry.professionId;
         local catId = nil;
 
-        if (professionId == 333 and skillData.equipLoc) then
+        if (professionId == 333 and (not skillData.itemId or skillData.itemId == 0)) then
             catId = "enchant";
         elseif (skillData.classId == 4 and skillData.subclassId) then
             -- Armor: split by material type (Cloth, Leather, Mail, Plate, Shield, etc.)
@@ -608,8 +613,8 @@ function SkillsListPanel:HasSubcategories()
         local subId = nil;
 
         if (self.categoryId == "enchant") then
-            if (professionId == 333 and skillData.equipLoc) then
-                subId = "slot:" .. skillData.equipLoc;
+            if (professionId == 333 and skillData.enchantCategory) then
+                subId = "ec:" .. skillData.enchantCategory;
             end
         elseif (string.sub(self.categoryId, 1, 2) == "4:") then
             local catSubclassId = tonumber(string.sub(self.categoryId, 3));
@@ -664,9 +669,9 @@ function SkillsListPanel:PopulateSubcategoryDropdown()
         local subId = nil;
 
         if (self.categoryId == "enchant") then
-            -- enchantments: subcategories are equip slots
-            if (professionId == 333 and skillData.equipLoc) then
-                subId = "slot:" .. skillData.equipLoc;
+            -- enchantments: subcategories from spell name
+            if (professionId == 333 and skillData.enchantCategory) then
+                subId = "ec:" .. skillData.enchantCategory;
             end
         elseif (string.sub(self.categoryId, 1, 2) == "4:") then
             -- armor: subcategories are equip slots
@@ -705,14 +710,14 @@ function SkillsListPanel:MatchesCategory(skillData, professionId)
         return true;
     end
 
-    -- enchantment category
+    -- enchantment category (spells without item result)
     if (self.categoryId == "enchant") then
-        if (professionId ~= 333 or not skillData.equipLoc) then
+        if (professionId ~= 333 or (skillData.itemId and skillData.itemId ~= 0)) then
             return false;
         end
         if (self.subcategoryId) then
-            local filterEquipLoc = string.sub(self.subcategoryId, 6);
-            return skillData.equipLoc == filterEquipLoc;
+            local filterCategory = string.sub(self.subcategoryId, 4);
+            return skillData.enchantCategory == filterCategory;
         end
         return true;
     end
@@ -817,8 +822,9 @@ function SkillsListPanel:AddSkills()
     -- pre-compute player name strings
     local playerService = self:GetService("player");
     for _, skillData in ipairs(self.skills) do
-        if (skillData.players) then
-            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(skillData.players, 12), ", ");
+        local players = skillData.players or (skillData.skill and skillData.skill.players);
+        if (players) then
+            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(players, 12), ", ");
         end
     end
 

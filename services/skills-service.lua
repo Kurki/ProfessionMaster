@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 5;
+local SKILL_CACHE_VERSION = 7;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -154,14 +154,15 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
     };
     PM_Skills[skillId] = entry;
 
-    -- handle enchantment spells (profession 333)
-    if (professionId == 333) then
+    -- handle enchantment spells (profession 333) without an item result
+    if (professionId == 333 and (not itemId or itemId == 0)) then
         local spellName, _, spellIcon = GetSpellInfo(skillId);
         if (spellName) then
             entry.name = spellName;
             entry.icon = spellIcon;
             entry.itemColor = "FF71D5FF";
             entry.equipLoc = self:GetEnchantEquipLoc(spellName);
+            entry.enchantCategory = self:GetEnchantCategory(spellName);
             if (self.addon.isVanilla) then
                 entry.skillLink = "|cFF71D5FF|Henchant:" .. skillId .. "|h[" .. spellName .. "]|h|r";
             else
@@ -248,6 +249,17 @@ function SkillsService:GetEnchantEquipLoc(spellName)
     if (string.find(name, "ring")) then return "INVTYPE_FINGER"; end
 
     return nil;
+end
+
+--- Extract enchantment category from spell name (text before first " - ").
+-- e.g. "Enchant Weapon - Fiery Weapon" -> "Enchant Weapon"
+function SkillsService:GetEnchantCategory(spellName)
+    if (not spellName) then return nil; end
+    local dashPos = string.find(spellName, " %- ", 1, false);
+    if (dashPos) then
+        return string.sub(spellName, 1, dashPos - 1);
+    end
+    return spellName;
 end
 
 --- Ensure a skill exists in the cache, creating it if necessary.
