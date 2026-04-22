@@ -486,10 +486,15 @@ function SkillsListPanel:GetCategoryText(categoryId)
 end
 
 --- Get localized text for a subcategory id.
--- Subcategory IDs: "sub:classId:subclassId" (weapon types) or "slot:INVTYPE_X" (equip slots)
+-- Subcategory IDs: "sub:classId:subclassId" (weapon types), "slot:INVTYPE_X" (equip slots),
+-- or "ec:CategoryName" (enchant categories from spell name)
 function SkillsListPanel:GetSubcategoryText(subcategoryId)
     if (not subcategoryId) then
         return self:GetService("locale"):Get("ProfessionsViewSubcategoryAll");
+    end
+
+    if (string.sub(subcategoryId, 1, 3) == "ec:") then
+        return string.sub(subcategoryId, 4);
     end
 
     if (string.sub(subcategoryId, 1, 4) == "sub:") then
@@ -567,7 +572,7 @@ function SkillsListPanel:PopulateCategoryDropdown()
         local professionId = entry.professionId;
         local catId = nil;
 
-        if (professionId == 333 and skillData.equipLoc) then
+        if (professionId == 333 and (not skillData.itemId or skillData.itemId == 0)) then
             catId = "enchant";
         elseif (skillData.classId == 4 and skillData.subclassId) then
             -- Armor: split by material type (Cloth, Leather, Mail, Plate, Shield, etc.)
@@ -608,8 +613,8 @@ function SkillsListPanel:HasSubcategories()
         local subId = nil;
 
         if (self.categoryId == "enchant") then
-            if (professionId == 333 and skillData.equipLoc) then
-                subId = "slot:" .. skillData.equipLoc;
+            if (professionId == 333 and skillData.enchantCategory) then
+                subId = "ec:" .. skillData.enchantCategory;
             end
         elseif (string.sub(self.categoryId, 1, 2) == "4:") then
             local catSubclassId = tonumber(string.sub(self.categoryId, 3));
@@ -664,9 +669,9 @@ function SkillsListPanel:PopulateSubcategoryDropdown()
         local subId = nil;
 
         if (self.categoryId == "enchant") then
-            -- enchantments: subcategories are equip slots
-            if (professionId == 333 and skillData.equipLoc) then
-                subId = "slot:" .. skillData.equipLoc;
+            -- enchantments: subcategories from spell name
+            if (professionId == 333 and skillData.enchantCategory) then
+                subId = "ec:" .. skillData.enchantCategory;
             end
         elseif (string.sub(self.categoryId, 1, 2) == "4:") then
             -- armor: subcategories are equip slots
@@ -705,14 +710,14 @@ function SkillsListPanel:MatchesCategory(skillData, professionId)
         return true;
     end
 
-    -- enchantment category
+    -- enchantment category (spells without item result)
     if (self.categoryId == "enchant") then
-        if (professionId ~= 333 or not skillData.equipLoc) then
+        if (professionId ~= 333 or (skillData.itemId and skillData.itemId ~= 0)) then
             return false;
         end
         if (self.subcategoryId) then
-            local filterEquipLoc = string.sub(self.subcategoryId, 6);
-            return skillData.equipLoc == filterEquipLoc;
+            local filterCategory = string.sub(self.subcategoryId, 4);
+            return skillData.enchantCategory == filterCategory;
         end
         return true;
     end
