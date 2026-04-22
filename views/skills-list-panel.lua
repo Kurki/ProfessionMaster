@@ -822,8 +822,9 @@ function SkillsListPanel:AddSkills()
     -- pre-compute player name strings
     local playerService = self:GetService("player");
     for _, skillData in ipairs(self.skills) do
-        if (skillData.players) then
-            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(skillData.players, 12), ", ");
+        local players = skillData.players or (skillData.skill and skillData.skill.players);
+        if (players) then
+            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(players, 12), ", ");
         end
     end
 
