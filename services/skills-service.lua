@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 7;
+local SKILL_CACHE_VERSION = 9;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -92,6 +92,8 @@ function SkillsService:BuildCache()
             entry.difficulty = skillInfo.difficulty;
             if (skillInfo.recipeItemId) then
                 self:LoadRecipeItem(entry, skillInfo.recipeItemId, professionNamesService);
+                -- attach recipe source data (V=Vendor, D=Drop, W=WorldDrop, Q=Quest)
+                self:LoadRecipeSource(entry, skillInfo.recipeItemId);
             end
         end
     end
@@ -230,6 +232,18 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
     end
 end
 
+--- Load recipe source data (vendor, drop, world drop, quest) into a cache entry.
+function SkillsService:LoadRecipeSource(entry, recipeItemId)
+    local recipeSources = self:GetModel("recipe-sources");
+    if (not recipeSources) then return; end
+
+    local sourceData = recipeSources[recipeItemId];
+    if (sourceData) then
+        entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
+        entry.recipeSourceName = sourceData[2]; -- NPC name, boss name, or faction name (optional)
+    end
+end
+
 --- Determine equip location for an enchantment based on spell name patterns.
 function SkillsService:GetEnchantEquipLoc(spellName)
     if (not spellName) then return nil; end
@@ -302,4 +316,5 @@ function SkillsService:FreeSkillModels()
     modelTypes["wrath-skills"] = nil;
     modelTypes["cata-skills"] = nil;
     modelTypes["mop-skills"] = nil;
+    modelTypes["recipe-sources"] = nil;
 end

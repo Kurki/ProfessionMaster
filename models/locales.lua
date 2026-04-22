@@ -78,6 +78,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Recipe",
             ["SkillViewTaughtBy"] = "Taught by:",
             ["SkillViewTrainer"] = "Trainer",
+            ["SkillViewVendor"] = "Vendor",
+            ["SkillViewDrop"] = "Drop",
+            ["SkillViewWorldDrop"] = "World Drop",
+            ["SkillViewQuest"] = "Quest",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Missing Reagents",
@@ -199,6 +203,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Rezept",
             ["SkillViewTaughtBy"] = "Gelehrt durch:",
             ["SkillViewTrainer"] = "Lehrer",
+            ["SkillViewVendor"] = "Händler",
+            ["SkillViewDrop"] = "Drop",
+            ["SkillViewWorldDrop"] = "Welt-Drop",
+            ["SkillViewQuest"] = "Quest",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Fehlende Materialien",
@@ -320,6 +328,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Рецепт",
             ["SkillViewTaughtBy"] = "Изучается через:",
             ["SkillViewTrainer"] = "Учитель",
+            ["SkillViewVendor"] = "Торговец",
+            ["SkillViewDrop"] = "Добыча",
+            ["SkillViewWorldDrop"] = "Мировая добыча",
+            ["SkillViewQuest"] = "Задание",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Недостающие реагенты",
@@ -441,6 +453,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Receta",
             ["SkillViewTaughtBy"] = "Enseñado por:",
             ["SkillViewTrainer"] = "Instructor",
+            ["SkillViewVendor"] = "Vendedor",
+            ["SkillViewDrop"] = "Botín",
+            ["SkillViewWorldDrop"] = "Botín mundial",
+            ["SkillViewQuest"] = "Misión",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Materiales faltantes",
@@ -562,6 +578,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Recette",
             ["SkillViewTaughtBy"] = "Appris par :",
             ["SkillViewTrainer"] = "Maître",
+            ["SkillViewVendor"] = "Marchand",
+            ["SkillViewDrop"] = "Butin",
+            ["SkillViewWorldDrop"] = "Butin mondial",
+            ["SkillViewQuest"] = "Quête",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Composants manquants",
@@ -683,6 +703,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Ricetta",
             ["SkillViewTaughtBy"] = "Insegnato da:",
             ["SkillViewTrainer"] = "Istruttore",
+            ["SkillViewVendor"] = "Mercante",
+            ["SkillViewDrop"] = "Bottino",
+            ["SkillViewWorldDrop"] = "Bottino mondiale",
+            ["SkillViewQuest"] = "Missione",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagenti mancanti",
@@ -804,6 +828,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "레시피",
             ["SkillViewTaughtBy"] = "배우는 경로:",
             ["SkillViewTrainer"] = "훈련사",
+            ["SkillViewVendor"] = "상인",
+            ["SkillViewDrop"] = "드롭",
+            ["SkillViewWorldDrop"] = "월드 드롭",
+            ["SkillViewQuest"] = "퀘스트",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "부족한 재료",
@@ -925,6 +953,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "Receita",
             ["SkillViewTaughtBy"] = "Ensinado por:",
             ["SkillViewTrainer"] = "Treinador",
+            ["SkillViewVendor"] = "Vendedor",
+            ["SkillViewDrop"] = "Saque",
+            ["SkillViewWorldDrop"] = "Saque mundial",
+            ["SkillViewQuest"] = "Missão",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagentes faltantes",
@@ -1046,6 +1078,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "配方",
             ["SkillViewTaughtBy"] = "学习途径：",
             ["SkillViewTrainer"] = "训练师",
+            ["SkillViewVendor"] = "商人",
+            ["SkillViewDrop"] = "掉落",
+            ["SkillViewWorldDrop"] = "世界掉落",
+            ["SkillViewQuest"] = "任务",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
@@ -1167,6 +1203,10 @@ function LocalesModel:Create()
             ["SkillViewRecipe"] = "配方",
             ["SkillViewTaughtBy"] = "學習途徑：",
             ["SkillViewTrainer"] = "訓練師",
+            ["SkillViewVendor"] = "商人",
+            ["SkillViewDrop"] = "掉落",
+            ["SkillViewWorldDrop"] = "世界掉落",
+            ["SkillViewQuest"] = "任務",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",

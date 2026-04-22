@@ -42,5 +42,6 @@ models\skills\bcc.lua
 models\skills\wrath.lua
 models\skills\cata.lua
 models\skills\mop.lua
+models\recipe-sources.lua
 services\services.xml
 views\views.xml

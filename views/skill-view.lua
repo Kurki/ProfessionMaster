@@ -185,7 +185,15 @@ function SkillView:Show(skillRow, professionsView)
     if (skillInfo and skillInfo.recipe and skillInfo.recipe.itemLink) then
         self.recipeItemLink = skillInfo.recipe.itemLink;
         local recipeColor = skillInfo.recipe.itemColor or "FF1EFF00";
-        self.recipeLabel.text:SetText(taughtByText .. "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r");
+        local recipeText = "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r";
+
+        -- append recipe source type if known
+        local sourceLabel = self:GetRecipeSourceLabel(skillInfo, localeService);
+        if (sourceLabel) then
+            recipeText = recipeText .. " |cff999999(" .. sourceLabel .. ")|r";
+        end
+
+        self.recipeLabel.text:SetText(taughtByText .. recipeText);
         self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
         self.recipeLabel:Show();
     else
@@ -422,4 +430,23 @@ function SkillView:Hide()
     if (self.view) then
         self.view:Hide();
     end
+end
+
+--- Get a localized label for the recipe source type, including source name if available.
+function SkillView:GetRecipeSourceLabel(skillInfo, localeService)
+    if (not skillInfo) then return nil; end
+    local source = skillInfo.recipeSource;
+    if (not source) then return nil; end
+
+    local sourceLabel = nil;
+    if (source == "V") then sourceLabel = localeService:Get("SkillViewVendor"); end
+    if (source == "D") then sourceLabel = localeService:Get("SkillViewDrop"); end
+    if (source == "W") then sourceLabel = localeService:Get("SkillViewWorldDrop"); end
+    if (source == "Q") then sourceLabel = localeService:Get("SkillViewQuest"); end
+
+    if (sourceLabel and skillInfo.recipeSourceName) then
+        sourceLabel = sourceLabel .. ": " .. skillInfo.recipeSourceName;
+    end
+
+    return sourceLabel;
 end
