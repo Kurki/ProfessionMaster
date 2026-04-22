@@ -196,12 +196,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add category filter dropdown
     local categoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    categoryLabel:SetPoint("TOPLEFT", 18, -60);
+    categoryLabel:SetPoint("TOPLEFT", 18, -64);
     categoryLabel:SetText(localeService:Get("ProfessionsViewCategory"));
     self.categoryLabel = categoryLabel;
     local categorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
     categorySelection:ClearAllPoints();
-    categorySelection:SetPoint("TOPLEFT", 0, -74);
+    categorySelection:SetPoint("TOPLEFT", 0, -78);
     UIDropDownMenu_SetWidth(categorySelection, 130);
     self.categorySelection = categorySelection;
     self.categoryId = nil;
@@ -212,12 +212,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add subcategory filter dropdown
     local subcategoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    subcategoryLabel:SetPoint("TOPLEFT", 188, -60);
+    subcategoryLabel:SetPoint("TOPLEFT", 188, -64);
     subcategoryLabel:SetText(localeService:Get("ProfessionsViewSubcategory"));
     self.subcategoryLabel = subcategoryLabel;
     local subcategorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
     subcategorySelection:ClearAllPoints();
-    subcategorySelection:SetPoint("TOPLEFT", 170, -74);
+    subcategorySelection:SetPoint("TOPLEFT", 170, -78);
     UIDropDownMenu_SetWidth(subcategorySelection, 130);
     self.subcategorySelection = subcategorySelection;
     self.subcategoryId = nil;
@@ -239,12 +239,12 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     local bucketListIcon = frame:CreateTexture(nil, "OVERLAY");
     bucketListIcon:SetSize(16, 16);
     bucketListIcon:SetTexture("Interface\\Buttons\\UI-GuildButton-PublicNote-Up");
-    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -109);
+    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -113);
     self.bucketListIcon = bucketListIcon;
 
     -- add specialization area (between search and item list)
     local specArea = CreateFrame("Frame", nil, frame);
-    specArea:SetPoint("TOPLEFT", 10, -104);
+    specArea:SetPoint("TOPLEFT", 10, -108);
     specArea:SetPoint("RIGHT", frame, "RIGHT", -12, 0);
     specArea:SetHeight(1);
     specArea:Hide();
@@ -264,22 +264,22 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add skill text (anchored below spec area)
     local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    skillText:SetPoint("TOPLEFT", 18, -111);
+    skillText:SetPoint("TOPLEFT", 18, -115);
     self.skillText = skillText;
-    self.skillTextDefaultTop = -111;
+    self.skillTextDefaultTop = -115;
 
     -- add player text
     local playerText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    playerText:SetPoint("TOPLEFT", 292, -111);
+    playerText:SetPoint("TOPLEFT", 292, -115);
     playerText:SetText(localeService:Get("ProfessionsViewPlayers"));
     self.playerHeaderText = playerText;
-    self.playerHeaderDefaultTop = -111;
+    self.playerHeaderDefaultTop = -115;
 
     -- create scroll frame
     local scrollFrame, scrollChild, scrollElement = uiService:CreateScrollFrame(frame);
-    scrollFrame:SetPoint("TOPLEFT", 10, -124);
+    scrollFrame:SetPoint("TOPLEFT", 10, -128);
     scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
-    self.scrollFrameDefaultTop = -124;
+    self.scrollFrameDefaultTop = -128;
     scrollElement:SetScript("OnVerticalScroll", function(_, top)
         self.scrollTop = top;
         self:RefreshRows();
