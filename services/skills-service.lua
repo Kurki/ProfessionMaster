@@ -239,6 +239,14 @@ function SkillsService:LoadRecipeSource(entry, recipeItemId)
 
     local sourceData = recipeSources[recipeItemId];
     if (sourceData) then
+        -- Field 4: faction side filter - "A" = Alliance only, "H" = Horde only, nil = both
+        local side = sourceData[4];
+        if (side) then
+            local playerFaction = UnitFactionGroup("player");
+            if (side == "A" and playerFaction ~= "Alliance") then return; end
+            if (side == "H" and playerFaction ~= "Horde") then return; end
+        end
+
         entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
 
         -- Field 2: source name - number means faction ID, string means NPC/boss name
