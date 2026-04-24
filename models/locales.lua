@@ -82,6 +82,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Drop",
             ["SkillViewWorldDrop"] = "World Drop",
             ["SkillViewQuest"] = "Quest",
+            ["SkillViewSource"] = "Source:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Missing Reagents",
@@ -207,6 +208,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Drop",
             ["SkillViewWorldDrop"] = "Welt-Drop",
             ["SkillViewQuest"] = "Quest",
+            ["SkillViewSource"] = "Herkunft:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Fehlende Materialien",
@@ -332,6 +334,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Добыча",
             ["SkillViewWorldDrop"] = "Мировая добыча",
             ["SkillViewQuest"] = "Задание",
+            ["SkillViewSource"] = "Источник:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Недостающие реагенты",
@@ -457,6 +460,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Botín",
             ["SkillViewWorldDrop"] = "Botín mundial",
             ["SkillViewQuest"] = "Misión",
+            ["SkillViewSource"] = "Origen:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Materiales faltantes",
@@ -582,6 +586,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Butin",
             ["SkillViewWorldDrop"] = "Butin mondial",
             ["SkillViewQuest"] = "Quête",
+            ["SkillViewSource"] = "Source :",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Composants manquants",
@@ -707,6 +712,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Bottino",
             ["SkillViewWorldDrop"] = "Bottino mondiale",
             ["SkillViewQuest"] = "Missione",
+            ["SkillViewSource"] = "Origine:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagenti mancanti",
@@ -832,6 +838,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "드롭",
             ["SkillViewWorldDrop"] = "월드 드롭",
             ["SkillViewQuest"] = "퀘스트",
+            ["SkillViewSource"] = "출처:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "부족한 재료",
@@ -957,6 +964,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "Saque",
             ["SkillViewWorldDrop"] = "Saque mundial",
             ["SkillViewQuest"] = "Missão",
+            ["SkillViewSource"] = "Origem:",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "Reagentes faltantes",
@@ -1082,6 +1090,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "掉落",
             ["SkillViewWorldDrop"] = "世界掉落",
             ["SkillViewQuest"] = "任务",
+            ["SkillViewSource"] = "来源：",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",
@@ -1207,6 +1216,7 @@ function LocalesModel:Create()
             ["SkillViewDrop"] = "掉落",
             ["SkillViewWorldDrop"] = "世界掉落",
             ["SkillViewQuest"] = "任務",
+            ["SkillViewSource"] = "來源：",
 
             -- missing reagents view
             ["MissingReagentsViewTitle"] = "缺少的材料",

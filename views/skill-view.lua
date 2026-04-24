@@ -26,7 +26,7 @@ function SkillView:Show(skillRow, professionsView)
         self.playerScrollTop = 0;
 
         -- create view
-        local view = uiService:CreateView("PmSkill", 480, 310, "");
+        local view = uiService:CreateView("PmSkill", 480, 340, "");
         view:EnableKeyboard();
         self.view = view;
 
@@ -42,12 +42,12 @@ function SkillView:Show(skillRow, professionsView)
         -- add players frame
         local playersFrame = uiService:CreatePanel(view);
         playersFrame:SetPoint("TOPLEFT", 12, -36);
-        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 42);
+        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 64);
         self.playersFrame = playersFrame;
 
         -- add recipe label
         local recipeLabel = CreateFrame("Button", nil, view);
-        recipeLabel:SetPoint("BOTTOMLEFT", 16, 14);
+        recipeLabel:SetPoint("BOTTOMLEFT", 16, 34);
         recipeLabel:SetHeight(14);
         recipeLabel.text = recipeLabel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
         recipeLabel.text:SetPoint("LEFT", 0, 0);
@@ -62,6 +62,13 @@ function SkillView:Show(skillRow, professionsView)
             GameTooltip:Hide();
         end);
         self.recipeLabel = recipeLabel;
+
+        -- add source label
+        local sourceLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+        sourceLabel:SetPoint("BOTTOMLEFT", 16, 16);
+        sourceLabel:SetPoint("BOTTOMRIGHT", -120, 16);
+        sourceLabel:SetJustifyH("LEFT");
+        self.sourceLabel = sourceLabel;
 
         -- add players label
         local playersLabel = playersFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -84,7 +91,7 @@ function SkillView:Show(skillRow, professionsView)
         -- add bucket list frame
         local bucketListFrame = uiService:CreatePanel(view);
         bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
-        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 42);
+        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 64);
         self.bucketListFrame = bucketListFrame;
 
         -- add bucket list label
@@ -187,12 +194,6 @@ function SkillView:Show(skillRow, professionsView)
         local recipeColor = skillInfo.recipe.itemColor or "FF1EFF00";
         local recipeText = "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r";
 
-        -- append recipe source type if known
-        local sourceLabel = self:GetRecipeSourceLabel(skillInfo, localeService);
-        if (sourceLabel) then
-            recipeText = recipeText .. " |cff999999(" .. sourceLabel .. ")|r";
-        end
-
         self.recipeLabel.text:SetText(taughtByText .. recipeText);
         self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
         self.recipeLabel:Show();
@@ -200,6 +201,16 @@ function SkillView:Show(skillRow, professionsView)
         self.recipeLabel.text:SetText(taughtByText .. localeService:Get("SkillViewTrainer"));
         self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
         self.recipeLabel:Show();
+    end
+
+    -- update source label
+    local sourceText = self:GetRecipeSourceText(skillInfo, localeService);
+    if (sourceText) then
+        self.sourceLabel:SetText(sourceText);
+        self.sourceLabel:Show();
+    else
+        self.sourceLabel:SetText("");
+        self.sourceLabel:Hide();
     end
 
     -- set position
@@ -432,21 +443,37 @@ function SkillView:Hide()
     end
 end
 
---- Get a localized label for the recipe source type, including source name if available.
-function SkillView:GetRecipeSourceLabel(skillInfo, localeService)
+--- Build the full source text for the dedicated source line below the recipe.
+-- Format examples:
+--   "Source: Vendor - Kendor Kabonka, Stormwind"
+--   "Source: Drop - Shade of Aran, Karazhan"
+--   "Source: World Drop"
+--   "Source: Quest"
+function SkillView:GetRecipeSourceText(skillInfo, localeService)
     if (not skillInfo) then return nil; end
     local source = skillInfo.recipeSource;
     if (not source) then return nil; end
 
-    local sourceLabel = nil;
-    if (source == "V") then sourceLabel = localeService:Get("SkillViewVendor"); end
-    if (source == "D") then sourceLabel = localeService:Get("SkillViewDrop"); end
-    if (source == "W") then sourceLabel = localeService:Get("SkillViewWorldDrop"); end
-    if (source == "Q") then sourceLabel = localeService:Get("SkillViewQuest"); end
+    local sourceTypeLabel = nil;
+    if (source == "V") then sourceTypeLabel = localeService:Get("SkillViewVendor"); end
+    if (source == "D") then sourceTypeLabel = localeService:Get("SkillViewDrop"); end
+    if (source == "W") then sourceTypeLabel = localeService:Get("SkillViewWorldDrop"); end
+    if (source == "Q") then sourceTypeLabel = localeService:Get("SkillViewQuest"); end
+    if (not sourceTypeLabel) then return nil; end
 
-    if (sourceLabel and skillInfo.recipeSourceName) then
-        sourceLabel = sourceLabel .. ": " .. skillInfo.recipeSourceName;
+    local prefix = "|cff999999" .. localeService:Get("SkillViewSource") .. "|r ";
+    local detail = "|cffdddddd" .. sourceTypeLabel .. "|r";
+
+    local sourceName = skillInfo.recipeSourceName;
+    local sourceLocation = skillInfo.recipeSourceLocation;
+
+    if (sourceName and sourceLocation) then
+        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceName .. ", " .. sourceLocation .. "|r";
+    elseif (sourceName) then
+        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceName .. "|r";
+    elseif (sourceLocation) then
+        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceLocation .. "|r";
     end
 
-    return sourceLabel;
+    return prefix .. detail;
 end

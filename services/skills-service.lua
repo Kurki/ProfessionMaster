@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 9;
+local SKILL_CACHE_VERSION = 10;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -240,7 +240,24 @@ function SkillsService:LoadRecipeSource(entry, recipeItemId)
     local sourceData = recipeSources[recipeItemId];
     if (sourceData) then
         entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
-        entry.recipeSourceName = sourceData[2]; -- NPC name, boss name, or faction name (optional)
+
+        -- Field 2: source name - number means faction ID, string means NPC/boss name
+        local sourceName = sourceData[2];
+        if (type(sourceName) == "number") then
+            local factionName = GetFactionInfoByID(sourceName);
+            entry.recipeSourceName = factionName or tostring(sourceName);
+        else
+            entry.recipeSourceName = sourceName;
+        end
+
+        -- Field 3: location - number means MapID, string means zone/city name
+        local location = sourceData[3];
+        if (type(location) == "number") then
+            local mapInfo = C_Map.GetMapInfo(location);
+            entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(location);
+        else
+            entry.recipeSourceLocation = location;
+        end
     end
 end
 
