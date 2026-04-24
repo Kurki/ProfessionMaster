@@ -238,35 +238,61 @@ function SkillsService:LoadRecipeSource(entry, recipeItemId)
     if (not recipeSources) then return; end
 
     local sourceData = recipeSources[recipeItemId];
-    if (sourceData) then
-        -- Field 4: faction side filter - "A" = Alliance only, "H" = Horde only, nil = both
-        local side = sourceData[4];
-        if (side) then
-            local playerFaction = UnitFactionGroup("player");
-            if (side == "A" and playerFaction ~= "Alliance") then return; end
-            if (side == "H" and playerFaction ~= "Horde") then return; end
+    if (not sourceData) then return; end
+
+    entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
+
+    if (entry.recipeSource == "V") then
+        -- Vendors: sub-tables starting at index 2
+        -- Each: {"NpcName", mapId, "A"/"H"} or {factionId, mapId}
+        local playerFaction = UnitFactionGroup("player");
+        local chosenVendor = nil;
+
+        for i = 2, #sourceData do
+            local vendor = sourceData[i];
+            local side = vendor[3];
+            if (not side) then
+                -- Neutral or faction vendor - always usable
+                chosenVendor = vendor;
+                break;
+            elseif (side == "A" and playerFaction == "Alliance") then
+                chosenVendor = vendor;
+                break;
+            elseif (side == "H" and playerFaction == "Horde") then
+                chosenVendor = vendor;
+                break;
+            end
         end
 
-        entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
+        if (not chosenVendor) then return; end
 
-        -- Field 2: source name - number means faction ID, string means NPC/boss name
-        local sourceName = sourceData[2];
-        if (type(sourceName) == "number") then
-            local factionName = GetFactionInfoByID(sourceName);
-            entry.recipeSourceName = factionName or tostring(sourceName);
+        -- Field 1: source name - number means faction ID, string means NPC name
+        if (type(chosenVendor[1]) == "number") then
+            local factionName = GetFactionInfoByID(chosenVendor[1]);
+            entry.recipeSourceName = factionName or tostring(chosenVendor[1]);
         else
-            entry.recipeSourceName = sourceName;
+            entry.recipeSourceName = chosenVendor[1];
         end
 
-        -- Field 3: location - number means MapID, string means zone/city name
-        local location = sourceData[3];
-        if (type(location) == "number") then
-            local mapInfo = C_Map.GetMapInfo(location);
-            entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(location);
-        else
-            entry.recipeSourceLocation = location;
+        -- Field 2: location MapID
+        if (type(chosenVendor[2]) == "number") then
+            local mapInfo = C_Map.GetMapInfo(chosenVendor[2]);
+            entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(chosenVendor[2]);
+        end
+
+    elseif (entry.recipeSource == "D") then
+        -- Drops: sub-tables starting at index 2
+        -- Each: {"BossName", mapId}
+        local firstBoss = sourceData[2];
+        if (firstBoss) then
+            entry.recipeSourceName = firstBoss[1];
+            if (type(firstBoss[2]) == "number") then
+                local mapInfo = C_Map.GetMapInfo(firstBoss[2]);
+                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(firstBoss[2]);
+            end
         end
     end
+    -- "W" and "Q" have no sub-tables, just the source type
 end
 
 --- Determine equip location for an enchantment based on spell name patterns.
