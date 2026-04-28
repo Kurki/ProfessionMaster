@@ -26,7 +26,7 @@ function SkillView:Show(skillRow, professionsView)
         self.playerScrollTop = 0;
 
         -- create view
-        local view = uiService:CreateView("PmSkill", 480, 340, "");
+        local view = uiService:CreateView("PmSkill", 480, 290, "");
         view:EnableKeyboard();
         self.view = view;
 
@@ -42,33 +42,24 @@ function SkillView:Show(skillRow, professionsView)
         -- add players frame
         local playersFrame = uiService:CreatePanel(view);
         playersFrame:SetPoint("TOPLEFT", 12, -36);
-        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 64);
+        playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 44);
         self.playersFrame = playersFrame;
 
         -- add recipe label
         local recipeLabel = CreateFrame("Button", nil, view);
-        recipeLabel:SetPoint("BOTTOMLEFT", 16, 34);
+        recipeLabel:SetPoint("BOTTOMLEFT", 16, 14);
         recipeLabel:SetHeight(14);
         recipeLabel.text = recipeLabel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
         recipeLabel.text:SetPoint("LEFT", 0, 0);
         recipeLabel:SetScript("OnEnter", function()
-            if (self.recipeItemLink) then
-                GameTooltip:SetOwner(recipeLabel, "ANCHOR_TOPRIGHT");
-                GameTooltip:SetHyperlink(self.recipeItemLink);
-                GameTooltip:Show();
-            end
+            if (not self.recipe) then return; end
+            local tooltipService = self:GetService("tooltip");
+            tooltipService:ShowRecipeSourceTooltip(recipeLabel, self.recipe);
         end);
         recipeLabel:SetScript("OnLeave", function()
             GameTooltip:Hide();
         end);
         self.recipeLabel = recipeLabel;
-
-        -- add source label
-        local sourceLabel = view:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-        sourceLabel:SetPoint("BOTTOMLEFT", 16, 16);
-        sourceLabel:SetPoint("BOTTOMRIGHT", -120, 16);
-        sourceLabel:SetJustifyH("LEFT");
-        self.sourceLabel = sourceLabel;
 
         -- add players label
         local playersLabel = playersFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -91,7 +82,7 @@ function SkillView:Show(skillRow, professionsView)
         -- add bucket list frame
         local bucketListFrame = uiService:CreatePanel(view);
         bucketListFrame:SetPoint("TOPLEFT", view, "TOPRIGHT", -252, -36);
-        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 64);
+        bucketListFrame:SetPoint("BOTTOMRIGHT", -12, 44);
         self.bucketListFrame = bucketListFrame;
 
         -- add bucket list label
@@ -160,7 +151,7 @@ function SkillView:Show(skillRow, professionsView)
         end);
         okButton:SetWidth(100);
         okButton:SetHeight(22);
-        okButton:SetPoint("BOTTOMRIGHT", -12, 8);
+        okButton:SetPoint("BOTTOMRIGHT", -12, 10);
     end
 
     -- update item text and skill id
@@ -187,30 +178,18 @@ function SkillView:Show(skillRow, professionsView)
     self.view.titleLabel:SetText(self.addon.shortcut .. titleName);
 
     -- update recipe label
-    self.recipeItemLink = nil;
-    local taughtByText = localeService:Get("SkillViewTaughtBy") .. " ";
+    self.recipe = nil;
     if (skillInfo and skillInfo.recipe and skillInfo.recipe.itemLink) then
-        self.recipeItemLink = skillInfo.recipe.itemLink;
+        self.recipe = skillInfo.recipe;
         local recipeColor = skillInfo.recipe.itemColor or "FF1EFF00";
         local recipeText = "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r";
 
-        self.recipeLabel.text:SetText(taughtByText .. recipeText);
+        self.recipeLabel.text:SetText(recipeText);
         self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
         self.recipeLabel:Show();
     else
-        self.recipeLabel.text:SetText(taughtByText .. localeService:Get("SkillViewTrainer"));
-        self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
-        self.recipeLabel:Show();
-    end
-
-    -- update source label
-    local sourceText = self:GetRecipeSourceText(skillInfo, localeService);
-    if (sourceText) then
-        self.sourceLabel:SetText(sourceText);
-        self.sourceLabel:Show();
-    else
-        self.sourceLabel:SetText("");
-        self.sourceLabel:Hide();
+        self.recipeLabel.text:SetText("");
+        self.recipeLabel:Hide();
     end
 
     -- set position
@@ -441,39 +420,4 @@ function SkillView:Hide()
     if (self.view) then
         self.view:Hide();
     end
-end
-
---- Build the full source text for the dedicated source line below the recipe.
--- Format examples:
---   "Source: Vendor - Kendor Kabonka, Stormwind"
---   "Source: Drop - Shade of Aran, Karazhan"
---   "Source: World Drop"
---   "Source: Quest"
-function SkillView:GetRecipeSourceText(skillInfo, localeService)
-    if (not skillInfo) then return nil; end
-    local source = skillInfo.recipeSource;
-    if (not source) then return nil; end
-
-    local sourceTypeLabel = nil;
-    if (source == "V") then sourceTypeLabel = localeService:Get("SkillViewVendor"); end
-    if (source == "D") then sourceTypeLabel = localeService:Get("SkillViewDrop"); end
-    if (source == "W") then sourceTypeLabel = localeService:Get("SkillViewWorldDrop"); end
-    if (source == "Q") then sourceTypeLabel = localeService:Get("SkillViewQuest"); end
-    if (not sourceTypeLabel) then return nil; end
-
-    local prefix = "|cff999999" .. localeService:Get("SkillViewSource") .. "|r ";
-    local detail = "|cffdddddd" .. sourceTypeLabel .. "|r";
-
-    local sourceName = skillInfo.recipeSourceName;
-    local sourceLocation = skillInfo.recipeSourceLocation;
-
-    if (sourceName and sourceLocation) then
-        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceName .. ", " .. sourceLocation .. "|r";
-    elseif (sourceName) then
-        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceName .. "|r";
-    elseif (sourceLocation) then
-        detail = "|cffdddddd" .. sourceTypeLabel .. " - " .. sourceLocation .. "|r";
-    end
-
-    return prefix .. detail;
 end

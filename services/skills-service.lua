@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 10;
+local SKILL_CACHE_VERSION = 12;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -263,72 +263,18 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
     end
 end
 
---- Load recipe source data into a cache entry.
+--- Load recipe source data into a cache entry's recipe sub-table.
 --- Format: {vendors = {{name, mapId, side}}, drops = {{name, mapId}}, worldDrop = bool, quest = bool}
 function SkillsService:LoadRecipeSource(entry, recipeItemId)
-    if (not self.recipeSources) then return; end
+    if (not self.recipeSources or not entry.recipe) then return; end
 
     local sourceData = self.recipeSources[recipeItemId];
     if (not sourceData) then return; end
 
-    -- Store all source types
-    entry.recipeVendors = sourceData.vendors;
-    entry.recipeDrops = sourceData.drops;
-    entry.recipeWorldDrop = sourceData.worldDrop;
-    entry.recipeQuest = sourceData.quest;
-
-    -- Determine primary source for display (vendor > drop > worldDrop > quest)
-    if (sourceData.vendors and #sourceData.vendors > 0) then
-        entry.recipeSource = "V";
-
-        -- Choose faction-appropriate vendor
-        local playerFaction = UnitFactionGroup("player");
-        local chosenVendor = nil;
-
-        for _, vendor in ipairs(sourceData.vendors) do
-            local side = vendor[3];
-            if (not side) then
-                chosenVendor = vendor;
-                break;
-            elseif (side == "A" and playerFaction == "Alliance") then
-                chosenVendor = vendor;
-                break;
-            elseif (side == "H" and playerFaction == "Horde") then
-                chosenVendor = vendor;
-                break;
-            end
-        end
-
-        -- Fallback to first vendor if no faction match
-        if (not chosenVendor) then
-            chosenVendor = sourceData.vendors[1];
-        end
-
-        if (chosenVendor) then
-            entry.recipeSourceName = chosenVendor[1];
-            if (type(chosenVendor[2]) == "number") then
-                local mapInfo = C_Map.GetMapInfo(chosenVendor[2]);
-                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(chosenVendor[2]);
-            end
-        end
-
-    elseif (sourceData.drops and #sourceData.drops > 0) then
-        entry.recipeSource = "D";
-        local firstDrop = sourceData.drops[1];
-        if (firstDrop) then
-            entry.recipeSourceName = firstDrop[1];
-            if (type(firstDrop[2]) == "number") then
-                local mapInfo = C_Map.GetMapInfo(firstDrop[2]);
-                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(firstDrop[2]);
-            end
-        end
-
-    elseif (sourceData.worldDrop) then
-        entry.recipeSource = "W";
-
-    elseif (sourceData.quest) then
-        entry.recipeSource = "Q";
-    end
+    entry.recipe.vendors = sourceData.vendors;
+    entry.recipe.drops = sourceData.drops;
+    entry.recipe.worldDrop = sourceData.worldDrop;
+    entry.recipe.quest = sourceData.quest;
 end
 
 --- Determine equip location for an enchantment based on spell name patterns.
