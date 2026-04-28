@@ -833,7 +833,7 @@ function SkillsListPanel:AddSkills()
     for _, skillData in ipairs(self.skills) do
         local players = skillData.players or (skillData.skill and skillData.skill.players);
         if (players) then
-            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(players, 12), ", ");
+            skillData.playerNamesText = table.concat(playerService:CombinePlayerNames(players, 12, skillData.professionId, skillData.skillId), ", ");
         end
     end
 

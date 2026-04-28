@@ -151,13 +151,49 @@ function PlayerService:IsCurrentPlayer(name)
 end
 
 --- Format palyer names.
-function PlayerService:CombinePlayerNames(playerNames, maxAmount)
+function PlayerService:CombinePlayerNames(playerNames, maxAmount, professionId, skillId)
     -- prepare values
     local localeService = self:GetService("locale");
     local containsCurrentPlayer = false;
     local ownPlayerNames = {};
     local onlinePlayers = {};
     local offlinePlayers = {};
+    local onlineSpecialists = {};
+    local offlineSpecialists = {};
+
+    -- determine which specialization spell IDs match this skill
+    local matchingSpecSpellIds = nil;
+    if (professionId and skillId) then
+        local specializationSpells = self:GetModel("specialization-spells");
+        local specs = specializationSpells and specializationSpells[professionId];
+        if (specs) then
+            local skillData = self:GetService("skills"):GetSkillById(skillId);
+            if (skillData) then
+                local itemClassId = skillData.classId;
+                local itemSubclassId = skillData.subclassId;
+                matchingSpecSpellIds = {};
+                for _, spec in ipairs(specs) do
+                    if (spec.matchClassId) then
+                        if (itemClassId == spec.matchClassId) then
+                            if (spec.matchSubclassIds) then
+                                for _, subId in ipairs(spec.matchSubclassIds) do
+                                    if (itemSubclassId == subId) then
+                                        table.insert(matchingSpecSpellIds, spec.spellId);
+                                        break;
+                                    end
+                                end
+                            else
+                                table.insert(matchingSpecSpellIds, spec.spellId);
+                            end
+                        end
+                    end
+                end
+                if (#matchingSpecSpellIds == 0) then
+                    matchingSpecSpellIds = nil;
+                end
+            end
+        end
+    end
 
     -- iterate all player names
     for _, playerName in ipairs(playerNames) do
@@ -180,11 +216,29 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                     table.insert(ownPlayerNames, shortPlayerName);
                 end
             else
+                -- check if player has matching specialization for this skill
+                local isSpecialist = false;
+                if (matchingSpecSpellIds and PM_Specializations[playerName]) then
+                    local playerSpecSpellId = PM_Specializations[playerName][professionId];
+                    if (playerSpecSpellId) then
+                        for _, matchSpellId in ipairs(matchingSpecSpellIds) do
+                            if (playerSpecSpellId == matchSpellId) then
+                                isSpecialist = true;
+                                break;
+                            end
+                        end
+                    end
+                end
+
                 -- check if is online
                 local guildPlayer = self.guildmates[playerName];
                 if (guildPlayer and guildPlayer.online) then
                     -- set online player
-                    onlinePlayers[shortPlayerName] = {};
+                    if (isSpecialist) then
+                        onlineSpecialists[shortPlayerName] = {};
+                    else
+                        onlinePlayers[shortPlayerName] = {};
+                    end
                 else
                     -- find character set
                     local addToOffline = true;
@@ -223,15 +277,24 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                                 for _, twinkNameOnline in pairs(twinkNamesOnline) do
                                     -- add short online twink name to online players if not already added
                                     local shortTwinkNameOnline = self:GetShortName(twinkNameOnline);
-                                    if (not onlinePlayers[shortTwinkNameOnline]) then
-                                        onlinePlayers[shortTwinkNameOnline] = {};
-                                    end
-
-                                    -- check if is in guild
-                                    if (self.guildmates[playerName]) then
-                                        table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
+                                    if (isSpecialist) then
+                                        if (not onlineSpecialists[shortTwinkNameOnline]) then
+                                            onlineSpecialists[shortTwinkNameOnline] = {};
+                                        end
+                                        if (self.guildmates[playerName]) then
+                                            table.insert(onlineSpecialists[shortTwinkNameOnline], shortPlayerName);
+                                        else
+                                            table.insert(onlineSpecialists[shortTwinkNameOnline], "alt");
+                                        end
                                     else
-                                        table.insert(onlinePlayers[shortTwinkNameOnline], "alt");
+                                        if (not onlinePlayers[shortTwinkNameOnline]) then
+                                            onlinePlayers[shortTwinkNameOnline] = {};
+                                        end
+                                        if (self.guildmates[playerName]) then
+                                            table.insert(onlinePlayers[shortTwinkNameOnline], shortPlayerName);
+                                        else
+                                            table.insert(onlinePlayers[shortTwinkNameOnline], "alt");
+                                        end
                                     end
                                 end
                             end
@@ -242,15 +305,26 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
                     if (addToOffline) then
                         if (self.guildmates[playerName]) then
                             -- add to offline players
-                            table.insert(offlinePlayers, shortPlayerName);
+                            if (isSpecialist) then
+                                table.insert(offlineSpecialists, shortPlayerName);
+                            else
+                                table.insert(offlinePlayers, shortPlayerName);
+                            end
                         elseif (characterSet) then
                             local guildTwinkName = nil;
                             local characterSetExists = false;
                             for _, twinkName in ipairs(characterSet) do
                                 local shortTwinkName = self:GetShortName(twinkName);
-                                if (self:ListContains(offlinePlayers, shortTwinkName)) then
-                                    characterSetExists = true;
-                                    break;
+                                if (isSpecialist) then
+                                    if (self:ListContains(offlineSpecialists, shortTwinkName)) then
+                                        characterSetExists = true;
+                                        break;
+                                    end
+                                else
+                                    if (self:ListContains(offlinePlayers, shortTwinkName)) then
+                                        characterSetExists = true;
+                                        break;
+                                    end
                                 end
                                 
                                 -- get guild twink name
@@ -261,7 +335,11 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
 
                             -- check if guild twink name found and not added already
                             if (not characterSetExists and guildTwinkName) then
-                                table.insert(offlinePlayers, guildTwinkName);
+                                if (isSpecialist) then
+                                    table.insert(offlineSpecialists, guildTwinkName);
+                                else
+                                    table.insert(offlinePlayers, guildTwinkName);
+                                end
                             end
                         end
                     end
@@ -283,6 +361,24 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
         table.insert(result, "|cff00ee00" .. localeService:Get("You") .. " (" .. table.concat(ownPlayerNames, ", ") .. ")");
     end
 
+    -- add online specialists (light blue)
+    table.sort(onlineSpecialists, function(a, b)
+        return a < b;
+    end);
+    for onlineSpecialistName, onlineSpecialistTwinks in pairs(onlineSpecialists) do
+        if (maxAmount and #result >= maxAmount) then
+            table.insert(result, "...");
+            break;
+        end
+        if (#onlineSpecialistTwinks == 1) then
+            table.insert(result, "|cff71d5ff" .. onlineSpecialistName .. " (" .. onlineSpecialistTwinks[1] .. ")");
+        elseif (#onlineSpecialistTwinks > 1) then
+            table.insert(result, "|cff71d5ff" .. onlineSpecialistName .. " (alt)");
+        else
+            table.insert(result, "|cff71d5ff" .. onlineSpecialistName);
+        end
+    end
+
     -- add online players
     table.sort(onlinePlayers, function(a, b)
         return a < b;
@@ -298,6 +394,21 @@ function PlayerService:CombinePlayerNames(playerNames, maxAmount)
             table.insert(result, "|cffffffff" .. onlinePlayerName .. " (alt)");
         else
             table.insert(result, "|cffffffff" .. onlinePlayerName);
+        end
+    end
+
+    -- check maximum amount
+    if (not maxAmount or #result < maxAmount) then
+        -- add offline specialists (faded light blue)
+        table.sort(offlineSpecialists, function(a, b)
+            return a < b;
+        end);
+        for _, offlineSpecialist in ipairs(offlineSpecialists) do
+            if (maxAmount and #result >= maxAmount) then
+                table.insert(result, "...");
+                break;
+            end
+            table.insert(result, "|cff448099" .. offlineSpecialist);
         end
     end
 
