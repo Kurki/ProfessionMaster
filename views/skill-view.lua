@@ -195,8 +195,9 @@ function SkillView:RefreshRecipeLabels(skillInfo)
         return;
     end
 
-    -- show one label per recipe
+    -- show recipes comma-separated on a single line with individual click regions
     local tooltipService = self:GetService("tooltip");
+    local offsetX = 16;
     for index, recipe in ipairs(skillInfo.recipes) do
         if (recipe.itemLink) then
             local label = self.recipeLabels[index];
@@ -212,15 +213,21 @@ function SkillView:RefreshRecipeLabels(skillInfo)
                 self.recipeLabels[index] = label;
             end
 
-            -- position: stack from bottom-left upward
+            -- position: inline from left
             label:ClearAllPoints();
-            label:SetPoint("BOTTOMLEFT", 16, 14 + (index - 1) * 16);
+            label:SetPoint("BOTTOMLEFT", offsetX, 14);
 
-            -- set text
+            -- set text (add comma separator for all but last)
             local recipeColor = recipe.itemColor or "FF1EFF00";
             local recipeText = "|c" .. recipeColor .. (recipe.name or "") .. "|r";
+            if (index < #skillInfo.recipes) then
+                recipeText = recipeText .. ",";
+            end
             label.text:SetText(recipeText);
             label:SetWidth(label.text:GetStringWidth() + 4);
+
+            -- advance horizontal offset
+            offsetX = offsetX + label.text:GetStringWidth() + 6;
 
             -- bind tooltip to this specific recipe
             label.recipe = recipe;

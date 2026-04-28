@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 13;
+local SKILL_CACHE_VERSION = 14;
 
 --- Initialize service.
 function SkillsService:Initialize()

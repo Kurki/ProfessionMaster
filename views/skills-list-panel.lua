@@ -66,6 +66,7 @@ function SkillsListPanel:Create(parentFrame, professionsView)
         end
         self.searchPending = C_Timer.NewTimer(0.2, function()
             self.searchPending = nil;
+            PM_CharacterSettings.lastSearchText = self.itemSearch:GetText();
             self:AddSkills();
         end);
     end);
@@ -301,9 +302,18 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     otherGroupText:SetFont("Fonts\\FRIZQT__.TTF", 10);
     self.otherGroupText = otherGroupText;
 
-    -- select first profession
-    self:SelectProfession(PM_Settings.lastProfession or 0);
-    self:SelectAddon(PM_Settings.lastAddon);
+    -- restore last settings
+    self:SelectProfession(PM_CharacterSettings.lastProfession or 0);
+    self:SelectAddon(PM_CharacterSettings.lastAddon);
+    if (PM_CharacterSettings.lastCategory) then
+        self:SelectCategory(PM_CharacterSettings.lastCategory);
+        if (PM_CharacterSettings.lastSubcategory) then
+            self:SelectSubcategory(PM_CharacterSettings.lastSubcategory);
+        end
+    end
+    if (PM_CharacterSettings.lastSearchText and PM_CharacterSettings.lastSearchText ~= "") then
+        self.itemSearch:SetText(PM_CharacterSettings.lastSearchText);
+    end
 end
 
 --- Handle resize event.
@@ -378,7 +388,7 @@ end
 -- @param professionId Profession ID.
 function SkillsListPanel:SelectProfession(professionId)
     self.professionId = professionId;
-    PM_Settings.lastProfession = professionId;
+    PM_CharacterSettings.lastProfession = professionId;
     UIDropDownMenu_SetText(self.professionSelection, self:GetProfessionText(professionId));
     self:SelectCategory(nil);
 end
@@ -412,7 +422,7 @@ function SkillsListPanel:SelectAddon(addonId)
         addonId = nil;
     end
     self.addonId = addonId;
-    PM_Settings.lastAddon = addonId;
+    PM_CharacterSettings.lastAddon = addonId;
     if (self.addonSelection) then
         UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
     end
@@ -422,6 +432,8 @@ end
 function SkillsListPanel:SelectCategory(categoryId)
     self.categoryId = categoryId;
     self.subcategoryId = nil;
+    PM_CharacterSettings.lastCategory = categoryId;
+    PM_CharacterSettings.lastSubcategory = nil;
     if (not self.categorySelection) then
         return;
     end
@@ -448,6 +460,7 @@ end
 --- Select subcategory filter.
 function SkillsListPanel:SelectSubcategory(subcategoryId)
     self.subcategoryId = subcategoryId;
+    PM_CharacterSettings.lastSubcategory = subcategoryId;
     if (not self.subcategorySelection) then
         return;
     end

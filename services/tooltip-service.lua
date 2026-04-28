@@ -250,7 +250,11 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
     if (recipe.drops and #recipe.drops > 0) then
         GameTooltip:AddLine(" ");
         GameTooltip:AddLine("|cffffd100" .. localeService:Get("SkillViewDroppedBy") .. "|r");
-        for _, drop in ipairs(recipe.drops) do
+        for i, drop in ipairs(recipe.drops) do
+            if (i > 20) then
+                GameTooltip:AddLine("|cff999999...|r");
+                break;
+            end
             local dropName = drop[1] or "?";
             local locationText = self:GetZoneName(drop[2]);
             if (locationText) then
