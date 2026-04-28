@@ -32,6 +32,7 @@ $excludePatterns = @(
     '(^|\\)\.git(\\|$)',
     '(^|\\)\.github(\\|$)',
     '(^|\\)\.vscode(\\|$)',
+    '(^|\\)tools(\\|$)',
     '(^|\\)deploy.*\.bat$',
     '(^|\\)version\.txt$',
     '(^|\\)watch-addon\.ps1$'

@@ -38,6 +38,6 @@ ProfessionMaster.lua
 models\models.xml
 models\messages\messages.xml
 models\skills\vanilla.lua
-models\recipe-sources.lua
+models\recipe-sources\vanilla.lua
 services\services.xml
 views\views.xml

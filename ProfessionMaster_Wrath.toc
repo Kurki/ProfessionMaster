@@ -40,6 +40,8 @@ models\messages\messages.xml
 models\skills\vanilla.lua
 models\skills\bcc.lua
 models\skills\wrath.lua
-models\recipe-sources.lua
+models\recipe-sources\vanilla.lua
+models\recipe-sources\bcc.lua
+models\recipe-sources\wrath.lua
 services\services.xml
 views\views.xml

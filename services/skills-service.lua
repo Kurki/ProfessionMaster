@@ -79,6 +79,28 @@ function SkillsService:BuildCache()
         self:MergeSourceSkills(sourceSkills, 5, self:GetModel('mop-skills'));
     end
 
+    -- merge per-expansion recipe source models (later expansions override earlier)
+    local mergedRecipeSources = {};
+    self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-vanilla'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-bcc'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-wrath'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-cata'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-mop'));
+    end
+
+    self.recipeSources = mergedRecipeSources;
+
     -- build PM_Skills from source data
     for skillId, skillInfo in pairs(sourceSkills) do
         self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService, bopItems);
@@ -108,6 +130,15 @@ function SkillsService:BuildCache()
                 end
             end
         end
+    end
+end
+
+--- Merge recipe source data from a per-expansion model into the target table.
+--- Later expansions override earlier entries for the same item.
+function SkillsService:MergeRecipeSources(targetTable, expansionSources)
+    if (not expansionSources) then return; end
+    for recipeItemId, sourceData in pairs(expansionSources) do
+        targetTable[recipeItemId] = sourceData;
     end
 end
 
@@ -232,27 +263,31 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
     end
 end
 
---- Load recipe source data (vendor, drop, world drop, quest) into a cache entry.
+--- Load recipe source data into a cache entry.
+--- Format: {vendors = {{name, mapId, side}}, drops = {{name, mapId}}, worldDrop = bool, quest = bool}
 function SkillsService:LoadRecipeSource(entry, recipeItemId)
-    local recipeSources = self:GetModel("recipe-sources");
-    if (not recipeSources) then return; end
+    if (not self.recipeSources) then return; end
 
-    local sourceData = recipeSources[recipeItemId];
+    local sourceData = self.recipeSources[recipeItemId];
     if (not sourceData) then return; end
 
-    entry.recipeSource = sourceData[1]; -- "V", "D", "W", "Q"
+    -- Store all source types
+    entry.recipeVendors = sourceData.vendors;
+    entry.recipeDrops = sourceData.drops;
+    entry.recipeWorldDrop = sourceData.worldDrop;
+    entry.recipeQuest = sourceData.quest;
 
-    if (entry.recipeSource == "V") then
-        -- Vendors: sub-tables starting at index 2
-        -- Each: {"NpcName", mapId, "A"/"H"} or {factionId, mapId}
+    -- Determine primary source for display (vendor > drop > worldDrop > quest)
+    if (sourceData.vendors and #sourceData.vendors > 0) then
+        entry.recipeSource = "V";
+
+        -- Choose faction-appropriate vendor
         local playerFaction = UnitFactionGroup("player");
         local chosenVendor = nil;
 
-        for i = 2, #sourceData do
-            local vendor = sourceData[i];
+        for _, vendor in ipairs(sourceData.vendors) do
             local side = vendor[3];
             if (not side) then
-                -- Neutral or faction vendor - always usable
                 chosenVendor = vendor;
                 break;
             elseif (side == "A" and playerFaction == "Alliance") then
@@ -264,35 +299,36 @@ function SkillsService:LoadRecipeSource(entry, recipeItemId)
             end
         end
 
-        if (not chosenVendor) then return; end
+        -- Fallback to first vendor if no faction match
+        if (not chosenVendor) then
+            chosenVendor = sourceData.vendors[1];
+        end
 
-        -- Field 1: source name - number means faction ID, string means NPC name
-        if (type(chosenVendor[1]) == "number") then
-            local factionName = GetFactionInfoByID(chosenVendor[1]);
-            entry.recipeSourceName = factionName or tostring(chosenVendor[1]);
-        else
+        if (chosenVendor) then
             entry.recipeSourceName = chosenVendor[1];
-        end
-
-        -- Field 2: location MapID
-        if (type(chosenVendor[2]) == "number") then
-            local mapInfo = C_Map.GetMapInfo(chosenVendor[2]);
-            entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(chosenVendor[2]);
-        end
-
-    elseif (entry.recipeSource == "D") then
-        -- Drops: sub-tables starting at index 2
-        -- Each: {"BossName", mapId}
-        local firstBoss = sourceData[2];
-        if (firstBoss) then
-            entry.recipeSourceName = firstBoss[1];
-            if (type(firstBoss[2]) == "number") then
-                local mapInfo = C_Map.GetMapInfo(firstBoss[2]);
-                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(firstBoss[2]);
+            if (type(chosenVendor[2]) == "number") then
+                local mapInfo = C_Map.GetMapInfo(chosenVendor[2]);
+                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(chosenVendor[2]);
             end
         end
+
+    elseif (sourceData.drops and #sourceData.drops > 0) then
+        entry.recipeSource = "D";
+        local firstDrop = sourceData.drops[1];
+        if (firstDrop) then
+            entry.recipeSourceName = firstDrop[1];
+            if (type(firstDrop[2]) == "number") then
+                local mapInfo = C_Map.GetMapInfo(firstDrop[2]);
+                entry.recipeSourceLocation = mapInfo and mapInfo.name or tostring(firstDrop[2]);
+            end
+        end
+
+    elseif (sourceData.worldDrop) then
+        entry.recipeSource = "W";
+
+    elseif (sourceData.quest) then
+        entry.recipeSource = "Q";
     end
-    -- "W" and "Q" have no sub-tables, just the source type
 end
 
 --- Determine equip location for an enchantment based on spell name patterns.
@@ -367,5 +403,10 @@ function SkillsService:FreeSkillModels()
     modelTypes["wrath-skills"] = nil;
     modelTypes["cata-skills"] = nil;
     modelTypes["mop-skills"] = nil;
-    modelTypes["recipe-sources"] = nil;
+    modelTypes["recipe-sources-vanilla"] = nil;
+    modelTypes["recipe-sources-bcc"] = nil;
+    modelTypes["recipe-sources-wrath"] = nil;
+    modelTypes["recipe-sources-cata"] = nil;
+    modelTypes["recipe-sources-mop"] = nil;
+    self.recipeSources = nil;
 end

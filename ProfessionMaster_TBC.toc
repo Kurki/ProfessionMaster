@@ -39,6 +39,7 @@ models\models.xml
 models\messages\messages.xml
 models\skills\vanilla.lua
 models\skills\bcc.lua
-models\recipe-sources.lua
+models\recipe-sources\vanilla.lua
+models\recipe-sources\bcc.lua
 services\services.xml
 views\views.xml
