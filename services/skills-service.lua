@@ -45,8 +45,12 @@ function SkillsService:Initialize()
         if (itemId and itemId ~= 0) then
             self.allItems[itemId] = skillId;
         end
-        if (skillData.recipe and skillData.recipe.itemId) then
-            self.allRecipes[skillData.recipe.itemId] = skillId;
+        if (skillData.recipes) then
+            for _, recipe in ipairs(skillData.recipes) do
+                if (recipe.itemId) then
+                    self.allRecipes[recipe.itemId] = skillId;
+                end
+            end
         end
     end
 
@@ -111,11 +115,15 @@ function SkillsService:BuildCache()
             entry.reagents = skillInfo.reagents;
             entry.itemAmount = skillInfo.itemAmount;
             entry.addon = skillInfo.addon;
+            entry.addonIds = skillInfo.addonIds;
             entry.difficulty = skillInfo.difficulty;
-            if (skillInfo.recipeItemId) then
-                self:LoadRecipeItem(entry, skillInfo.recipeItemId, professionNamesService);
-                -- attach recipe source data (V=Vendor, D=Drop, W=WorldDrop, Q=Quest)
-                self:LoadRecipeSource(entry, skillInfo.recipeItemId);
+            if (skillInfo.recipeItemIds and #skillInfo.recipeItemIds > 0) then
+                entry.recipes = {};
+                for _, recipeItemId in ipairs(skillInfo.recipeItemIds) do
+                    local recipe = self:LoadRecipeItemData(recipeItemId, professionNamesService);
+                    self:LoadRecipeSourceData(recipe, recipeItemId);
+                    table.insert(entry.recipes, recipe);
+                end
             end
         end
     end
@@ -145,19 +153,53 @@ end
 --- Merge source skill data from an addon into the target table.
 function SkillsService:MergeSourceSkills(targetTable, addonNumber, addonData)
     for skillId, skillData in pairs(addonData) do
+        -- normalize recipe item IDs to array
+        local newRecipeItemIds = {};
+        if (type(skillData.r) == "number") then
+            newRecipeItemIds = {skillData.r};
+        elseif (type(skillData.r) == "table") then
+            newRecipeItemIds = skillData.r;
+        end
+
         local skill = {
             itemId = skillData.itemId,
             itemAmount = skillData.itemAmount,
             reagents = skillData.reagents,
             professionId = skillData.p,
             difficulty = skillData.d,
-            recipeItemId = skillData.r
+            recipeItemIds = newRecipeItemIds
         };
 
         if (targetTable[skillId]) then
             skill.addon = targetTable[skillId].addon;
+            skill.addonIds = targetTable[skillId].addonIds or {targetTable[skillId].addon};
+            -- accumulate recipe IDs from previous expansions
+            local previousRecipeItemIds = targetTable[skillId].recipeItemIds or {};
+            skill.recipeItemIds = previousRecipeItemIds;
+
+            -- check for new recipe IDs not seen in earlier expansions
+            local hasNewRecipe = false;
+            for _, newId in ipairs(newRecipeItemIds) do
+                local found = false;
+                for _, existingId in ipairs(skill.recipeItemIds) do
+                    if (existingId == newId) then
+                        found = true;
+                        break;
+                    end
+                end
+                if (not found) then
+                    hasNewRecipe = true;
+                    table.insert(skill.recipeItemIds, newId);
+                end
+            end
+
+            -- if new recipes appeared in this expansion, mark it as relevant
+            if (hasNewRecipe) then
+                table.insert(skill.addonIds, addonNumber);
+            end
         else
             skill.addon = addonNumber;
+            skill.addonIds = {addonNumber};
         end
 
         targetTable[skillId] = skill;
@@ -241,8 +283,9 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
 end
 
 --- Load recipe item data (name, link, color) into a cache entry.
-function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesService)
-    entry.recipe = {
+--- Load recipe item data and return a recipe table.
+function SkillsService:LoadRecipeItemData(recipeItemId, professionNamesService)
+    local recipe = {
         itemId = recipeItemId,
         name = nil,
         itemLink = nil,
@@ -254,27 +297,29 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
         if (not item:IsItemEmpty()) then
             pcall(function()
                 item:ContinueOnItemLoad(function()
-                    entry.recipe.name = item:GetItemName();
-                    entry.recipe.itemLink = item:GetItemLink();
-                    entry.recipe.itemColor = professionNamesService:GetItemColor(item:GetItemLink());
+                    recipe.name = item:GetItemName();
+                    recipe.itemLink = item:GetItemLink();
+                    recipe.itemColor = professionNamesService:GetItemColor(item:GetItemLink());
                 end);
             end);
         end
     end
+
+    return recipe;
 end
 
---- Load recipe source data into a cache entry's recipe sub-table.
+--- Load recipe source data into a recipe table.
 --- Format: {vendors = {{name, zone, side}}, drops = {{name, zone}}, worldDrop = bool, quest = bool}
-function SkillsService:LoadRecipeSource(entry, recipeItemId)
-    if (not self.recipeSources or not entry.recipe) then return; end
+function SkillsService:LoadRecipeSourceData(recipe, recipeItemId)
+    if (not self.recipeSources or not recipe) then return; end
 
     local sourceData = self.recipeSources[recipeItemId];
     if (not sourceData) then return; end
 
-    entry.recipe.vendors = sourceData.vendors;
-    entry.recipe.drops = sourceData.drops;
-    entry.recipe.worldDrop = sourceData.worldDrop;
-    entry.recipe.quest = sourceData.quest;
+    recipe.vendors = sourceData.vendors;
+    recipe.drops = sourceData.drops;
+    recipe.worldDrop = sourceData.worldDrop;
+    recipe.quest = sourceData.quest;
 end
 
 --- Determine equip location for an enchantment based on spell name patterns.

@@ -45,21 +45,8 @@ function SkillView:Show(skillRow, professionsView)
         playersFrame:SetPoint("BOTTOMRIGHT", view, "BOTTOMLEFT", 222, 44);
         self.playersFrame = playersFrame;
 
-        -- add recipe label
-        local recipeLabel = CreateFrame("Button", nil, view);
-        recipeLabel:SetPoint("BOTTOMLEFT", 16, 14);
-        recipeLabel:SetHeight(14);
-        recipeLabel.text = recipeLabel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
-        recipeLabel.text:SetPoint("LEFT", 0, 0);
-        recipeLabel:SetScript("OnEnter", function()
-            if (not self.recipe) then return; end
-            local tooltipService = self:GetService("tooltip");
-            tooltipService:ShowRecipeSourceTooltip(recipeLabel, self.recipe);
-        end);
-        recipeLabel:SetScript("OnLeave", function()
-            GameTooltip:Hide();
-        end);
-        self.recipeLabel = recipeLabel;
+        -- recipe labels pool
+        self.recipeLabels = {};
 
         -- add players label
         local playersLabel = playersFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -177,20 +164,8 @@ function SkillView:Show(skillRow, professionsView)
 
     self.view.titleLabel:SetText(self.addon.shortcut .. titleName);
 
-    -- update recipe label
-    self.recipe = nil;
-    if (skillInfo and skillInfo.recipe and skillInfo.recipe.itemLink) then
-        self.recipe = skillInfo.recipe;
-        local recipeColor = skillInfo.recipe.itemColor or "FF1EFF00";
-        local recipeText = "|c" .. recipeColor .. (skillInfo.recipe.name or "") .. "|r";
-
-        self.recipeLabel.text:SetText(recipeText);
-        self.recipeLabel:SetWidth(self.recipeLabel.text:GetStringWidth() + 4);
-        self.recipeLabel:Show();
-    else
-        self.recipeLabel.text:SetText("");
-        self.recipeLabel:Hide();
-    end
+    -- update recipe labels
+    self:RefreshRecipeLabels(skillInfo);
 
     -- set position
     self.view:ClearAllPoints();
@@ -207,6 +182,55 @@ function SkillView:Show(skillRow, professionsView)
 
     -- show view
     self.view:Show();
+end
+
+--- Refresh recipe labels based on skill recipes.
+function SkillView:RefreshRecipeLabels(skillInfo)
+    -- hide all existing recipe labels
+    for _, label in ipairs(self.recipeLabels) do
+        label:Hide();
+    end
+
+    if (not skillInfo or not skillInfo.recipes or #skillInfo.recipes == 0) then
+        return;
+    end
+
+    -- show one label per recipe
+    local tooltipService = self:GetService("tooltip");
+    for index, recipe in ipairs(skillInfo.recipes) do
+        if (recipe.itemLink) then
+            local label = self.recipeLabels[index];
+            if (not label) then
+                -- create new pooled label
+                label = CreateFrame("Button", nil, self.view);
+                label:SetHeight(14);
+                label.text = label:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall");
+                label.text:SetPoint("LEFT", 0, 0);
+                label:SetScript("OnLeave", function()
+                    GameTooltip:Hide();
+                end);
+                self.recipeLabels[index] = label;
+            end
+
+            -- position: stack from bottom-left upward
+            label:ClearAllPoints();
+            label:SetPoint("BOTTOMLEFT", 16, 14 + (index - 1) * 16);
+
+            -- set text
+            local recipeColor = recipe.itemColor or "FF1EFF00";
+            local recipeText = "|c" .. recipeColor .. (recipe.name or "") .. "|r";
+            label.text:SetText(recipeText);
+            label:SetWidth(label.text:GetStringWidth() + 4);
+
+            -- bind tooltip to this specific recipe
+            label.recipe = recipe;
+            label:SetScript("OnEnter", function(self)
+                tooltipService:ShowRecipeSourceTooltip(self, self.recipe);
+            end);
+
+            label:Show();
+        end
+    end
 end
 
 --- Refresh player rows (pooled).

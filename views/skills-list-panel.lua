@@ -535,7 +535,7 @@ function SkillsListPanel:CollectVisibleSkillData()
             for skillId, skillEntry in pairs(profession) do
                 local skillData = skillsService:GetSkillById(skillId);
                 if (skillData and skillData.name) then
-                    if (self.addonId == nil or self.addonId == skillData.addon) then
+                    if (self.addonId == nil or self:MatchesAddon(skillData, self.addonId)) then
                         if (skillEntry.players and playerService:HasVisiblePlayers(skillEntry.players)) then
                             table.insert(result, {professionId = professionId, skillData = skillData});
                         end
@@ -703,6 +703,15 @@ function SkillsListPanel:PopulateSubcategoryDropdown()
     end
 end
 
+--- Check if a skill matches the given addon filter.
+-- A skill matches if it originated in this addon OR has new recipes in this addon.
+function SkillsListPanel:MatchesAddon(skillData, addonId)
+    if (skillData.addonIds) then
+        return tContains(skillData.addonIds, addonId);
+    end
+    return addonId == skillData.addon;
+end
+
 --- Check if a skill matches the currently selected category and subcategory filters.
 function SkillsListPanel:MatchesCategory(skillData, professionId)
     -- no category filter
@@ -848,7 +857,7 @@ function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
         for skillId, skillEntry in pairs(profession) do
             local skillData = skillsService:GetSkillById(skillId);
             if (skillData and skillData.name ~= nil) then
-                if (addonId == nil or addonId == skillData.addon) then
+                if (addonId == nil or self:MatchesAddon(skillData, addonId)) then
                     if (self:MatchesCategory(skillData, professionId)) then
                     if (skillEntry.players and playerService:HasVisiblePlayers(skillEntry.players)) then
                         local bucketListAmount = PM_BucketList[skillId];
