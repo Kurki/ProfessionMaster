@@ -9,7 +9,7 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 12;
+local SKILL_CACHE_VERSION = 13;
 
 --- Initialize service.
 function SkillsService:Initialize()
@@ -264,7 +264,7 @@ function SkillsService:LoadRecipeItem(entry, recipeItemId, professionNamesServic
 end
 
 --- Load recipe source data into a cache entry's recipe sub-table.
---- Format: {vendors = {{name, mapId, side}}, drops = {{name, mapId}}, worldDrop = bool, quest = bool}
+--- Format: {vendors = {{name, zone, side}}, drops = {{name, zone}}, worldDrop = bool, quest = bool}
 function SkillsService:LoadRecipeSource(entry, recipeItemId)
     if (not self.recipeSources or not entry.recipe) then return; end
 

@@ -237,7 +237,7 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
         GameTooltip:AddLine("|cffffd100" .. localeService:Get("SkillViewSoldBy") .. "|r");
         for _, vendor in ipairs(recipe.vendors) do
             local vendorName = vendor[1] or "?";
-            local locationText = self:GetMapName(vendor[2]);
+            local locationText = self:GetZoneName(vendor[2]);
             if (locationText) then
                 GameTooltip:AddLine("|cffffffff" .. vendorName .. " - " .. locationText .. "|r");
             else
@@ -252,7 +252,7 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
         GameTooltip:AddLine("|cffffd100" .. localeService:Get("SkillViewDroppedBy") .. "|r");
         for _, drop in ipairs(recipe.drops) do
             local dropName = drop[1] or "?";
-            local locationText = self:GetMapName(drop[2]);
+            local locationText = self:GetZoneName(drop[2]);
             if (locationText) then
                 GameTooltip:AddLine("|cffffffff" .. dropName .. " - " .. locationText .. "|r");
             else
@@ -286,9 +286,8 @@ function TooltipService:HexToRgb(hex)
     return r, g, b;
 end
 
---- Get a map name by map ID, or nil if unknown.
-function TooltipService:GetMapName(mapId)
-    if (type(mapId) ~= "number") then return nil; end
-    local mapInfo = C_Map.GetMapInfo(mapId);
-    return mapInfo and mapInfo.name or nil;
+--- Get a zone name from an entry. Zone is now stored as a string directly.
+function TooltipService:GetZoneName(zone)
+    if (type(zone) == "string" and zone ~= "") then return zone; end
+    return nil;
 end
