@@ -438,30 +438,281 @@ function UiService:CreateTab(container, caption)
     return tab;
 end
 
---- Create edit box.
+--- Create edit box with dark flat styling.
+-- @param container Parent frame.
+-- @param width Width in pixels.
+-- @return Container frame with .editBox (the EditBox) and :GetText() / :SetText() helpers.
 function UiService:CreateEditBox(container, width)
-    local editBoxCotnainer = CreateFrame("Frame", nil, container, BackdropTemplateMixin and "BackdropTemplate");
-    editBoxCotnainer:SetBackdrop({
-        bgFile = [[Interface\Buttons\WHITE8x8]]
+    local frame = CreateFrame("Frame", nil, container, BackdropTemplateMixin and "BackdropTemplate");
+    frame:SetBackdrop({
+        bgFile = [[Interface/Buttons/WHITE8X8]],
+        edgeFile = [[Interface/Buttons/WHITE8X8]],
+        edgeSize = 1
     });
-    editBoxCotnainer:SetBackdropColor(1, 1, 1, 0.2);
-    editBoxCotnainer:SetWidth(width);
-    editBoxCotnainer:SetHeight(20);
-    local editBox = CreateFrame("EditBox", nil, editBoxCotnainer);
+    frame:SetBackdropColor(0.12, 0.12, 0.12, 0.95);
+    frame:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    frame:SetWidth(width);
+    frame:SetHeight(22);
+
+    local editBox = CreateFrame("EditBox", nil, frame);
     editBox:SetFontObject("ChatFontNormal");
-    editBox:SetPoint("TOPLEFT", 4, -2);
-    editBox:SetPoint("BOTTOMRIGHT", -4, 2);
+    editBox:SetPoint("TOPLEFT", 6, -3);
+    editBox:SetPoint("BOTTOMRIGHT", -6, 3);
     editBox:SetAutoFocus(false);
-    editBoxCotnainer.text = editBox;
-    return editBoxCotnainer;
+    frame.editBox = editBox;
+
+    -- hover highlight
+    frame:SetScript("OnEnter", function(self)
+        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.62);
+    end);
+    frame:SetScript("OnLeave", function(self)
+        if (not editBox:HasFocus()) then
+            self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+        end
+    end);
+
+    -- focus highlight
+    editBox:SetScript("OnEditFocusGained", function()
+        frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 0.8);
+    end);
+    editBox:SetScript("OnEditFocusLost", function()
+        frame:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    end);
+
+    -- convenience helpers
+    function frame:GetText()
+        return editBox:GetText();
+    end
+    function frame:SetText(text)
+        editBox:SetText(text or "");
+    end
+    function frame:SetPlaceholder(text)
+        if (not self.placeholder) then
+            local placeholder = frame:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall");
+            placeholder:SetPoint("LEFT", 6, 0);
+            self.placeholder = placeholder;
+            editBox:HookScript("OnTextChanged", function()
+                placeholder:SetShown(editBox:GetText() == "");
+            end);
+            editBox:HookScript("OnEditFocusGained", function()
+                placeholder:Hide();
+            end);
+            editBox:HookScript("OnEditFocusLost", function()
+                placeholder:SetShown(editBox:GetText() == "");
+            end);
+        end
+        self.placeholder:SetText(text);
+        self.placeholder:SetShown(editBox:GetText() == "");
+    end
+
+    return frame;
 end
 
---- Create edit box.
+--- Create number edit box (right-aligned text).
+-- @param container Parent frame.
+-- @param width Width in pixels.
 function UiService:CreateNumberEditBox(container, width)
-    -- create edit box
-    local editBox = self:CreateEditBox(container, width);
-    editBox.text:SetJustifyH("RIGHT");
-    return editBox;
+    local frame = self:CreateEditBox(container, width);
+    frame.editBox:SetJustifyH("RIGHT");
+    return frame;
+end
+
+-- registry of all dropdown instances for mutual close behavior
+UiService.openDropdowns = UiService.openDropdowns or {};
+
+--- Close all open dropdowns except the given one.
+function UiService:CloseOtherDropdowns(exceptFrame)
+    for _, dropdown in ipairs(self.openDropdowns) do
+        if (dropdown ~= exceptFrame and dropdown.menuFrame and dropdown.menuFrame:IsShown()) then
+            dropdown.menuFrame:Hide();
+        end
+    end
+end
+
+--- Create dropdown with dark flat styling.
+-- @param container Parent frame.
+-- @param width Width in pixels.
+-- @param items Table of items: { { value = ..., text = "..." }, ... }
+-- @param onSelect Callback function(value, text) called when an item is selected.
+-- @return Dropdown frame with :SetValue(value), :GetValue(), :SetItems(items).
+function UiService:CreateDropdown(container, width, items, onSelect)
+    local frame = CreateFrame("Frame", nil, container, BackdropTemplateMixin and "BackdropTemplate");
+    frame:SetBackdrop({
+        bgFile = [[Interface/Buttons/WHITE8X8]],
+        edgeFile = [[Interface/Buttons/WHITE8X8]],
+        edgeSize = 1
+    });
+    frame:SetBackdropColor(0.12, 0.12, 0.12, 0.95);
+    frame:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    frame:SetWidth(width);
+    frame:SetHeight(22);
+
+    -- selected text label
+    local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
+    label:SetPoint("LEFT", 6, 0);
+    label:SetPoint("RIGHT", -18, 0);
+    label:SetJustifyH("LEFT");
+    frame.label = label;
+
+    -- arrow indicator
+    local arrow = frame:CreateTexture(nil, "OVERLAY");
+    arrow:SetSize(8, 8);
+    arrow:SetPoint("RIGHT", -6, 0);
+    arrow:SetTexture([[Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up]]);
+    arrow:SetTexCoord(0.25, 0.75, 0.25, 0.75);
+    arrow:SetVertexColor(0.8, 0.8, 0.8);
+
+    -- state
+    frame.items = items or {};
+    frame.selectedValue = nil;
+    frame.onSelect = onSelect;
+    frame.menuFrame = nil;
+
+    -- hover highlight
+    frame:SetScript("OnEnter", function(self)
+        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.62);
+    end);
+    frame:SetScript("OnLeave", function(self)
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.45);
+    end);
+
+    -- close menu helper
+    local function CloseMenu()
+        if (frame.menuFrame and frame.menuFrame:IsShown()) then
+            frame.menuFrame:Hide();
+        end
+    end
+
+    -- register in dropdown list
+    table.insert(UiService.openDropdowns, frame);
+
+    -- build and show menu
+    local function ShowMenu()
+        if (frame.menuFrame and frame.menuFrame:IsShown()) then
+            CloseMenu();
+            return;
+        end
+
+        -- close any other open dropdown
+        UiService:CloseOtherDropdowns(frame);
+
+        if (not frame.menuFrame) then
+            local menu = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate");
+            menu:SetBackdrop({
+                bgFile = [[Interface/Buttons/WHITE8X8]],
+                edgeFile = [[Interface/Buttons/WHITE8X8]],
+                edgeSize = 1
+            });
+            menu:SetBackdropColor(0.1, 0.1, 0.1, 0.97);
+            menu:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.6);
+            menu:SetFrameStrata("FULLSCREEN_DIALOG");
+            menu:SetClampedToScreen(true);
+            menu:Hide();
+            frame.menuFrame = menu;
+        end
+
+        local menu = frame.menuFrame;
+
+        -- clear old rows
+        if (menu.rows) then
+            for _, row in ipairs(menu.rows) do
+                row:Hide();
+            end
+        end
+        menu.rows = {};
+
+        local rowHeight = 18;
+        local menuWidth = width;
+        local itemCount = #frame.items;
+        local menuHeight = itemCount * rowHeight + 4;
+        menu:SetWidth(menuWidth);
+        menu:SetHeight(menuHeight);
+        menu:ClearAllPoints();
+        menu:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, -1);
+
+        for index, item in ipairs(frame.items) do
+            local row = CreateFrame("Button", nil, menu, BackdropTemplateMixin and "BackdropTemplate");
+            row:SetHeight(rowHeight);
+            row:SetPoint("TOPLEFT", 1, -(2 + (index - 1) * rowHeight));
+            row:SetPoint("TOPRIGHT", -1, -(2 + (index - 1) * rowHeight));
+            row:SetBackdrop({
+                bgFile = [[Interface/Buttons/WHITE8X8]]
+            });
+            row:SetBackdropColor(0, 0, 0, 0);
+
+            local rowLabel = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall");
+            rowLabel:SetPoint("LEFT", 5, 0);
+            rowLabel:SetPoint("RIGHT", -5, 0);
+            rowLabel:SetJustifyH("LEFT");
+            rowLabel:SetText(item.text);
+
+            -- highlight selected item
+            if (item.value == frame.selectedValue) then
+                row:SetBackdropColor(0.2, 0.2, 0.2, 0.8);
+            end
+
+            row:SetScript("OnEnter", function(self)
+                self:SetBackdropColor(0.25, 0.25, 0.25, 0.9);
+            end);
+            row:SetScript("OnLeave", function(self)
+                if (item.value == frame.selectedValue) then
+                    self:SetBackdropColor(0.2, 0.2, 0.2, 0.8);
+                else
+                    self:SetBackdropColor(0, 0, 0, 0);
+                end
+            end);
+            row:SetScript("OnClick", function()
+                frame.selectedValue = item.value;
+                label:SetText(item.text);
+                CloseMenu();
+                if (frame.onSelect) then
+                    frame.onSelect(item.value, item.text);
+                end
+            end);
+            table.insert(menu.rows, row);
+        end
+
+        menu:Show();
+    end
+
+    -- click to toggle menu
+    frame:EnableMouse(true);
+    frame:SetScript("OnMouseDown", function()
+        ShowMenu();
+    end);
+
+    -- close menu when clicking elsewhere
+    frame:SetScript("OnHide", function()
+        CloseMenu();
+    end);
+
+    -- public API
+    function frame:SetValue(value)
+        self.selectedValue = value;
+        for _, item in ipairs(self.items) do
+            if (item.value == value) then
+                label:SetText(item.text);
+                return;
+            end
+        end
+        label:SetText("");
+    end
+
+    function frame:GetValue()
+        return self.selectedValue;
+    end
+
+    function frame:SetItems(newItems)
+        self.items = newItems or {};
+    end
+
+    -- set initial display
+    if (#frame.items > 0) then
+        label:SetText(frame.items[1].text);
+        frame.selectedValue = frame.items[1].value;
+    end
+
+    return frame;
 end
 
 --- Create check button.

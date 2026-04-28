@@ -39,15 +39,17 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     itemSearchLabel:SetPoint("TOPLEFT", 18, -15);
     itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
     self.itemSearchLabel = itemSearchLabel;
-    local itemSearch = CreateFrame("EditBox", nil, frame, "InputBoxTemplate");
-    itemSearch:SetPoint("TOPLEFT", 22, -33);
+    local itemSearchContainer = uiService:CreateEditBox(frame, 100);
+    itemSearchContainer:SetPoint("TOPLEFT", 18, -33);
     if (professionsView.addon.isVanilla) then
-        itemSearch:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -199, -56);
+        itemSearchContainer:SetPoint("RIGHT", frame, "RIGHT", -199, 0);
     else
-        itemSearch:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -332, -56);
+        itemSearchContainer:SetPoint("RIGHT", frame, "RIGHT", -332, 0);
     end
-    itemSearch:SetAutoFocus(false);
+    itemSearchContainer:SetHeight(22);
+    local itemSearch = itemSearchContainer.editBox;
     self.itemSearch = itemSearch;
+    self.itemSearchContainer = itemSearchContainer;
     itemSearch:SetScript("OnKeyDown", function(_, key)
         if (key == "ESCAPE") then
             if (professionsView.skillViewVisible) then
@@ -66,7 +68,7 @@ function SkillsListPanel:Create(parentFrame, professionsView)
         end
         self.searchPending = C_Timer.NewTimer(0.2, function()
             self.searchPending = nil;
-            PM_CharacterSettings.lastSearchText = self.itemSearch:GetText();
+            PM_CharacterSettings.lastSearchText = itemSearch:GetText();
             self:AddSkills();
         end);
     end);
@@ -75,124 +77,61 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     local professionLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     professionLabel:SetText(localeService:Get("ProfessionsViewProfession"));
     self.professionLabel = professionLabel;
-    local professionSelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-    professionSelection:ClearAllPoints();
+
+    -- build profession items for dropdown
+    local professionItems = {{ value = 0, text = self:GetProfessionText(0) }};
+    for _, professionId in ipairs(professionIds) do
+        table.insert(professionItems, { value = professionId, text = self:GetProfessionText(professionId) });
+    end
+    if (not professionsView.addon.isVanilla) then
+        table.insert(professionItems, { value = -1, text = self:GetProfessionText(-1) });
+    end
+
+    local professionSelection = uiService:CreateDropdown(frame, 160, professionItems, function(value)
+        self:SelectProfession(value);
+        self.itemSearch:SetFocus();
+        self:AddSkills();
+    end);
     if (professionsView.addon.isVanilla) then
         professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -190, -15);
-        professionSelection:SetPoint("TOPRIGHT", -20, -31);
+        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -192, -31);
     else
         professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -323, -15);
-        professionSelection:SetPoint("TOPRIGHT", -153, -31);
-    end
-    UIDropDownMenu_SetWidth(professionSelection, 140);
-    if (professionSelection.Button) then
-        professionSelection.Button:HookScript("OnClick", function()
-            C_Timer.After(0, function()
-                if (DropDownList1 and DropDownList1:IsShown() and DropDownList1.dropdown == professionSelection) then
-                    DropDownList1:ClearAllPoints();
-                    DropDownList1:SetPoint("TOPRIGHT", professionSelection, "BOTTOMRIGHT", -18, 6);
-                end
-            end);
-        end);
+        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -325, -31);
     end
     self.professionSelection = professionSelection;
-    UIDropDownMenu_Initialize(professionSelection, function()
-        -- create item
-        local item = UIDropDownMenu_CreateInfo();
-        item.notCheckable = true;
-        item.func = function(_self, professionId, arg2)
-            self:SelectProfession(professionId);
-            self.itemSearch:SetFocus();
-            self:AddSkills();
-        end;
-
-        -- add all date
-        item.text, item.arg1 = self:GetProfessionText(0), 0;
-        UIDropDownMenu_AddButton(item);
-
-        -- add dates
-        for i, professionId in ipairs(professionIds) do
-            item.text, item.arg1 = self:GetProfessionText(professionId), professionId;
-            UIDropDownMenu_AddButton(item);
-        end
-
-        -- add all specializations entry (non-vanilla only)
-        if (not professionsView.addon.isVanilla) then
-            local separator = UIDropDownMenu_CreateInfo();
-            separator.notCheckable = true;
-            separator.isTitle = true;
-            separator.disabled = true;
-            separator.text = "";
-            UIDropDownMenu_AddButton(separator);
-
-            item.text, item.arg1 = self:GetProfessionText(-1), -1;
-            UIDropDownMenu_AddButton(item);
-        end
-    end);
 
     -- check if is not vanilla
     if (not professionsView.addon.isVanilla) then
         -- add addon selection
         local addonLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        addonLabel:SetPoint("TOPRIGHT", -130, -15);
+        addonLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -155, -15);
         addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
         self.addonLabel = addonLabel;
-        local addonSelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-        addonSelection:ClearAllPoints();
-        addonSelection:SetPoint("TOPRIGHT", -20, -31);
-        UIDropDownMenu_SetWidth(addonSelection, 110);
-        if (addonSelection.Button) then
-            addonSelection.Button:HookScript("OnClick", function()
-                C_Timer.After(0, function()
-                    if (DropDownList1 and DropDownList1:IsShown() and DropDownList1.dropdown == addonSelection) then
-                        DropDownList1:ClearAllPoints();
-                        DropDownList1:SetPoint("TOPRIGHT", addonSelection, "BOTTOMRIGHT", -18, 6);
-                    end
-                end);
-            end);
+
+        -- build addon items
+        local addonItems = {{ value = nil, text = self:GetAddonText(nil) }};
+        table.insert(addonItems, { value = 1, text = self:GetAddonText(1) });
+        if (professionsView.addon.isBccAtLeast) then
+            table.insert(addonItems, { value = 2, text = self:GetAddonText(2) });
         end
-        self.addonSelection = addonSelection;
-        UIDropDownMenu_Initialize(addonSelection, function()
-            local item = UIDropDownMenu_CreateInfo();
-            item.notCheckable = true;
-            item.func = function(_self, addonId, arg2)
-                self:SelectAddon(addonId);
-                self.itemSearch:SetFocus();
-                self:AddSkills();
-            end;
+        if (professionsView.addon.isWrathAtLeast) then
+            table.insert(addonItems, { value = 3, text = self:GetAddonText(3) });
+        end
+        if (professionsView.addon.isCataAtLeast) then
+            table.insert(addonItems, { value = 4, text = self:GetAddonText(4) });
+        end
+        if (professionsView.addon.isMopAtLeast) then
+            table.insert(addonItems, { value = 5, text = self:GetAddonText(5) });
+        end
 
-            -- add all addons
-            item.text, item.arg1 = self:GetAddonText(nil), nil;
-            UIDropDownMenu_AddButton(item);
-
-            -- add vanilla
-            item.text, item.arg1 = self:GetAddonText(1), 1;
-            UIDropDownMenu_AddButton(item);
-
-            -- add bcc
-            if (professionsView.addon.isBccAtLeast) then
-                item.text, item.arg1 = self:GetAddonText(2), 2;
-                UIDropDownMenu_AddButton(item);
-            end
-
-            -- add wrath
-            if (professionsView.addon.isWrathAtLeast) then
-                item.text, item.arg1 = self:GetAddonText(3), 3;
-                UIDropDownMenu_AddButton(item);
-            end
-
-            -- add cata
-            if (professionsView.addon.isCataAtLeast) then
-                item.text, item.arg1 = self:GetAddonText(4), 4;
-                UIDropDownMenu_AddButton(item);
-            end
-
-            -- add mop
-            if (professionsView.addon.isMopAtLeast) then
-                item.text, item.arg1 = self:GetAddonText(5), 5;
-                UIDropDownMenu_AddButton(item);
-            end
+        local addonSelection = uiService:CreateDropdown(frame, 130, addonItems, function(value)
+            self:SelectAddon(value);
+            self.itemSearch:SetFocus();
+            self:AddSkills();
         end);
+        addonSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -157, -31);
+        self.addonSelection = addonSelection;
     end
 
     -- add category filter dropdown
@@ -200,41 +139,33 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     categoryLabel:SetPoint("TOPLEFT", 18, -64);
     categoryLabel:SetText(localeService:Get("ProfessionsViewCategory"));
     self.categoryLabel = categoryLabel;
-    local categorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-    categorySelection:ClearAllPoints();
-    categorySelection:SetPoint("TOPLEFT", 0, -78);
-    UIDropDownMenu_SetWidth(categorySelection, 130);
+    local categorySelection = uiService:CreateDropdown(frame, 150, {
+        { value = nil, text = localeService:Get("ProfessionsViewCategoryAll") }
+    }, function(value)
+        self:SelectCategory(value);
+        self:AddSkills();
+    end);
+    categorySelection:SetPoint("TOPLEFT", 18, -80);
     self.categorySelection = categorySelection;
     self.categoryId = nil;
-    UIDropDownMenu_SetText(categorySelection, localeService:Get("ProfessionsViewCategoryAll"));
-    UIDropDownMenu_Initialize(categorySelection, function()
-        self:PopulateCategoryDropdown();
-    end);
 
     -- add subcategory filter dropdown
     local subcategoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     subcategoryLabel:SetPoint("TOPLEFT", 188, -64);
     subcategoryLabel:SetText(localeService:Get("ProfessionsViewSubcategory"));
     self.subcategoryLabel = subcategoryLabel;
-    local subcategorySelection = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate");
-    subcategorySelection:ClearAllPoints();
-    subcategorySelection:SetPoint("TOPLEFT", 170, -78);
-    UIDropDownMenu_SetWidth(subcategorySelection, 130);
+    local subcategorySelection = uiService:CreateDropdown(frame, 150, {
+        { value = nil, text = localeService:Get("ProfessionsViewSubcategoryAll") }
+    }, function(value)
+        self:SelectSubcategory(value);
+        self:AddSkills();
+    end);
+    subcategorySelection:SetPoint("TOPLEFT", 188, -80);
     self.subcategorySelection = subcategorySelection;
     self.subcategoryId = nil;
-    UIDropDownMenu_SetText(subcategorySelection, localeService:Get("ProfessionsViewSubcategoryAll"));
-    UIDropDownMenu_Initialize(subcategorySelection, function()
-        self:PopulateSubcategoryDropdown();
-    end);
     self.showSubcategory = false;
     subcategoryLabel:Hide();
     subcategorySelection:Hide();
-    subcategorySelection:HookScript("OnShow", function()
-        if (not self.showSubcategory) then
-            subcategoryLabel:Hide();
-            subcategorySelection:Hide();
-        end
-    end);
 
     -- add bucket list icon
     local bucketListIcon = frame:CreateTexture(nil, "OVERLAY");
@@ -245,7 +176,7 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add specialization area (between search and item list)
     local specArea = CreateFrame("Frame", nil, frame);
-    specArea:SetPoint("TOPLEFT", 10, -108);
+    specArea:SetPoint("TOPLEFT", 10, -115);
     specArea:SetPoint("RIGHT", frame, "RIGHT", -12, 0);
     specArea:SetHeight(1);
     specArea:Hide();
@@ -341,10 +272,10 @@ end
 
 --- Update responsive layout based on frame width.
 function SkillsListPanel:UpdateResponsiveLayout()
-    if (not self.frame or not self.itemSearch) then return; end
+    if (not self.frame or not self.itemSearchContainer) then return; end
     local frameWidth = self.frame:GetWidth();
     if (frameWidth < 500) then
-        self.itemSearch:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT", -10, -56);
+        self.itemSearchContainer:SetPoint("RIGHT", self.frame, "RIGHT", -10, 0);
         if (self.professionLabel) then self.professionLabel:Hide(); end
         if (self.professionSelection) then self.professionSelection:Hide(); end
         if (self.addonLabel) then self.addonLabel:Hide(); end
@@ -355,9 +286,9 @@ function SkillsListPanel:UpdateResponsiveLayout()
         self.hidePlayerColumn = true;
     else
         if (self.professionsView.addon.isVanilla) then
-            self.itemSearch:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT", -199, -56);
+            self.itemSearchContainer:SetPoint("RIGHT", self.frame, "RIGHT", -199, 0);
         else
-            self.itemSearch:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT", -332, -56);
+            self.itemSearchContainer:SetPoint("RIGHT", self.frame, "RIGHT", -332, 0);
         end
         if (self.professionLabel) then self.professionLabel:Show(); end
         if (self.professionSelection) then self.professionSelection:Show(); end
@@ -389,7 +320,8 @@ end
 function SkillsListPanel:SelectProfession(professionId)
     self.professionId = professionId;
     PM_CharacterSettings.lastProfession = professionId;
-    UIDropDownMenu_SetText(self.professionSelection, self:GetProfessionText(professionId));
+    self.professionSelection:SetValue(professionId);
+    self:RefreshCategoryItems();
     self:SelectCategory(nil);
 end
 
@@ -424,8 +356,9 @@ function SkillsListPanel:SelectAddon(addonId)
     self.addonId = addonId;
     PM_CharacterSettings.lastAddon = addonId;
     if (self.addonSelection) then
-        UIDropDownMenu_SetText(self.addonSelection, self:GetAddonText(addonId));
+        self.addonSelection:SetValue(addonId);
     end
+    self:RefreshCategoryItems();
 end
 
 --- Select category filter.
@@ -437,14 +370,11 @@ function SkillsListPanel:SelectCategory(categoryId)
     if (not self.categorySelection) then
         return;
     end
-    local localeService = self:GetService("locale");
-    if (categoryId) then
-        UIDropDownMenu_SetText(self.categorySelection, self:GetCategoryText(categoryId));
-    else
-        UIDropDownMenu_SetText(self.categorySelection, localeService:Get("ProfessionsViewCategoryAll"));
-    end
+    self.categorySelection:SetValue(categoryId);
+    self:RefreshCategoryItems();
     if (self.subcategorySelection) then
-        UIDropDownMenu_SetText(self.subcategorySelection, localeService:Get("ProfessionsViewSubcategoryAll"));
+        self.subcategorySelection:SetValue(nil);
+        self:RefreshSubcategoryItems();
         if (categoryId and self:HasSubcategories()) then
             self.showSubcategory = true;
             self.subcategoryLabel:Show();
@@ -464,12 +394,7 @@ function SkillsListPanel:SelectSubcategory(subcategoryId)
     if (not self.subcategorySelection) then
         return;
     end
-    local localeService = self:GetService("locale");
-    if (subcategoryId) then
-        UIDropDownMenu_SetText(self.subcategorySelection, self:GetSubcategoryText(subcategoryId));
-    else
-        UIDropDownMenu_SetText(self.subcategorySelection, localeService:Get("ProfessionsViewSubcategoryAll"));
-    end
+    self.subcategorySelection:SetValue(subcategoryId);
 end
 
 --- Get localized text for a main category id.
@@ -561,21 +486,11 @@ function SkillsListPanel:CollectVisibleSkillData()
     return result;
 end
 
---- Populate the main category dropdown.
-function SkillsListPanel:PopulateCategoryDropdown()
+--- Refresh category dropdown items based on visible skills.
+function SkillsListPanel:RefreshCategoryItems()
     local localeService = self:GetService("locale");
-    local item = UIDropDownMenu_CreateInfo();
-    item.notCheckable = true;
-    item.func = function(_self, categoryId)
-        self:SelectCategory(categoryId);
-        self:AddSkills();
-    end;
+    local items = {{ value = nil, text = localeService:Get("ProfessionsViewCategoryAll") }};
 
-    -- add "All" option
-    item.text, item.arg1 = localeService:Get("ProfessionsViewCategoryAll"), nil;
-    UIDropDownMenu_AddButton(item);
-
-    -- collect unique main categories from visible skills
     local visibleSkills = self:CollectVisibleSkillData();
     local categories = {};
     local categoryOrder = {};
@@ -588,7 +503,6 @@ function SkillsListPanel:PopulateCategoryDropdown()
         if (professionId == 333 and (not skillData.itemId or skillData.itemId == 0)) then
             catId = "enchant";
         elseif (skillData.classId == 4 and skillData.subclassId) then
-            -- Armor: split by material type (Cloth, Leather, Mail, Plate, Shield, etc.)
             catId = "4:" .. skillData.subclassId;
         elseif (skillData.classId) then
             catId = tostring(skillData.classId);
@@ -605,9 +519,59 @@ function SkillsListPanel:PopulateCategoryDropdown()
     end);
 
     for _, catId in ipairs(categoryOrder) do
-        item.text, item.arg1 = self:GetCategoryText(catId), catId;
-        UIDropDownMenu_AddButton(item);
+        table.insert(items, { value = catId, text = self:GetCategoryText(catId) });
     end
+
+    self.categorySelection:SetItems(items);
+end
+
+--- Refresh subcategory dropdown items based on visible skills and current category.
+function SkillsListPanel:RefreshSubcategoryItems()
+    local localeService = self:GetService("locale");
+    local items = {{ value = nil, text = localeService:Get("ProfessionsViewSubcategoryAll") }};
+
+    if (self.categoryId) then
+        local visibleSkills = self:CollectVisibleSkillData();
+        local subcategories = {};
+        local subcategoryOrder = {};
+
+        for _, entry in ipairs(visibleSkills) do
+            local skillData = entry.skillData;
+            local professionId = entry.professionId;
+            local subId = nil;
+
+            if (self.categoryId == "enchant") then
+                if (professionId == 333 and skillData.enchantCategory) then
+                    subId = "ec:" .. skillData.enchantCategory;
+                end
+            elseif (string.sub(self.categoryId, 1, 2) == "4:") then
+                local catSubclassId = tonumber(string.sub(self.categoryId, 3));
+                if (skillData.classId == 4 and skillData.subclassId == catSubclassId and skillData.equipLoc and skillData.equipLoc ~= "") then
+                    subId = "slot:" .. skillData.equipLoc;
+                end
+            else
+                local catClassId = tonumber(self.categoryId);
+                if (catClassId and skillData.classId == catClassId and skillData.subclassId) then
+                    subId = "sub:" .. skillData.classId .. ":" .. skillData.subclassId;
+                end
+            end
+
+            if (subId and not subcategories[subId]) then
+                subcategories[subId] = true;
+                table.insert(subcategoryOrder, subId);
+            end
+        end
+
+        table.sort(subcategoryOrder, function(a, b)
+            return self:GetSubcategoryText(a) < self:GetSubcategoryText(b);
+        end);
+
+        for _, subId in ipairs(subcategoryOrder) do
+            table.insert(items, { value = subId, text = self:GetSubcategoryText(subId) });
+        end
+    end
+
+    self.subcategorySelection:SetItems(items);
 end
 
 --- Check if there are subcategories available for the current category.
@@ -651,69 +615,6 @@ function SkillsListPanel:HasSubcategories()
     end
 
     return false;
-end
-
---- Populate the subcategory dropdown based on selected main category.
-function SkillsListPanel:PopulateSubcategoryDropdown()
-    local localeService = self:GetService("locale");
-    local item = UIDropDownMenu_CreateInfo();
-    item.notCheckable = true;
-    item.func = function(_self, subcategoryId)
-        self:SelectSubcategory(subcategoryId);
-        self:AddSkills();
-    end;
-
-    -- add "All" option
-    item.text, item.arg1 = localeService:Get("ProfessionsViewSubcategoryAll"), nil;
-    UIDropDownMenu_AddButton(item);
-
-    if (not self.categoryId) then
-        return;
-    end
-
-    -- collect unique subcategories from visible skills matching current category
-    local visibleSkills = self:CollectVisibleSkillData();
-    local subcategories = {};
-    local subcategoryOrder = {};
-
-    for _, entry in ipairs(visibleSkills) do
-        local skillData = entry.skillData;
-        local professionId = entry.professionId;
-        local subId = nil;
-
-        if (self.categoryId == "enchant") then
-            -- enchantments: subcategories from spell name
-            if (professionId == 333 and skillData.enchantCategory) then
-                subId = "ec:" .. skillData.enchantCategory;
-            end
-        elseif (string.sub(self.categoryId, 1, 2) == "4:") then
-            -- armor: subcategories are equip slots
-            local catSubclassId = tonumber(string.sub(self.categoryId, 3));
-            if (skillData.classId == 4 and skillData.subclassId == catSubclassId and skillData.equipLoc and skillData.equipLoc ~= "") then
-                subId = "slot:" .. skillData.equipLoc;
-            end
-        else
-            -- weapons / other: subcategories are item subclasses
-            local catClassId = tonumber(self.categoryId);
-            if (catClassId and skillData.classId == catClassId and skillData.subclassId) then
-                subId = "sub:" .. skillData.classId .. ":" .. skillData.subclassId;
-            end
-        end
-
-        if (subId and not subcategories[subId]) then
-            subcategories[subId] = true;
-            table.insert(subcategoryOrder, subId);
-        end
-    end
-
-    table.sort(subcategoryOrder, function(a, b)
-        return self:GetSubcategoryText(a) < self:GetSubcategoryText(b);
-    end);
-
-    for _, subId in ipairs(subcategoryOrder) do
-        item.text, item.arg1 = self:GetSubcategoryText(subId), subId;
-        UIDropDownMenu_AddButton(item);
-    end
 end
 
 --- Check if a skill matches the given addon filter.
