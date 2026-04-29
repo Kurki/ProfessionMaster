@@ -9,10 +9,30 @@
 local SkillsService = _G.professionMaster:CreateService("skills");
 
 -- skill cache version (bump when static skill data or cache structure changes)
-local SKILL_CACHE_VERSION = 14;
+local SKILL_CACHE_VERSION = 18;
 
 --- Initialize service.
 function SkillsService:Initialize()
+    -- always merge source skill data into self.sourceSkills (stays in RAM for metatable fallback)
+    self.sourceSkills = {};
+    self:MergeSourceSkills(self.sourceSkills, 1, self:GetModel('vanilla-skills'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeSourceSkills(self.sourceSkills, 2, self:GetModel('bcc-skills'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeSourceSkills(self.sourceSkills, 3, self:GetModel('wrath-skills'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeSourceSkills(self.sourceSkills, 4, self:GetModel('cata-skills'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeSourceSkills(self.sourceSkills, 5, self:GetModel('mop-skills'));
+    end
+
     -- check if skill cache needs rebuilding
     self.cacheRebuilt = (not PM_Settings.skillCacheVersion) or (PM_Settings.skillCacheVersion < SKILL_CACHE_VERSION) or (not PM_Skills) or (not next(PM_Skills));
 
@@ -23,6 +43,7 @@ function SkillsService:Initialize()
 
         -- reset and rebuild skill cache from scratch
         PM_Skills = {};
+        PM_Recipes = {};
         self:BuildCache();
         PM_Settings.skillCacheVersion = SKILL_CACHE_VERSION;
 
@@ -34,78 +55,56 @@ function SkillsService:Initialize()
         chatService:Write("SkillCacheUpdated", skillCount);
     end
 
-    -- allSkills always references PM_Skills
-    self.allSkills = PM_Skills;
+    -- build allSkills using wrapper tables so runtime data (recipes) does not pollute PM_Skills;
+    -- wrapper → PM_Skills entry → sourceSkills entry (via metatables)
+    self.allSkills = {};
+    for skillId, sourceData in pairs(self.sourceSkills) do
+        local cached = PM_Skills[skillId];
+        if (cached) then
+            setmetatable(cached, { __index = sourceData });
+            self.allSkills[skillId] = setmetatable({}, { __index = cached });
+        end
+    end
 
-    -- build reverse index
+    -- add PM_Skills entries not in source data (from PM_Professions)
+    for skillId, cached in pairs(PM_Skills) do
+        if (not self.allSkills[skillId]) then
+            self.allSkills[skillId] = setmetatable({}, { __index = cached });
+        end
+    end
+
+    -- merge per-expansion recipe source models (stays in RAM for runtime recipe building)
+    self.recipeSources = {};
+    self:MergeRecipeSources(self.recipeSources, self:GetModel('recipe-sources-vanilla'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeRecipeSources(self.recipeSources, self:GetModel('recipe-sources-bcc'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeRecipeSources(self.recipeSources, self:GetModel('recipe-sources-wrath'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeRecipeSources(self.recipeSources, self:GetModel('recipe-sources-cata'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeRecipeSources(self.recipeSources, self:GetModel('recipe-sources-mop'));
+    end
+
+    -- build reverse indexes and runtime recipe arrays on wrapper tables
     self.allItems = {};
     self.allRecipes = {};
-    for skillId, skillData in pairs(self.allSkills) do
-        local itemId = skillData.itemId;
+    for skillId, wrapper in pairs(self.allSkills) do
+        local itemId = wrapper.itemId;
         if (itemId and itemId ~= 0) then
             self.allItems[itemId] = skillId;
         end
-        if (skillData.recipes) then
-            for _, recipe in ipairs(skillData.recipes) do
-                if (recipe.itemId) then
-                    self.allRecipes[recipe.itemId] = skillId;
-                end
-            end
-        end
+        self:BuildRecipesForSkill(skillId, wrapper);
     end
 
-    -- free source model data to allow garbage collection
-    self:FreeSkillModels();
-end
-
---- Build PM_Skills cache from source data files and existing PM_Professions entries.
-function SkillsService:BuildCache()
-    local professionNamesService = self:GetService("profession-names");
-    local bopItems = self:GetModel("bop-items");
-
-    -- load from source data files into temporary table
-    local sourceSkills = {};
-    self:MergeSourceSkills(sourceSkills, 1, self:GetModel('vanilla-skills'));
-
-    if (self.addon.isBccAtLeast) then
-        self:MergeSourceSkills(sourceSkills, 2, self:GetModel('bcc-skills'));
-    end
-
-    if (self.addon.isWrathAtLeast) then
-        self:MergeSourceSkills(sourceSkills, 3, self:GetModel('wrath-skills'));
-    end
-
-    if (self.addon.isCataAtLeast) then
-        self:MergeSourceSkills(sourceSkills, 4, self:GetModel('cata-skills'));
-    end
-
-    if (self.addon.isMopAtLeast) then
-        self:MergeSourceSkills(sourceSkills, 5, self:GetModel('mop-skills'));
-    end
-
-    -- merge per-expansion recipe source models (later expansions override earlier)
-    local mergedRecipeSources = {};
-    self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-vanilla'));
-
-    if (self.addon.isBccAtLeast) then
-        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-bcc'));
-    end
-
-    if (self.addon.isWrathAtLeast) then
-        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-wrath'));
-    end
-
-    if (self.addon.isCataAtLeast) then
-        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-cata'));
-    end
-
-    if (self.addon.isMopAtLeast) then
-        self:MergeRecipeSources(mergedRecipeSources, self:GetModel('recipe-sources-mop'));
-    end
-
-    self.recipeSources = mergedRecipeSources;
-
-    -- merge per-expansion NPC name lookup models
+    -- merge per-expansion NPC name lookup models (needed every load for tooltip display)
     local mergedNpcNames = {};
     self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-vanilla'));
 
@@ -127,7 +126,7 @@ function SkillsService:BuildCache()
 
     self.npcNames = mergedNpcNames;
 
-    -- merge per-expansion zone name lookup models
+    -- merge per-expansion zone name lookup models (needed every load for tooltip display)
     local mergedZoneNames = {};
     self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-vanilla'));
 
@@ -149,46 +148,26 @@ function SkillsService:BuildCache()
 
     self.zoneNames = mergedZoneNames;
 
-    -- merge per-expansion zone name lookup models
-    local mergedZoneNames = {};
-    self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-vanilla'));
+    -- free source model data to allow garbage collection
+    self:FreeSkillModels();
+end
 
-    if (self.addon.isBccAtLeast) then
-        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-bcc'));
-    end
+--- Build PM_Skills and PM_Recipes caches from source data files and PM_Professions.
+--- PM_Skills stores only dynamically resolved skill fields (names, links, icons).
+--- PM_Recipes stores only dynamically resolved recipe fields (name, itemLink, itemColor).
+--- Static data (reagents, vendors, drops, etc.) is accessed at runtime from source models.
+function SkillsService:BuildCache()
+    local professionNamesService = self:GetService("profession-names");
 
-    if (self.addon.isWrathAtLeast) then
-        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-wrath'));
-    end
+    -- build PM_Skills entries from source data (only dynamic fields)
+    for skillId, skillInfo in pairs(self.sourceSkills) do
+        self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService);
 
-    if (self.addon.isCataAtLeast) then
-        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-cata'));
-    end
-
-    if (self.addon.isMopAtLeast) then
-        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-mop'));
-    end
-
-    self.zoneNames = mergedZoneNames;
-
-    -- build PM_Skills from source data
-    for skillId, skillInfo in pairs(sourceSkills) do
-        self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService, bopItems);
-
-        -- store recipe data in PM_Skills for future cache-based loading
-        local entry = PM_Skills[skillId];
-        if (entry) then
-            entry.reagents = skillInfo.reagents;
-            entry.itemAmount = skillInfo.itemAmount;
-            entry.addon = skillInfo.addon;
-            entry.addonIds = skillInfo.addonIds;
-            entry.difficulty = skillInfo.difficulty;
-            if (skillInfo.recipeItemIds and #skillInfo.recipeItemIds > 0) then
-                entry.recipes = {};
-                for _, recipeItemId in ipairs(skillInfo.recipeItemIds) do
-                    local recipe = self:LoadRecipeItemData(recipeItemId, professionNamesService);
-                    self:LoadRecipeSourceData(recipe, recipeItemId);
-                    table.insert(entry.recipes, recipe);
+        -- resolve recipe item data into PM_Recipes
+        if (skillInfo.recipeItemIds) then
+            for _, recipeItemId in ipairs(skillInfo.recipeItemIds) do
+                if (not PM_Recipes[recipeItemId]) then
+                    self:ResolveRecipeItemData(recipeItemId, professionNamesService);
                 end
             end
         end
@@ -200,7 +179,7 @@ function SkillsService:BuildCache()
             for skillId, skill in pairs(profession) do
                 if (not PM_Skills[skillId]) then
                     local itemId = skill.itemId or 0;
-                    self:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems);
+                    self:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService);
                 end
             end
         end
@@ -273,26 +252,24 @@ function SkillsService:MergeSourceSkills(targetTable, addonNumber, addonData)
 end
 
 --- Load a single skill into PM_Skills cache.
-function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService, bopItems)
+--- For source-data skills, only stores dynamically resolved fields (name, links, icons, classification).
+--- Static fields (itemId, professionId, reagents, etc.) are accessed via metatable from self.sourceSkills.
+--- For PM_Professions skills (not in source data), also stores itemId and professionId directly.
+function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, professionNamesService)
     -- check if already cached
     if (PM_Skills[skillId]) then
         return;
     end
 
-    -- create cache entry
-    local entry = {
-        name = nil,
-        skillLink = nil,
-        itemId = itemId or 0,
-        itemLink = nil,
-        itemColor = nil,
-        icon = nil,
-        bop = false,
-        professionId = professionId,
-        classId = nil,
-        subclassId = nil,
-        equipLoc = nil
-    };
+    -- create cache entry (only dynamic fields for source-data skills)
+    local entry = {};
+
+    -- for skills not in source data, store identifiers directly (no metatable fallback available)
+    if (not self.sourceSkills[skillId]) then
+        entry.itemId = itemId or 0;
+        entry.professionId = professionId;
+    end
+
     PM_Skills[skillId] = entry;
 
     -- handle enchantment spells (profession 333) without an item result
@@ -315,9 +292,6 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
 
     -- handle item-based skills
     if (itemId and itemId ~= 0 and type(itemId) == "number") then
-        -- check bop
-        entry.bop = bopItems[itemId] or false;
-
         -- load item data asynchronously
         if (C_Item.DoesItemExistByID(itemId)) then
             local item = Item:CreateFromItemID(itemId);
@@ -348,44 +322,51 @@ function SkillsService:LoadSkillIntoCache(skillId, itemId, professionId, profess
     end
 end
 
---- Load recipe item data (name, link, color) into a cache entry.
---- Load recipe item data and return a recipe table.
-function SkillsService:LoadRecipeItemData(recipeItemId, professionNamesService)
-    local recipe = {
-        itemId = recipeItemId,
-        name = nil,
-        itemLink = nil,
-        itemColor = nil
-    };
+--- Resolve recipe item data (name, link, color) and store in PM_Recipes.
+function SkillsService:ResolveRecipeItemData(recipeItemId, professionNamesService)
+    local entry = {};
+    PM_Recipes[recipeItemId] = entry;
 
     if (C_Item.DoesItemExistByID(recipeItemId)) then
         local item = Item:CreateFromItemID(recipeItemId);
         if (not item:IsItemEmpty()) then
             pcall(function()
                 item:ContinueOnItemLoad(function()
-                    recipe.name = item:GetItemName();
-                    recipe.itemLink = item:GetItemLink();
-                    recipe.itemColor = professionNamesService:GetItemColor(item:GetItemLink());
+                    entry.name = item:GetItemName();
+                    entry.itemLink = item:GetItemLink();
+                    entry.itemColor = professionNamesService:GetItemColor(item:GetItemLink());
                 end);
             end);
         end
     end
-
-    return recipe;
 end
 
---- Load recipe source data into a recipe table.
---- Format: {vendors = {{name, zone, side}}, drops = {{name, zone}}, worldDrop = bool, quest = bool}
-function SkillsService:LoadRecipeSourceData(recipe, recipeItemId)
-    if (not self.recipeSources or not recipe) then return; end
+--- Build the runtime recipes array for a skill and populate allRecipes reverse index.
+--- Combines PM_Recipes (dynamic: name, link, color) with self.recipeSources (static: vendors, drops).
+function SkillsService:BuildRecipesForSkill(skillId, wrapper)
+    local recipeItemIds = wrapper.recipeItemIds;
+    if (not recipeItemIds or #recipeItemIds == 0) then return; end
 
-    local sourceData = self.recipeSources[recipeItemId];
-    if (not sourceData) then return; end
-
-    recipe.vendors = sourceData.vendors;
-    recipe.drops = sourceData.drops;
-    recipe.worldDrop = sourceData.worldDrop;
-    recipe.quest = sourceData.quest;
+    local recipes = {};
+    for _, recipeItemId in ipairs(recipeItemIds) do
+        local cachedRecipe = PM_Recipes and PM_Recipes[recipeItemId];
+        local sourceData = self.recipeSources and self.recipeSources[recipeItemId];
+        local recipe = { itemId = recipeItemId };
+        if (cachedRecipe) then
+            recipe.name = cachedRecipe.name;
+            recipe.itemLink = cachedRecipe.itemLink;
+            recipe.itemColor = cachedRecipe.itemColor;
+        end
+        if (sourceData) then
+            recipe.vendors = sourceData.vendors;
+            recipe.drops = sourceData.drops;
+            recipe.worldDrop = sourceData.worldDrop;
+            recipe.quest = sourceData.quest;
+        end
+        table.insert(recipes, recipe);
+        self.allRecipes[recipeItemId] = skillId;
+    end
+    wrapper.recipes = recipes;
 end
 
 --- Determine equip location for an enchantment based on spell name patterns.
@@ -427,13 +408,25 @@ function SkillsService:EnsureSkillCached(skillId, itemId, professionId)
     end
 
     local professionNamesService = self:GetService("profession-names");
-    local bopItems = self:GetModel("bop-items");
-    self:LoadSkillIntoCache(skillId, itemId or 0, professionId, professionNamesService, bopItems);
+    self:LoadSkillIntoCache(skillId, itemId or 0, professionId, professionNamesService);
 
-    -- update reverse index
-    local entry = self.allSkills[skillId];
-    if (entry and entry.itemId and entry.itemId ~= 0) then
-        self.allItems[entry.itemId] = skillId;
+    -- add to allSkills using wrapper pattern
+    local entry = PM_Skills[skillId];
+    if (entry) then
+        local sourceData = self.sourceSkills[skillId];
+        if (sourceData) then
+            setmetatable(entry, { __index = sourceData });
+        end
+        local wrapper = setmetatable({}, { __index = entry });
+        self.allSkills[skillId] = wrapper;
+
+        -- update reverse index
+        if (wrapper.itemId and wrapper.itemId ~= 0) then
+            self.allItems[wrapper.itemId] = skillId;
+        end
+
+        -- build runtime recipes
+        self:BuildRecipesForSkill(skillId, wrapper);
     end
 end
 
@@ -452,7 +445,8 @@ function SkillsService:GetSkillIdByRecipeItemId(recipeItemId)
    return self.allRecipes[recipeItemId];
 end
 
---- Free skill model data references so Lua garbage collector can reclaim source file tables.
+--- Free raw model data references so Lua garbage collector can reclaim source file tables.
+--- self.sourceSkills is kept alive (needed for metatable fallback on allSkills entries).
 function SkillsService:FreeSkillModels()
     local modelTypes = self.addon.modelTypes;
     modelTypes["vanilla-skills"] = nil;
@@ -475,5 +469,4 @@ function SkillsService:FreeSkillModels()
     modelTypes["zone-names-wrath"] = nil;
     modelTypes["zone-names-cata"] = nil;
     modelTypes["zone-names-mop"] = nil;
-    self.recipeSources = nil;
 end

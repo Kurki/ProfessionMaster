@@ -226,7 +226,6 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
     local skillsService = self:GetService("skills");
     local npcNames = skillsService.npcNames or {};
     local zoneNames = skillsService.zoneNames or {};
-    local zoneNames = skillsService.zoneNames or {};
 
     GameTooltip:SetOwner(owner, "ANCHOR_TOPRIGHT");
     GameTooltip:ClearLines();

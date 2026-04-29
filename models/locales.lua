@@ -70,7 +70,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Guild",
             ["TabSpecializations"] = "Specializations",
             ["TabOwn"] = "Own",
-            ["OwnNoProfessionsTitle"] = "No own professions found.",
+            ["OwnNoProfessionsTitle"] = "No own professions found",
             ["OwnNoProfessionsDescription"] = "Open your profession window to transfer data to Profession Master.",
 
             -- skill view
@@ -203,7 +203,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Gilde",
             ["TabSpecializations"] = "Spezialisierungen",
             ["TabOwn"] = "Eigene",
-            ["OwnNoProfessionsTitle"] = "Keine eigenen Berufe gefunden.",
+            ["OwnNoProfessionsTitle"] = "Keine eigenen Berufe gefunden",
             ["OwnNoProfessionsDescription"] = "Öffne dein Berufsfenster um die Daten an Profession Master zu übertragen.",
 
             -- skill view
@@ -336,7 +336,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Гильдия",
             ["TabSpecializations"] = "Специализации",
             ["TabOwn"] = "Свои",
-            ["OwnNoProfessionsTitle"] = "Собственные профессии не найдены.",
+            ["OwnNoProfessionsTitle"] = "Собственные профессии не найдены",
             ["OwnNoProfessionsDescription"] = "Откройте окно профессий, чтобы передать данные в Profession Master.",
 
             -- skill view
@@ -469,7 +469,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Hermandad",
             ["TabSpecializations"] = "Especializaciones",
             ["TabOwn"] = "Propias",
-            ["OwnNoProfessionsTitle"] = "No se encontraron profesiones propias.",
+            ["OwnNoProfessionsTitle"] = "No se encontraron profesiones propias",
             ["OwnNoProfessionsDescription"] = "Abre tu ventana de profesiones para transferir los datos a Profession Master.",
 
             -- skill view
@@ -602,7 +602,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Guilde",
             ["TabSpecializations"] = "Spécialisations",
             ["TabOwn"] = "Propres",
-            ["OwnNoProfessionsTitle"] = "Aucune profession trouvée.",
+            ["OwnNoProfessionsTitle"] = "Aucune profession trouvée",
             ["OwnNoProfessionsDescription"] = "Ouvrez votre fenêtre de métiers pour transférer les données à Profession Master.",
 
             -- skill view
@@ -735,7 +735,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Gilda",
             ["TabSpecializations"] = "Specializzazioni",
             ["TabOwn"] = "Proprie",
-            ["OwnNoProfessionsTitle"] = "Nessuna professione trovata.",
+            ["OwnNoProfessionsTitle"] = "Nessuna professione trovata",
             ["OwnNoProfessionsDescription"] = "Apri la finestra delle professioni per trasferire i dati a Profession Master.",
 
             -- skill view
@@ -868,7 +868,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "길드",
             ["TabSpecializations"] = "전문화",
             ["TabOwn"] = "내 것",
-            ["OwnNoProfessionsTitle"] = "자신의 전문 기술을 찾을 수 없습니다.",
+            ["OwnNoProfessionsTitle"] = "자신의 전문 기술을 찾을 수 없습니다",
             ["OwnNoProfessionsDescription"] = "전문 기술 창을 열어 Profession Master로 데이터를 전송하세요.",
 
             -- skill view
@@ -1001,7 +1001,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "Guilda",
             ["TabSpecializations"] = "Especializações",
             ["TabOwn"] = "Próprias",
-            ["OwnNoProfessionsTitle"] = "Nenhuma profissão própria encontrada.",
+            ["OwnNoProfessionsTitle"] = "Nenhuma profissão própria encontrada",
             ["OwnNoProfessionsDescription"] = "Abra a janela de profissões para transferir os dados para o Profession Master.",
 
             -- skill view
@@ -1134,7 +1134,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "公会",
             ["TabSpecializations"] = "专精",
             ["TabOwn"] = "自己的",
-            ["OwnNoProfessionsTitle"] = "未找到自己的专业技能。",
+            ["OwnNoProfessionsTitle"] = "未找到自己的专业技能",
             ["OwnNoProfessionsDescription"] = "打开你的专业技能窗口以将数据传输到 Profession Master。",
 
             -- skill view
@@ -1267,7 +1267,7 @@ function LocalesModel:Create()
             ["TabGuild"] = "公會",
             ["TabSpecializations"] = "專精",
             ["TabOwn"] = "自己的",
-            ["OwnNoProfessionsTitle"] = "未找到自己的專業技能。",
+            ["OwnNoProfessionsTitle"] = "未找到自己的專業技能",
             ["OwnNoProfessionsDescription"] = "打開你的專業技能窗口以將數據傳輸到 Profession Master。",
 
             -- skill view
