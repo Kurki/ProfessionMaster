@@ -105,6 +105,72 @@ function SkillsService:BuildCache()
 
     self.recipeSources = mergedRecipeSources;
 
+    -- merge per-expansion NPC name lookup models
+    local mergedNpcNames = {};
+    self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-vanilla'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-bcc'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-wrath'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-cata'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeRecipeSources(mergedNpcNames, self:GetModel('npc-names-mop'));
+    end
+
+    self.npcNames = mergedNpcNames;
+
+    -- merge per-expansion zone name lookup models
+    local mergedZoneNames = {};
+    self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-vanilla'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-bcc'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-wrath'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-cata'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-mop'));
+    end
+
+    self.zoneNames = mergedZoneNames;
+
+    -- merge per-expansion zone name lookup models
+    local mergedZoneNames = {};
+    self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-vanilla'));
+
+    if (self.addon.isBccAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-bcc'));
+    end
+
+    if (self.addon.isWrathAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-wrath'));
+    end
+
+    if (self.addon.isCataAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-cata'));
+    end
+
+    if (self.addon.isMopAtLeast) then
+        self:MergeRecipeSources(mergedZoneNames, self:GetModel('zone-names-mop'));
+    end
+
+    self.zoneNames = mergedZoneNames;
+
     -- build PM_Skills from source data
     for skillId, skillInfo in pairs(sourceSkills) do
         self:LoadSkillIntoCache(skillId, skillInfo.itemId, skillInfo.professionId, professionNamesService, bopItems);
@@ -399,5 +465,15 @@ function SkillsService:FreeSkillModels()
     modelTypes["recipe-sources-wrath"] = nil;
     modelTypes["recipe-sources-cata"] = nil;
     modelTypes["recipe-sources-mop"] = nil;
+    modelTypes["npc-names-vanilla"] = nil;
+    modelTypes["npc-names-bcc"] = nil;
+    modelTypes["npc-names-wrath"] = nil;
+    modelTypes["npc-names-cata"] = nil;
+    modelTypes["npc-names-mop"] = nil;
+    modelTypes["zone-names-vanilla"] = nil;
+    modelTypes["zone-names-bcc"] = nil;
+    modelTypes["zone-names-wrath"] = nil;
+    modelTypes["zone-names-cata"] = nil;
+    modelTypes["zone-names-mop"] = nil;
     self.recipeSources = nil;
 end

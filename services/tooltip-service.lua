@@ -223,6 +223,10 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
     if (not recipe or not recipe.name) then return; end
 
     local localeService = self:GetService("locale");
+    local skillsService = self:GetService("skills");
+    local npcNames = skillsService.npcNames or {};
+    local zoneNames = skillsService.zoneNames or {};
+    local zoneNames = skillsService.zoneNames or {};
 
     GameTooltip:SetOwner(owner, "ANCHOR_TOPRIGHT");
     GameTooltip:ClearLines();
@@ -236,8 +240,8 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
         GameTooltip:AddLine(" ");
         GameTooltip:AddLine("|cffffd100" .. localeService:Get("SkillViewSoldBy") .. "|r");
         for _, vendor in ipairs(recipe.vendors) do
-            local vendorName = vendor[1] or "?";
-            local locationText = self:GetZoneName(vendor[2]);
+            local vendorName = npcNames[vendor[1]] or "?";
+            local locationText = self:GetZoneName(vendor[2], zoneNames);
             if (locationText) then
                 GameTooltip:AddLine("|cffffffff" .. vendorName .. " - " .. locationText .. "|r");
             else
@@ -255,8 +259,8 @@ function TooltipService:ShowRecipeSourceTooltip(owner, recipe)
                 GameTooltip:AddLine("|cff999999...|r");
                 break;
             end
-            local dropName = drop[1] or "?";
-            local locationText = self:GetZoneName(drop[2]);
+            local dropName = npcNames[drop[1]] or "?";
+            local locationText = self:GetZoneName(drop[2], zoneNames);
             if (locationText) then
                 GameTooltip:AddLine("|cffffffff" .. dropName .. " - " .. locationText .. "|r");
             else
@@ -290,8 +294,10 @@ function TooltipService:HexToRgb(hex)
     return r, g, b;
 end
 
---- Get a zone name from an entry. Zone is now stored as a string directly.
-function TooltipService:GetZoneName(zone)
-    if (type(zone) == "string" and zone ~= "") then return zone; end
+--- Get a zone name from a zone ID via the zoneNames lookup table.
+function TooltipService:GetZoneName(zoneId, zoneNames)
+    if (type(zoneId) == "number" and zoneNames) then
+        return zoneNames[zoneId];
+    end
     return nil;
 end

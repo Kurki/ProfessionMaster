@@ -42,6 +42,16 @@ models\skills\bcc.lua
 models\skills\wrath.lua
 models\skills\cata.lua
 models\skills\mop.lua
+models\npc-names\vanilla.lua
+models\npc-names\bcc.lua
+models\npc-names\wrath.lua
+models\npc-names\cata.lua
+models\npc-names\mop.lua
+models\zone-names\vanilla.lua
+models\zone-names\bcc.lua
+models\zone-names\wrath.lua
+models\zone-names\cata.lua
+models\zone-names\mop.lua
 models\recipe-sources\vanilla.lua
 models\recipe-sources\bcc.lua
 models\recipe-sources\wrath.lua

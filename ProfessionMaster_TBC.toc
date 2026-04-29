@@ -39,6 +39,10 @@ models\models.xml
 models\messages\messages.xml
 models\skills\vanilla.lua
 models\skills\bcc.lua
+models\npc-names\vanilla.lua
+models\npc-names\bcc.lua
+models\zone-names\vanilla.lua
+models\zone-names\bcc.lua
 models\recipe-sources\vanilla.lua
 models\recipe-sources\bcc.lua
 services\services.xml
