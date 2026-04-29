@@ -16,7 +16,7 @@ function OwnSkillList:Create(parentFrame, professionsView)
     self.rowPool = {};
     self.groupHeaderPool = {};
     self.skills = {};
-    self.professionId = 0;
+    self.professionId = PM_CharacterSettings.lastOwnProfession or 0;
     self.scrollTop = 0;
     self.bucketListSkillAmount = 0;
 
@@ -49,6 +49,7 @@ function OwnSkillList:Create(parentFrame, professionsView)
         end
         self.searchPending = C_Timer.NewTimer(0.2, function()
             self.searchPending = nil;
+            PM_CharacterSettings.lastOwnSearchText = self.searchBox:GetText();
             self:AddSkills();
         end);
     end);
@@ -68,6 +69,7 @@ function OwnSkillList:Create(parentFrame, professionsView)
 
     local professionSelection = uiService:CreateDropdown(frame, 160, {}, function(value)
         self.professionId = value;
+        PM_CharacterSettings.lastOwnProfession = value;
         self.searchBox:SetFocus();
         self:AddSkills();
     end);
@@ -118,6 +120,11 @@ function OwnSkillList:Create(parentFrame, professionsView)
     otherGroupText:SetText(localeService:Get("ProfessionsViewNotOnBucketList"));
     otherGroupText:Hide();
     self.otherGroupText = otherGroupText;
+
+    -- restore search text
+    if (PM_CharacterSettings.lastOwnSearchText and PM_CharacterSettings.lastOwnSearchText ~= "") then
+        self.searchBox:SetText(PM_CharacterSettings.lastOwnSearchText);
+    end
 
     -- add empty state message (centered)
     local emptyContainer = CreateFrame("Frame", nil, frame);
@@ -173,17 +180,14 @@ function OwnSkillList:AddSkills()
     local playerService = self:GetService("player");
     local currentPlayer = playerService.current;
 
-    -- determine which professions the current player has
+    -- determine which professions the current player has from PM_OwnProfessions
     local allProfessionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
     local ownProfessionIds = {};
-    for _, professionId in ipairs(allProfessionIds) do
-        local profession = PM_Professions[professionId];
-        if (profession) then
-            for _, skillEntry in pairs(profession) do
-                if (skillEntry.players and skillEntry.players[currentPlayer]) then
-                    table.insert(ownProfessionIds, professionId);
-                    break;
-                end
+    local ownProfessions = PM_OwnProfessions[currentPlayer];
+    if (ownProfessions) then
+        for _, professionId in ipairs(allProfessionIds) do
+            if (ownProfessions[professionId]) then
+                table.insert(ownProfessionIds, professionId);
             end
         end
     end
@@ -217,6 +221,19 @@ function OwnSkillList:AddSkills()
     end
     self.professionSelection:SetItems(professionItems);
 
+    -- validate saved profession is still valid
+    local validProfession = false;
+    for _, item in ipairs(professionItems) do
+        if (item.value == self.professionId) then
+            validProfession = true;
+            break;
+        end
+    end
+    if (not validProfession) then
+        self.professionId = 0;
+    end
+    self.professionSelection:SetValue(self.professionId);
+
     -- set column header
     self.skillText:SetText(localeService:Get("ProfessionsViewItem"));
 
@@ -238,35 +255,33 @@ function OwnSkillList:AddSkills()
     end
 
     for _, professionId in ipairs(professionIds) do
-        local profession = PM_Professions[professionId];
-        if (profession) then
-            for skillId, skillEntry in pairs(profession) do
-                -- only show skills the current player knows
-                if (skillEntry.players and skillEntry.players[currentPlayer]) then
-                    local skillData = skillsService:GetSkillById(skillId);
-                    if (skillData and skillData.name ~= nil) then
-                        local bucketListAmount = PM_BucketList[skillId];
-                        local matchesSearch = true;
+        local ownSkills = ownProfessions and ownProfessions[professionId];
+        if (ownSkills) then
+            for _, ownSkill in ipairs(ownSkills) do
+                local skillId = ownSkill.skillId;
+                local skillData = skillsService:GetSkillById(skillId);
+                if (skillData and skillData.name ~= nil) then
+                    local bucketListAmount = PM_BucketList[skillId];
+                    local matchesSearch = true;
 
-                        if (#searchParts > 0) then
-                            for _, part in ipairs(searchParts) do
-                                if (string.len(part) > 0 and string.find(string.lower(skillData.name), part) == nil) then
-                                    matchesSearch = false;
-                                    break;
-                                end
+                    if (#searchParts > 0) then
+                        for _, part in ipairs(searchParts) do
+                            if (string.len(part) > 0 and string.find(string.lower(skillData.name), part) == nil) then
+                                matchesSearch = false;
+                                break;
                             end
                         end
+                    end
 
-                        if (matchesSearch) then
-                            table.insert(self.skills, {
-                                professionId = professionId,
-                                skillId = skillId,
-                                skill = skillData,
-                                bucketListAmount = bucketListAmount,
-                            });
-                            if (bucketListAmount) then
-                                self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
-                            end
+                    if (matchesSearch) then
+                        table.insert(self.skills, {
+                            professionId = professionId,
+                            skillId = skillId,
+                            skill = skillData,
+                            bucketListAmount = bucketListAmount,
+                        });
+                        if (bucketListAmount) then
+                            self.bucketListSkillAmount = self.bucketListSkillAmount + 1;
                         end
                     end
                 end
@@ -326,7 +341,7 @@ function OwnSkillList:RefreshRows()
 
         -- add item text
         local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        itemText:SetPoint("TOPLEFT", 6, -3);
+        itemText:SetPoint("TOPLEFT", 3, -3);
         row.itemText = itemText;
 
         -- add bucket list count
@@ -384,8 +399,8 @@ function OwnSkillList:RefreshRows()
             end
 
             row:ClearAllPoints();
-            row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 5, -top);
-            row:SetPoint("RIGHT", self.scrollChild, "RIGHT", -5, 0);
+            row:SetPoint("TOPLEFT", self.scrollChild, "TOPLEFT", 0, -top);
+            row:SetPoint("RIGHT", self.scrollChild, "RIGHT", -28, 0);
             row:SetHeight(20);
 
             local backgroundColor = (rowIndex % 2 == 0) and 0.12 or 0.06;
@@ -396,9 +411,15 @@ function OwnSkillList:RefreshRows()
             row.skillId = skillData.skillId;
             row.skill = skillData.skill;
 
-            -- set item text with icon
+            -- set item text with icon and item color
             local icon = skillData.skill.icon or 134400;
-            row.itemText:SetText("|T" .. icon .. ":16|t " .. skillData.skill.name);
+            local itemName = skillData.skill.itemColor and ("|c" .. skillData.skill.itemColor .. skillData.skill.name) or skillData.skill.name;
+            local skillInfo = self:GetService("skills"):GetSkillById(skillData.skillId);
+            local itemAmount = skillInfo and skillInfo.itemAmount;
+            if (itemAmount and itemAmount > 1) then
+                itemName = itemName .. "|r x" .. itemAmount;
+            end
+            row.itemText:SetText("|T" .. icon .. ":16|t  " .. itemName);
 
             -- set bucket list amount
             if (skillData.bucketListAmount) then

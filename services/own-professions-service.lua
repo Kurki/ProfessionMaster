@@ -81,9 +81,18 @@ end
 function OwnProfessionsService:GetTradeSkillProfessionData(professionIsLink, professionPlayerName)
     -- get and check profession id
     local professionNamesService = self:GetService("profession-names");
-    local professionId = professionNamesService:GetProfessionId(GetTradeSkillLine());
+    local skillLineName, currentRank, maxRank = GetTradeSkillLine();
+    local professionId = professionNamesService:GetProfessionId(skillLineName);
     if (not professionId) then
         return;
+    end
+
+    -- store skill level for own character
+    if (not professionIsLink and currentRank) then
+        if (not PM_CharacterSettings.professionLevels) then
+            PM_CharacterSettings.professionLevels = {};
+        end
+        PM_CharacterSettings.professionLevels[professionId] = currentRank;
     end
 
     -- get amount of trade skills
@@ -144,7 +153,8 @@ end
 function OwnProfessionsService:GetCraftSkillProfessionData(professionIsLink, professionPlayerName)
     -- get and check profession id
     local professionNamesService = self:GetService("profession-names");
-    local professionId = professionNamesService:GetProfessionId(GetCraftDisplaySkillLine());
+    local craftSkillLineName = GetCraftDisplaySkillLine();
+    local professionId = professionNamesService:GetProfessionId(craftSkillLineName);
     if (not professionId) then
         return;
     end

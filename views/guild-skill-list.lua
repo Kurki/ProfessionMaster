@@ -937,7 +937,7 @@ function GuildSkillList:RefreshSpecializationRows()
         });
 
         local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        itemText:SetPoint("TOPLEFT", 6, -3);
+        itemText:SetPoint("TOPLEFT", 3, -3);
         row.itemText = itemText;
 
         local playerText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
@@ -982,7 +982,7 @@ function GuildSkillList:RefreshSpecializationRows()
         local row = self.specRowPool[i];
         local top = headerHeight + (i - 1) * rowHeight;
         row:ClearAllPoints();
-        row:SetPoint("TOPLEFT", self.specArea, "TOPLEFT", 5, -top);
+        row:SetPoint("TOPLEFT", self.specArea, "TOPLEFT", 0, -top);
         row:SetPoint("RIGHT", self.specArea, "RIGHT", -28, 0);
         row:SetHeight(rowHeight);
 
@@ -991,7 +991,7 @@ function GuildSkillList:RefreshSpecializationRows()
         row:SetBackdropColor(backgroundColor, backgroundColor, backgroundColor, 0.5);
 
         row.specData = specData;
-        row.itemText:SetText("|T" .. specData.icon .. ":16|t " .. specData.name);
+        row.itemText:SetText("|T" .. specData.icon .. ":16|t  " .. specData.name);
 
         if (self.hidePlayerColumn) then
             row.playerText:Hide();
@@ -1052,7 +1052,7 @@ function GuildSkillList:RefreshRows()
 
         -- add item text
         local itemText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        itemText:SetPoint("TOPLEFT", 6, -3);
+        itemText:SetPoint("TOPLEFT", 3, -3);
         row.itemText = itemText;
 
         -- add player text
@@ -1179,7 +1179,7 @@ function GuildSkillList:RefreshRows()
             if (itemAmount and itemAmount > 1) then
                 itemName = itemName .. "|r x" .. itemAmount;
             end
-            row.itemText:SetText("|T" .. skill.icon .. ":16|t " .. itemName);
+            row.itemText:SetText("|T" .. skill.icon .. ":16|t  " .. itemName);
 
             -- set player text (use pre-computed cache from AddSkills)
             if (self.hidePlayerColumn) then
