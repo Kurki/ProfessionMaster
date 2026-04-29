@@ -24,8 +24,8 @@ function GuildSpecializationsPanel:Create(parentFrame, professionsView)
 
     -- create container frame
     local frame = CreateFrame("Frame", nil, parentFrame);
-    frame:SetPoint("TOPLEFT", 0, 0);
-    frame:SetPoint("BOTTOMRIGHT", 0, 0);
+    frame:SetPoint("TOPLEFT", 5, -2);
+    frame:SetPoint("BOTTOMRIGHT", -5, 2);
     frame:Hide();
     self.frame = frame;
 

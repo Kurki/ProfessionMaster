@@ -53,17 +53,15 @@ function ProfessionsView:Show()
         self.helpView = self.addon:NewView("help");
         local helpButton = uiService:CreateFlatSquareButton(view, "?", function()
             self.helpView:ToggleVisibility();
-        end, 16);
+        end, 22);
         helpButton:SetPoint("RIGHT", closeButton, "LEFT", -8, 0);
-        helpButton:SetNormalFontObject("GameFontHighlightSmall");
-        helpButton:SetHighlightFontObject("GameFontHighlight");
         uiService:BindTooltip(helpButton, localeService:Get("HelpTooltip"));
 
         -- add purge button (broom icon left of help button)
         self.purgeView = self.addon:NewView("purge");
         local purgeButton = uiService:CreateFlatSquareButton(view, "D", function()
             self.purgeView:Show();
-        end, 16);
+        end, 22);
         purgeButton:SetPoint("RIGHT", helpButton, "LEFT", -8, 0);
         uiService:BindTooltip(purgeButton, localeService:Get("PurgeViewTitle"));
 
