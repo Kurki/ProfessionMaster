@@ -407,7 +407,7 @@ function PurgeView:PurgeSelected()
     -- refresh professions view if open
     local professionsView = self.addon.professionsView;
     if (professionsView and professionsView.visible) then
-        professionsView.skillsListPanel:AddSkills();
+        professionsView:RefreshActiveTab();
     end
 end
 

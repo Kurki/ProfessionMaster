@@ -6,12 +6,12 @@
 --]]
 
 -- create panel
-local SkillsListPanel = _G.professionMaster:CreateView("skills-list-panel");
+local GuildSkillList = _G.professionMaster:CreateView("guild-skill-list");
 
 --- Create skills list panel frames.
 -- @param parentFrame The parent view frame to attach to.
 -- @param professionsView Reference to the parent professions view.
-function SkillsListPanel:Create(parentFrame, professionsView)
+function GuildSkillList:Create(parentFrame, professionsView)
     self.professionsView = professionsView;
     self.rowPool = {};
     self.groupHeaderPool = {};
@@ -29,18 +29,18 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
 
     -- add skills frame
-    local frame = uiService:CreatePanel(parentFrame);
-    frame:SetPoint("TOPLEFT", 12, -36);
-    frame:SetPoint("BOTTOMRIGHT", -12, 30);
+    local frame = CreateFrame("Frame", nil, parentFrame);
+    frame:SetPoint("TOPLEFT", 0, 0);
+    frame:SetPoint("BOTTOMRIGHT", 0, 0);
     self.frame = frame;
 
     -- add item search box
     local itemSearchLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    itemSearchLabel:SetPoint("TOPLEFT", 18, -15);
+    itemSearchLabel:SetPoint("TOPLEFT", 12, -12);
     itemSearchLabel:SetText(localeService:Get("ProfessionsViewSearch"));
     self.itemSearchLabel = itemSearchLabel;
     local itemSearchContainer = uiService:CreateEditBox(frame, 100);
-    itemSearchContainer:SetPoint("TOPLEFT", 18, -33);
+    itemSearchContainer:SetPoint("TOPLEFT", 12, -28);
     if (professionsView.addon.isVanilla) then
         itemSearchContainer:SetPoint("RIGHT", frame, "RIGHT", -199, 0);
     else
@@ -83,9 +83,6 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     for _, professionId in ipairs(professionIds) do
         table.insert(professionItems, { value = professionId, text = self:GetProfessionText(professionId) });
     end
-    if (not professionsView.addon.isVanilla) then
-        table.insert(professionItems, { value = -1, text = self:GetProfessionText(-1) });
-    end
 
     local professionSelection = uiService:CreateDropdown(frame, 160, professionItems, function(value)
         self:SelectProfession(value);
@@ -93,11 +90,11 @@ function SkillsListPanel:Create(parentFrame, professionsView)
         self:AddSkills();
     end);
     if (professionsView.addon.isVanilla) then
-        professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -190, -15);
-        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -192, -31);
+        professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -190, -12);
+        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -192, -28);
     else
-        professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -323, -15);
-        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -325, -31);
+        professionLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -323, -12);
+        professionSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -325, -28);
     end
     self.professionSelection = professionSelection;
 
@@ -105,7 +102,7 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     if (not professionsView.addon.isVanilla) then
         -- add addon selection
         local addonLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-        addonLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -155, -15);
+        addonLabel:SetPoint("TOPLEFT", frame, "TOPRIGHT", -155, -12);
         addonLabel:SetText(localeService:Get("ProfessionsViewAddon"));
         self.addonLabel = addonLabel;
 
@@ -130,13 +127,13 @@ function SkillsListPanel:Create(parentFrame, professionsView)
             self.itemSearch:SetFocus();
             self:AddSkills();
         end);
-        addonSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -157, -31);
+        addonSelection:SetPoint("TOPLEFT", frame, "TOPRIGHT", -157, -28);
         self.addonSelection = addonSelection;
     end
 
     -- add category filter dropdown
     local categoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    categoryLabel:SetPoint("TOPLEFT", 18, -64);
+    categoryLabel:SetPoint("TOPLEFT", 12, -58);
     categoryLabel:SetText(localeService:Get("ProfessionsViewCategory"));
     self.categoryLabel = categoryLabel;
     local categorySelection = uiService:CreateDropdown(frame, 150, {
@@ -145,13 +142,13 @@ function SkillsListPanel:Create(parentFrame, professionsView)
         self:SelectCategory(value);
         self:AddSkills();
     end);
-    categorySelection:SetPoint("TOPLEFT", 18, -80);
+    categorySelection:SetPoint("TOPLEFT", 12, -74);
     self.categorySelection = categorySelection;
     self.categoryId = nil;
 
     -- add subcategory filter dropdown
     local subcategoryLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    subcategoryLabel:SetPoint("TOPLEFT", 188, -64);
+    subcategoryLabel:SetPoint("TOPLEFT", 182, -58);
     subcategoryLabel:SetText(localeService:Get("ProfessionsViewSubcategory"));
     self.subcategoryLabel = subcategoryLabel;
     local subcategorySelection = uiService:CreateDropdown(frame, 150, {
@@ -160,7 +157,7 @@ function SkillsListPanel:Create(parentFrame, professionsView)
         self:SelectSubcategory(value);
         self:AddSkills();
     end);
-    subcategorySelection:SetPoint("TOPLEFT", 188, -80);
+    subcategorySelection:SetPoint("TOPLEFT", 182, -74);
     self.subcategorySelection = subcategorySelection;
     self.subcategoryId = nil;
     self.showSubcategory = false;
@@ -171,13 +168,13 @@ function SkillsListPanel:Create(parentFrame, professionsView)
     local bucketListIcon = frame:CreateTexture(nil, "OVERLAY");
     bucketListIcon:SetSize(16, 16);
     bucketListIcon:SetTexture("Interface\\Buttons\\UI-GuildButton-PublicNote-Up");
-    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -113);
+    bucketListIcon:SetPoint("TOPLEFT", frame, "TOPRIGHT", -56, -107);
     self.bucketListIcon = bucketListIcon;
 
     -- add specialization area (between search and item list)
     local specArea = CreateFrame("Frame", nil, frame);
-    specArea:SetPoint("TOPLEFT", 10, -115);
-    specArea:SetPoint("RIGHT", frame, "RIGHT", -12, 0);
+    specArea:SetPoint("TOPLEFT", 6, -109);
+    specArea:SetPoint("RIGHT", frame, "RIGHT", -8, 0);
     specArea:SetHeight(1);
     specArea:Hide();
     self.specArea = specArea;
@@ -196,22 +193,22 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 
     -- add skill text (anchored below spec area)
     local skillText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    skillText:SetPoint("TOPLEFT", 18, -115);
+    skillText:SetPoint("TOPLEFT", 12, -109);
     self.skillText = skillText;
-    self.skillTextDefaultTop = -115;
+    self.skillTextDefaultTop = -109;
 
     -- add player text
     local playerText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal");
-    playerText:SetPoint("TOPLEFT", 292, -115);
+    playerText:SetPoint("TOPLEFT", 286, -109);
     playerText:SetText(localeService:Get("ProfessionsViewPlayers"));
     self.playerHeaderText = playerText;
-    self.playerHeaderDefaultTop = -115;
+    self.playerHeaderDefaultTop = -109;
 
     -- create scroll frame
     local scrollFrame, scrollChild, scrollElement = uiService:CreateScrollFrame(frame);
-    scrollFrame:SetPoint("TOPLEFT", 10, -128);
-    scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
-    self.scrollFrameDefaultTop = -128;
+    scrollFrame:SetPoint("TOPLEFT", 6, -122);
+    scrollFrame:SetPoint("BOTTOMRIGHT", -8, 8);
+    self.scrollFrameDefaultTop = -122;
     scrollElement:SetScript("OnVerticalScroll", function(_, top)
         self.scrollTop = top;
         self:RefreshRows();
@@ -248,14 +245,14 @@ function SkillsListPanel:Create(parentFrame, professionsView)
 end
 
 --- Handle resize event.
-function SkillsListPanel:OnSizeChanged()
+function GuildSkillList:OnSizeChanged()
     if (self.scrollChild and self.scrollFrame) then
         self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
     end
 end
 
 --- Focus the search box.
-function SkillsListPanel:FocusSearch()
+function GuildSkillList:FocusSearch()
     if (self.itemSearch) then
         self.itemSearch:SetFocus();
     end
@@ -263,15 +260,15 @@ end
 
 --- Set right margin of skills frame for bucket list visibility.
 -- @param margin Right margin in pixels.
-function SkillsListPanel:SetRightMargin(margin)
+function GuildSkillList:SetRightMargin(margin)
     if (self.frame) then
-        self.frame:SetPoint("BOTTOMRIGHT", -margin, 30);
+        self.frame:SetPoint("BOTTOMRIGHT", -margin, 0);
         self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
     end
 end
 
 --- Update responsive layout based on frame width.
-function SkillsListPanel:UpdateResponsiveLayout()
+function GuildSkillList:UpdateResponsiveLayout()
     if (not self.frame or not self.itemSearchContainer) then return; end
     local frameWidth = self.frame:GetWidth();
     if (frameWidth < 500) then
@@ -304,12 +301,9 @@ end
 --- Get text of profession.
 -- @param professionId Profession ID.
 -- @return Formatted profession text with icon.
-function SkillsListPanel:GetProfessionText(professionId)
+function GuildSkillList:GetProfessionText(professionId)
     if (professionId == 0) then
         return "|T133745:16|t " .. self:GetService("locale"):Get("ProfessionsViewAllProfessions");
-    end
-    if (professionId == -1) then
-        return "|T133739:16|t " .. self:GetService("locale"):Get("AllSpecializations");
     end
     local service = self:GetService("profession-names");
     return "|T" .. service:GetProfessionIcon(professionId) .. ":16|t  " .. service:GetProfessionName(professionId);
@@ -317,7 +311,7 @@ end
 
 --- Select profession.
 -- @param professionId Profession ID.
-function SkillsListPanel:SelectProfession(professionId)
+function GuildSkillList:SelectProfession(professionId)
     self.professionId = professionId;
     PM_CharacterSettings.lastProfession = professionId;
     self.professionSelection:SetValue(professionId);
@@ -328,7 +322,7 @@ end
 --- Get text of addon.
 -- @param addonId Addon ID.
 -- @return Formatted addon text with icon.
-function SkillsListPanel:GetAddonText(addonId)
+function GuildSkillList:GetAddonText(addonId)
     if (addonId == 1) then
         return "|T135954:16|t Vanilla";
     end
@@ -349,7 +343,7 @@ end
 
 --- Select addon.
 -- @param addonId Addon ID.
-function SkillsListPanel:SelectAddon(addonId)
+function GuildSkillList:SelectAddon(addonId)
     if (self.professionsView.addon.isVanilla) then
         addonId = nil;
     end
@@ -362,7 +356,7 @@ function SkillsListPanel:SelectAddon(addonId)
 end
 
 --- Select category filter.
-function SkillsListPanel:SelectCategory(categoryId)
+function GuildSkillList:SelectCategory(categoryId)
     self.categoryId = categoryId;
     self.subcategoryId = nil;
     PM_CharacterSettings.lastCategory = categoryId;
@@ -388,7 +382,7 @@ function SkillsListPanel:SelectCategory(categoryId)
 end
 
 --- Select subcategory filter.
-function SkillsListPanel:SelectSubcategory(subcategoryId)
+function GuildSkillList:SelectSubcategory(subcategoryId)
     self.subcategoryId = subcategoryId;
     PM_CharacterSettings.lastSubcategory = subcategoryId;
     if (not self.subcategorySelection) then
@@ -400,7 +394,7 @@ end
 --- Get localized text for a main category id.
 -- Category IDs: "2" (Weapons), "4:1" (Armor-Cloth), "4:2" (Armor-Leather), "4:3" (Armor-Mail),
 -- "4:4" (Armor-Plate), "4:6" (Armor-Shield), "0" (Consumable), "7" (Trade Goods), "enchant" (Enchantments)
-function SkillsListPanel:GetCategoryText(categoryId)
+function GuildSkillList:GetCategoryText(categoryId)
     if (not categoryId) then
         return self:GetService("locale"):Get("ProfessionsViewCategoryAll");
     end
@@ -426,7 +420,7 @@ end
 --- Get localized text for a subcategory id.
 -- Subcategory IDs: "sub:classId:subclassId" (weapon types), "slot:INVTYPE_X" (equip slots),
 -- or "ec:CategoryName" (enchant categories from spell name)
-function SkillsListPanel:GetSubcategoryText(subcategoryId)
+function GuildSkillList:GetSubcategoryText(subcategoryId)
     if (not subcategoryId) then
         return self:GetService("locale"):Get("ProfessionsViewSubcategoryAll");
     end
@@ -453,7 +447,7 @@ function SkillsListPanel:GetSubcategoryText(subcategoryId)
 end
 
 --- Collect visible skill data for populating dropdowns.
-function SkillsListPanel:CollectVisibleSkillData()
+function GuildSkillList:CollectVisibleSkillData()
     local skillsService = self:GetService("skills");
     local playerService = self:GetService("player");
     local result = {};
@@ -487,7 +481,7 @@ function SkillsListPanel:CollectVisibleSkillData()
 end
 
 --- Refresh category dropdown items based on visible skills.
-function SkillsListPanel:RefreshCategoryItems()
+function GuildSkillList:RefreshCategoryItems()
     local localeService = self:GetService("locale");
     local items = {{ value = nil, text = localeService:Get("ProfessionsViewCategoryAll") }};
 
@@ -526,7 +520,7 @@ function SkillsListPanel:RefreshCategoryItems()
 end
 
 --- Refresh subcategory dropdown items based on visible skills and current category.
-function SkillsListPanel:RefreshSubcategoryItems()
+function GuildSkillList:RefreshSubcategoryItems()
     local localeService = self:GetService("locale");
     local items = {{ value = nil, text = localeService:Get("ProfessionsViewSubcategoryAll") }};
 
@@ -575,7 +569,7 @@ function SkillsListPanel:RefreshSubcategoryItems()
 end
 
 --- Check if there are subcategories available for the current category.
-function SkillsListPanel:HasSubcategories()
+function GuildSkillList:HasSubcategories()
     if (not self.categoryId) then
         return false;
     end
@@ -619,7 +613,7 @@ end
 
 --- Check if a skill matches the given addon filter.
 -- A skill matches if it originated in this addon OR has new recipes in this addon.
-function SkillsListPanel:MatchesAddon(skillData, addonId)
+function GuildSkillList:MatchesAddon(skillData, addonId)
     if (skillData.addonIds) then
         return tContains(skillData.addonIds, addonId);
     end
@@ -627,7 +621,7 @@ function SkillsListPanel:MatchesAddon(skillData, addonId)
 end
 
 --- Check if a skill matches the currently selected category and subcategory filters.
-function SkillsListPanel:MatchesCategory(skillData, professionId)
+function GuildSkillList:MatchesCategory(skillData, professionId)
     -- no category filter
     if (not self.categoryId) then
         return true;
@@ -676,14 +670,12 @@ function SkillsListPanel:MatchesCategory(skillData, professionId)
 end
 
 --- Add skills.
-function SkillsListPanel:AddSkills()
+function GuildSkillList:AddSkills()
     local messageService = self:GetService("message");
     local localeService = self:GetService("locale");
 
     -- set skill text
-    if (self.professionId == -1) then
-        self.skillText:SetText(localeService:Get("Specialization"));
-    elseif (self.professionId == 333) then
+    if (self.professionId == 333) then
         self.skillText:SetText(localeService:Get("ProfessionsViewEnchantment"));
     else
         self.skillText:SetText(localeService:Get("ProfessionsViewItem"));
@@ -704,9 +696,7 @@ function SkillsListPanel:AddSkills()
 
     -- check if all should be shown
     self.bucketListSkillAmount = 0;
-    if (self.professionId == -1) then
-        self:AddSpecializationSkills(searchParts);
-    elseif (self.professionId == 0) then
+    if (self.professionId == 0) then
         local professionIds = self:GetService("profession-names"):GetProfessionIdsToShow();
         for i, professionId in ipairs(professionIds) do
             self:AddFilteredSkills(professionId, self.addonId, searchParts);
@@ -762,7 +752,7 @@ end
 -- @param professionId Profession ID to filter.
 -- @param addonId Addon ID to filter (nil for all).
 -- @param searchParts Search parts for filtering.
-function SkillsListPanel:AddFilteredSkills(professionId, addonId, searchParts)
+function GuildSkillList:AddFilteredSkills(professionId, addonId, searchParts)
     local profession = PM_Professions[professionId];
     local skillsService = self:GetService("skills");
     local playerService = self:GetService("player");
@@ -819,7 +809,7 @@ end
 
 --- Add specialization entries as skill rows (for "All Specializations" mode).
 -- @param searchParts Search parts for filtering.
-function SkillsListPanel:AddSpecializationSkills(searchParts)
+function GuildSkillList:AddSpecializationSkills(searchParts)
     local localeService = self:GetService("locale");
     local playerService = self:GetService("player");
     local professionNamesService = self:GetService("profession-names");
@@ -882,7 +872,7 @@ function SkillsListPanel:AddSpecializationSkills(searchParts)
 end
 
 --- Refresh specialization rows above the item list.
-function SkillsListPanel:RefreshSpecializationRows()
+function GuildSkillList:RefreshSpecializationRows()
     if (not self.specArea or self.professionsView.addon.isVanilla) then return; end
 
     -- hide all existing spec rows
@@ -892,8 +882,8 @@ function SkillsListPanel:RefreshSpecializationRows()
 
     local professionId = self.professionId;
 
-    -- hide specs for "all professions" (0) and "all specializations" (-1)
-    if (not professionId or professionId == 0 or professionId == -1) then
+    -- hide specs for "all professions" (0)
+    if (not professionId or professionId == 0) then
         self.specArea:Hide();
         self:UpdateItemAreaPosition(0);
         return;
@@ -1019,7 +1009,7 @@ end
 
 --- Update the item area position based on specialization area height.
 -- @param specHeight Height of the specialization area.
-function SkillsListPanel:UpdateItemAreaPosition(specHeight)
+function GuildSkillList:UpdateItemAreaPosition(specHeight)
     if (not self.skillText) then return; end
     local offset = specHeight > 0 and (specHeight + 4) or 0;
     local skillTextTop = self.skillTextDefaultTop - offset;
@@ -1027,17 +1017,17 @@ function SkillsListPanel:UpdateItemAreaPosition(specHeight)
     local scrollFrameTop = self.scrollFrameDefaultTop - offset;
 
     self.skillText:ClearAllPoints();
-    self.skillText:SetPoint("TOPLEFT", 18, skillTextTop);
+    self.skillText:SetPoint("TOPLEFT", 12, skillTextTop);
 
     self.playerHeaderText:ClearAllPoints();
-    self.playerHeaderText:SetPoint("TOPLEFT", 292, playerHeaderTop);
+    self.playerHeaderText:SetPoint("TOPLEFT", 286, playerHeaderTop);
 
     self.bucketListIcon:ClearAllPoints();
     self.bucketListIcon:SetPoint("TOPLEFT", self.frame, "TOPRIGHT", -56, skillTextTop - 2 + 4);
 
     self.scrollFrame:ClearAllPoints();
-    self.scrollFrame:SetPoint("TOPLEFT", 10, scrollFrameTop);
-    self.scrollFrame:SetPoint("BOTTOMRIGHT", -12, 12);
+    self.scrollFrame:SetPoint("TOPLEFT", 6, scrollFrameTop);
+    self.scrollFrame:SetPoint("BOTTOMRIGHT", -8, 8);
 
     if (self.scrollChild and self.scrollFrame) then
         self.scrollChild:SetWidth(self.scrollFrame:GetWidth());
@@ -1045,7 +1035,7 @@ function SkillsListPanel:UpdateItemAreaPosition(specHeight)
 end
 
 --- Refresh rows.
-function SkillsListPanel:RefreshRows()
+function GuildSkillList:RefreshRows()
     -- get visible range based on actual scroll frame height
     local visibleRowCount = math.ceil((self.scrollFrame:GetHeight() or 400) / 20) + 6;
     local startIndex = math.max(math.floor(self.scrollTop / 20) - 3, 1);

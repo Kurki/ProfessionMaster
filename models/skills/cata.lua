@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 
 @author Kurki
 @copyright Â©2026 Profession Master. All Rights Reserved.
@@ -2226,7 +2226,7 @@ local cataSkills = {
         ["itemId"] = 54853,
         ["reagents"] = {[65365] = 4, [52327] = 1},
         ["d"] = {425, 425, 425, 425},
-        ["r"] = 66062
+        ["r"] = {66064, 66062}
     },
     [84429] = {
         ["p"] = 202,

@@ -20,8 +20,8 @@ function BucketListPanel:Create(parentFrame, professionsView)
 
     -- add bucket list frame
     local frame = uiService:CreatePanel(parentFrame);
-    frame:SetPoint("TOPLEFT", parentFrame, "TOPRIGHT", -302, -36);
-    frame:SetPoint("BOTTOMRIGHT", -12, 30);
+    frame:SetPoint("TOPLEFT", parentFrame, "TOPRIGHT", -302, 0);
+    frame:SetPoint("BOTTOMRIGHT", 0, 0);
     self.frame = frame;
 
     -- add bucket list scroll frame
@@ -415,7 +415,7 @@ function BucketListPanel:OnCraftButtonClicked(reagentRow)
         PM_ReagentWatchList[reagentRow.craftItemId] = nil;
     elseif (reagentRow.craftButtonMode == "remove-bucket") then
         PM_BucketList[reagentRow.bucketSkillId] = nil;
-        self.professionsView.skillsListPanel:AddSkills();
+        self.professionsView:RefreshActiveTab();
         self.professionsView:CheckBucketList();
         inventoryService:CheckMissingReagents();
         return;

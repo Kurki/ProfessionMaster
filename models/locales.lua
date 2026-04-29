@@ -67,6 +67,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Other",
             ["ProfessionsViewFooter"] = "|cffDA8CFFLeft Click: |cffffffffShow details.   |cffDA8CFFShift + Left Click: |cffffffffItem link into chat.   |cffDA8CFFCtrl + Shift + Left Click: |cffffffffSkill link into chat.",
             ["ProfessionsViewAnnounce"] = "Promote in Guild Chat",
+            ["TabGuild"] = "Guild",
+            ["TabSpecializations"] = "Specializations",
+            ["TabOwn"] = "Own",
+            ["OwnNoProfessionsTitle"] = "No own professions found.",
+            ["OwnNoProfessionsDescription"] = "Open your profession window to transfer data to Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Players",
@@ -195,6 +200,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Weitere",
             ["ProfessionsViewFooter"] = "|cffDA8CFFLinksklick: |cffffffffDetails anzeigen.   |cffDA8CFFShift + Linksklick: |cffffffffItem-Link in Chat.   |cffDA8CFFStrg + Shift + Linksklick: |cffffffffSkill-Link in Chat.",
             ["ProfessionsViewAnnounce"] = "Im Gildenchat ankündigen",
+            ["TabGuild"] = "Gilde",
+            ["TabSpecializations"] = "Spezialisierungen",
+            ["TabOwn"] = "Eigene",
+            ["OwnNoProfessionsTitle"] = "Keine eigenen Berufe gefunden.",
+            ["OwnNoProfessionsDescription"] = "Öffne dein Berufsfenster um die Daten an Profession Master zu übertragen.",
 
             -- skill view
             ["SkillViewPlayers"] = "Spieler",
@@ -323,6 +333,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Прочее",
             ["ProfessionsViewFooter"] = "|cffDA8CFFЛевый клик: |cffffffffПоказать детали.   |cffDA8CFFShift + Левый клик: |cffffffffСсылка на предмет в чат.   |cffDA8CFFCtrl + Shift + Левый клик: |cffffffffСсылка на навык в чат.",
             ["ProfessionsViewAnnounce"] = "Объявить в чате гильдии",
+            ["TabGuild"] = "Гильдия",
+            ["TabSpecializations"] = "Специализации",
+            ["TabOwn"] = "Свои",
+            ["OwnNoProfessionsTitle"] = "Собственные профессии не найдены.",
+            ["OwnNoProfessionsDescription"] = "Откройте окно профессий, чтобы передать данные в Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Игроки",
@@ -451,6 +466,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Otros",
             ["ProfessionsViewFooter"] = "|cffDA8CFFClic izquierdo: |cffffffffMostrar detalles.   |cffDA8CFFShift + Clic izquierdo: |cffffffffEnlace del objeto en el chat.   |cffDA8CFFCtrl + Shift + Clic izquierdo: |cffffffffEnlace de habilidad en el chat.",
             ["ProfessionsViewAnnounce"] = "Anunciar en el chat del gremio",
+            ["TabGuild"] = "Hermandad",
+            ["TabSpecializations"] = "Especializaciones",
+            ["TabOwn"] = "Propias",
+            ["OwnNoProfessionsTitle"] = "No se encontraron profesiones propias.",
+            ["OwnNoProfessionsDescription"] = "Abre tu ventana de profesiones para transferir los datos a Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Jugadores",
@@ -579,6 +599,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Autres",
             ["ProfessionsViewFooter"] = "|cffDA8CFFClic gauche : |cffffffffAfficher les détails.   |cffDA8CFFShift + Clic gauche : |cffffffffLien de l'objet dans le chat.   |cffDA8CFFCtrl + Shift + Clic gauche : |cffffffffLien de compétence dans le chat.",
             ["ProfessionsViewAnnounce"] = "Annoncer dans le chat de guilde",
+            ["TabGuild"] = "Guilde",
+            ["TabSpecializations"] = "Spécialisations",
+            ["TabOwn"] = "Propres",
+            ["OwnNoProfessionsTitle"] = "Aucune profession trouvée.",
+            ["OwnNoProfessionsDescription"] = "Ouvrez votre fenêtre de métiers pour transférer les données à Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Joueurs",
@@ -707,6 +732,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Altro",
             ["ProfessionsViewFooter"] = "|cffDA8CFFClic sinistro: |cffffffffMostra dettagli.   |cffDA8CFFShift + Clic sinistro: |cffffffffLink oggetto nella chat.   |cffDA8CFFCtrl + Shift + Clic sinistro: |cffffffffLink abilità nella chat.",
             ["ProfessionsViewAnnounce"] = "Annuncia nella chat della gilda",
+            ["TabGuild"] = "Gilda",
+            ["TabSpecializations"] = "Specializzazioni",
+            ["TabOwn"] = "Proprie",
+            ["OwnNoProfessionsTitle"] = "Nessuna professione trovata.",
+            ["OwnNoProfessionsDescription"] = "Apri la finestra delle professioni per trasferire i dati a Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Giocatori",
@@ -835,6 +865,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "기타",
             ["ProfessionsViewFooter"] = "|cffDA8CFF좌클릭: |cffffffff상세 보기.   |cffDA8CFFShift + 좌클릭: |cffffffff채팅에 아이템 링크.   |cffDA8CFFCtrl + Shift + 좌클릭: |cffffffff채팅에 기술 링크.",
             ["ProfessionsViewAnnounce"] = "길드 채팅에 홍보",
+            ["TabGuild"] = "길드",
+            ["TabSpecializations"] = "전문화",
+            ["TabOwn"] = "내 것",
+            ["OwnNoProfessionsTitle"] = "자신의 전문 기술을 찾을 수 없습니다.",
+            ["OwnNoProfessionsDescription"] = "전문 기술 창을 열어 Profession Master로 데이터를 전송하세요.",
 
             -- skill view
             ["SkillViewPlayers"] = "플레이어",
@@ -963,6 +998,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "Outros",
             ["ProfessionsViewFooter"] = "|cffDA8CFFClique esquerdo: |cffffffffMostrar detalhes.   |cffDA8CFFShift + Clique esquerdo: |cffffffffLink do item no chat.   |cffDA8CFFCtrl + Shift + Clique esquerdo: |cffffffffLink da habilidade no chat.",
             ["ProfessionsViewAnnounce"] = "Anunciar no chat da guilda",
+            ["TabGuild"] = "Guilda",
+            ["TabSpecializations"] = "Especializações",
+            ["TabOwn"] = "Próprias",
+            ["OwnNoProfessionsTitle"] = "Nenhuma profissão própria encontrada.",
+            ["OwnNoProfessionsDescription"] = "Abra a janela de profissões para transferir os dados para o Profession Master.",
 
             -- skill view
             ["SkillViewPlayers"] = "Jogadores",
@@ -1091,6 +1131,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "其他",
             ["ProfessionsViewFooter"] = "|cffDA8CFF左键点击：|cffffffff显示详情。   |cffDA8CFFShift + 左键点击：|cffffffff在聊天中发送物品链接。   |cffDA8CFFCtrl + Shift + 左键点击：|cffffffff在聊天中发送技能链接。",
             ["ProfessionsViewAnnounce"] = "在公会聊天中宣传",
+            ["TabGuild"] = "公会",
+            ["TabSpecializations"] = "专精",
+            ["TabOwn"] = "自己的",
+            ["OwnNoProfessionsTitle"] = "未找到自己的专业技能。",
+            ["OwnNoProfessionsDescription"] = "打开你的专业技能窗口以将数据传输到 Profession Master。",
 
             -- skill view
             ["SkillViewPlayers"] = "玩家",
@@ -1219,6 +1264,11 @@ function LocalesModel:Create()
             ["ProfessionsViewNotOnBucketList"] = "其他",
             ["ProfessionsViewFooter"] = "|cffDA8CFF左鍵點擊：|cffffffff顯示詳情。   |cffDA8CFFShift + 左鍵點擊：|cffffffff在聊天中發送物品連結。   |cffDA8CFFCtrl + Shift + 左鍵點擊：|cffffffff在聊天中發送技能連結。",
             ["ProfessionsViewAnnounce"] = "在公會聊天中宣傳",
+            ["TabGuild"] = "公會",
+            ["TabSpecializations"] = "專精",
+            ["TabOwn"] = "自己的",
+            ["OwnNoProfessionsTitle"] = "未找到自己的專業技能。",
+            ["OwnNoProfessionsDescription"] = "打開你的專業技能窗口以將數據傳輸到 Profession Master。",
 
             -- skill view
             ["SkillViewPlayers"] = "玩家",
